@@ -1,0 +1,11 @@
+.agents/
+.impeccable/
+.superpowers/
+docs/
+scripts/
+参考数据/
+*.png
+AGENTS.md
+DESIGN.md
+PRODUCT.md
+

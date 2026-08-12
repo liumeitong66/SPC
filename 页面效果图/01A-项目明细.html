@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SPC集中管理平台 - 项目明细</title>
+  <link rel="stylesheet" href="spc-common.css">
+  <style>
+    .project-context{height:66px;flex:0 0 66px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:18px}.project-identity{display:flex;align-items:center;gap:14px;min-width:0}.back-link{height:34px;padding:0 11px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#475569;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.project-copy{min-width:0}.project-copy strong{display:block;color:var(--ink);font-size:16px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-copy span{display:block;margin-top:4px;color:var(--muted);font:12px ui-monospace,"SFMono-Regular",Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-meta{display:flex;align-items:center;gap:22px;flex:0 0 auto}.project-meta div{display:flex;flex-direction:column;gap:3px}.project-meta label{color:var(--muted);font-size:11px}.project-meta b{color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}
+    .project-detail-filters{height:88px!important;flex:0 0 88px!important;flex-wrap:nowrap!important}.project-detail-filters .field.time{width:310px!important;flex:0 0 310px}.project-detail-filters .field.device{width:220px!important;flex:0 0 220px}.project-detail-filters .field.mouth{width:220px;flex:0 0 220px}.project-select{width:100%;height:36px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155;padding:0 30px 0 10px;font-size:12px}.segmented{height:36px;padding:3px;border:1px solid #cfd8e4;border-radius:4px;background:#f8fafc;display:flex}.seg{padding:0 14px;display:grid;place-items:center;border-radius:3px;color:#526276;font-size:13px;cursor:pointer}.seg.active{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(16,42,76,.12);font-weight:650}
+    .project-metrics{height:92px;flex:0 0 92px;background:#fff;border:1px solid var(--line);border-radius:8px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}.project-metric{padding:13px 16px;position:relative;overflow:hidden}.project-metric+.project-metric:before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:1px;background:#e7ebf0}.project-metric label{display:block;color:var(--muted);font-size:12px;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-metric b{display:block;margin-top:7px;color:var(--ink);font-size:24px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}.project-metric small{display:block;margin-top:7px;color:#7b8899;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-metric .positive{color:var(--green);font-weight:650}
+    .detail-panel{display:flex;flex-direction:column;min-height:0}.device-panel{height:218px;flex:0 0 218px}.pcb-panel{flex:1}.detail-tablebox{flex:1;min-height:0;overflow:auto}.detail-table{min-width:100%;border-collapse:collapse;table-layout:fixed}.detail-table.device-table{width:1560px}.detail-table.pcb-table{width:2510px}.detail-table th{position:sticky;top:0;z-index:1;height:40px;background:#f7f9fc;border-bottom:1px solid var(--line);padding:0 12px;color:#526176;font-size:12px;text-align:left;font-weight:650;white-space:nowrap}.detail-table td{height:44px;border-bottom:1px solid #edf0f4;padding:0 12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.detail-table tr:hover td{background:#f7faff}.detail-table .num{text-align:right;font-variant-numeric:tabular-nums}.device-filter-link,.pcb-link{border:0;background:none;padding:0;color:#245fbf;font-weight:650;text-decoration:none;cursor:pointer}.device-filter-link:hover,.pcb-link:hover{text-decoration:underline}.device-row-selected td{background:#edf4ff!important}.panel-context{font-size:12px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.panel-context b{color:#245fbf}.status{display:inline-flex;align-items:center;gap:5px;font-weight:650}.status:before{content:"";width:7px;height:7px;border-radius:50%}.status.good{color:#167a4b}.status.good:before{background:var(--green)}.status.bad{color:#c43d3d}.status.bad:before{background:var(--red)}.status.review{color:#1f66cd}.status.review:before{background:var(--blue)}
+    .pager{height:40px;flex:0 0 40px;border-top:1px solid #edf0f4;padding:0 14px;display:flex;align-items:center;justify-content:space-between;color:#738196;font-size:12px}.pages{display:flex;gap:4px}.page{width:26px;height:26px;border-radius:4px;display:grid;place-items:center}.page.on{background:#edf4ff;color:#2468e8;font-weight:650}
+    @media(max-width:1400px){.project-context{height:76px;flex-basis:76px}.project-meta{gap:12px}.project-meta div:last-child{display:none}.project-detail-filters{height:88px!important;flex-basis:88px!important}.project-detail-filters .field.time{width:285px!important;flex-basis:285px}.project-detail-filters .field.device{width:180px!important;flex-basis:180px}.project-detail-filters .field.mouth{width:200px;flex-basis:200px}.device-panel{height:205px;flex-basis:205px}}
+  </style>
+</head>
+<body data-page="project-detail">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div>
+    <div class="group">质量分析</div>
+    <nav class="nav">
+      <div class="item active"><span class="ico">◉</span>项目统计</div>
+      <div class="item"><span class="ico">▤</span>单板查询</div>
+      <div class="item"><span class="ico">▥</span>缺陷分析</div>
+      <div class="item"><span class="ico">⌁</span>误报分析</div>
+      <div class="item"><span class="ico">⌇</span>基础 SPC<span class="tag">新增</span></div>
+      <div class="divider"></div>
+      <div class="item"><span class="ico">◎</span>二次复判统计</div>
+      <div class="group" style="padding:17px 10px 7px">平台管理</div>
+      <div class="item"><span class="ico">⇅</span>数据上传监控</div>
+      <div class="item"><span class="ico">▦</span>设备管理</div>
+      
+    </nav>
+    <div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div>
+  </aside>
+  <div class="app">
+    <header class="top"><div class="title"><h1>项目明细</h1></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <main class="main">
+      <div class="scope"><span><b>项目统计</b>　/　项目明细</span><span class="fresh"><i class="dot"></i>数据已更新至 2026-08-04 14:32:18</span></div>
+      <section class="project-context">
+        <div class="project-identity"><a class="back-link" href="01-项目统计首页.html">‹ 返回项目统计</a><div class="project-copy"><strong data-project-name>3267504J2G_A面</strong><span data-project-uuid>6d7c21c8-9c32-4a10-a501-08e8fe634912</span></div></div>
+        <div class="project-meta"><div><label>覆盖设备</label><b data-project-device-count>3 台</b></div><div><label>累计检测</label><b data-project-total>60,680 块</b></div><div><label>当前统计口径</label><b data-project-mouth>一次复判</b></div></div>
+      </section>
+      <section class="filters project-detail-filters">
+        <div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="placeholder">至</span><span>2026-08-04 14:32</span></div></div>
+        <div class="field device"><label>设备名称</label><select class="project-select" data-project-device-select aria-label="设备名称"><option value="">全部项目内设备</option></select></div>
+        <div class="field mouth"><label>统计口径</label><div class="segmented"><div class="seg">原始判定</div><div class="seg active">一次复判</div></div></div>
+        <div class="actions"><button class="btn" data-project-reset>重置</button><button class="btn primary" data-project-query>查询</button></div>
+      </section>
+      <section class="project-metrics">
+        <div class="project-metric"><label>板卡总数</label><b data-kpi="total">60,680</b><small>当前项目全部检测板卡</small></div>
+        <div class="project-metric"><label>板卡良品总数</label><b data-kpi="good">59,928</b><small>一次复判后良好</small></div>
+        <div class="project-metric"><label>板卡良率（%）</label><b data-kpi="yield">98.76%</b><small class="positive">较原始判定 +5.92 个百分点</small></div>
+        <div class="project-metric"><label>板卡不良总数</label><b data-kpi="ng">752</b><small>一次复判后不良</small></div>
+        <div class="project-metric"><label>器件 DPPM</label><b data-kpi="dppm">1,426</b><small>按当前统计口径计算</small></div>
+      </section>
+      <section class="panel detail-panel device-panel">
+        <div class="phead"><div class="phead-title"><b>项目检测设备</b><span>仅展示检测当前项目的设备</span></div><div class="tools"><button class="btn">导出设备明细</button></div></div>
+        <div class="detail-tablebox"><table class="detail-table device-table"><colgroup><col style="width:60px"><col style="width:150px"><col style="width:160px"><col style="width:120px"><col style="width:140px"><col style="width:120px"><col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:170px"></colgroup><thead><tr><th>序号</th><th>设备名称</th><th>设备SN</th><th class="num">板卡总数</th><th class="num">板卡良品总数</th><th class="num">板卡DPPM</th><th class="num">板卡良率（%）</th><th class="num">板卡不良总数</th><th class="num">板卡误报总数</th><th class="num">器件DPPM</th><th>最后数据时间</th></tr></thead><tbody data-project-device-rows></tbody></table></div>
+      </section>
+      <section class="panel detail-panel pcb-panel">
+        <div class="phead"><div class="phead-title"><b>PCB 检测明细</b><span class="panel-context" data-pcb-scope>当前项目 · 全部设备</span></div><div class="tools"><button class="btn">导出明细</button></div></div>
+        <div class="detail-tablebox"><table class="detail-table pcb-table"><colgroup><col style="width:60px"><col style="width:250px"><col style="width:240px"><col style="width:150px"><col style="width:160px"><col style="width:150px"><col style="width:110px"><col style="width:130px"><col style="width:130px"><col style="width:140px"><col style="width:140px"><col style="width:170px"><col style="width:120px"><col style="width:150px"><col style="width:170px"></colgroup><thead><tr><th>序号</th><th>PCB ID</th><th>条码号</th><th>设备SN</th><th>设备名称</th><th>工单号</th><th>算法结果</th><th>一次复判结果</th><th class="num">器件总数</th><th class="num">器件OK总数</th><th class="num">器件OK率（%）</th><th>检测开始时间</th><th class="num">检测时长（s）</th><th>复判员</th><th>复判时间</th></tr></thead><tbody data-project-pcb-rows></tbody></table></div>
+        <div class="pager"><span data-project-pcb-count>共6条</span><div class="pages"><span class="page">‹</span><span class="page on">1</span><span class="page">›</span></div></div>
+      </section>
+    </main>
+  </div>
+  <script src="spc-prototype.js"></script>
+  <script>
+    (() => {
+      const projects = {
+        '6d7c21c8-9c32-4a10-a501-08e8fe634912': { name:'3267504J2G_A面', total:60680, good:59928, yield:'98.76%', ng:752, dppm:1426, devices:[['AOI-01','SI1020E1112'],['AOI-03','SI1020E1148'],['AOI-04','SI1020E1206']] },
+        '9b40ccad-1ab6-4a21-b791-c3745d0348e2': { name:'1-A', total:28412, good:28048, yield:'98.72%', ng:364, dppm:1863, devices:[['AOI-02','SI1020E1186'],['AOI-05','SI1020E1288']] },
+        'c1a92c30-53c3-41f4-a031-3b84d623719e': { name:'329134S_P129', total:21596, good:21004, yield:'97.26%', ng:592, dppm:2782, devices:[['AOI-02','SI1020E1186'],['AOI-04','SI1020E1206'],['AOI-06','SI1020E1301']] },
+        '744876c1-7837-46e5-b96d-e8c1161ad904': { name:'155042F_P9', total:18340, good:18146, yield:'98.94%', ng:194, dppm:1708, devices:[['AOI-01','SI1020E1112']] }
+      };
+      const query = new URLSearchParams(location.search);
+      const requestedUuid = query.get('project') || Object.keys(projects)[0];
+      const project = projects[requestedUuid] || { ...projects[Object.keys(projects)[0]], name:query.get('name') || '当前项目' };
+      const uuid = projects[requestedUuid] ? requestedUuid : requestedUuid;
+      const number = value => new Intl.NumberFormat('zh-CN').format(value);
+      document.querySelector('[data-project-name]').textContent = query.get('name') || project.name;
+      document.querySelector('[data-project-uuid]').textContent = uuid;
+      document.querySelector('[data-project-device-count]').textContent = `${project.devices.length} 台`;
+      document.querySelector('[data-project-total]').textContent = `${number(project.total)} 块`;
+      document.querySelector('[data-kpi="total"]').textContent = number(project.total);
+      document.querySelector('[data-kpi="good"]').textContent = number(project.good);
+      document.querySelector('[data-kpi="yield"]').textContent = project.yield;
+      document.querySelector('[data-kpi="ng"]').textContent = number(project.ng);
+      document.querySelector('[data-kpi="dppm"]').textContent = number(project.dppm);
+
+      const deviceSelect = document.querySelector('[data-project-device-select]');
+      project.devices.forEach(([name,sn]) => deviceSelect.insertAdjacentHTML('beforeend', `<option value="${name}">${name}（${sn}）</option>`));
+      const deviceRows = document.querySelector('[data-project-device-rows]');
+      const deviceStats = project.devices.map(([name,sn],index) => {
+        const share = index === project.devices.length - 1 ? project.total - Math.floor(project.total/project.devices.length)*(project.devices.length-1) : Math.floor(project.total/project.devices.length);
+        const rate = Math.max(94.5, parseFloat(project.yield)-index*.34);
+        const good = Math.round(share*rate/100);
+        return {name,sn,total:share,good,rate,ng:share-good,falseCount:Math.max(3,Math.round((share-good)*.76)),dppm:project.dppm+index*137};
+      });
+      deviceRows.innerHTML = deviceStats.map((item,index) => `<tr data-device-row="${item.name}"><td>${index+1}</td><td><button class="device-filter-link" data-filter-device="${item.name}">${item.name}</button></td><td>${item.sn}</td><td class="num">${number(item.total)}</td><td class="num">${number(item.good)}</td><td class="num">${number(Math.round((item.ng/item.total)*1000000))}</td><td class="num">${item.rate.toFixed(2)}%</td><td class="num">${number(item.ng)}</td><td class="num">${number(item.falseCount)}</td><td class="num">${number(item.dppm)}</td><td>2026-08-04 ${14-index}:32:18</td></tr>`).join('');
+
+      const resultPairs = [['不良','误报'],['良好','直通'],['不良','不良'],['良好','直通'],['不良','误报'],['良好','良好']];
+      const pcbRows = Array.from({length:6},(_,index) => {
+        const [name,sn] = project.devices[index%project.devices.length];
+        const [algorithm,review] = resultPairs[index];
+        const stamp = 29-index*2;
+        return {device:name,sn,id:`${project.name.replace(/[^A-Za-z0-9]/g,'')}_${String(index+1).padStart(2,'0')}_20260804`,barcode:`SY-${name.replace('AOI-','')}-${project.name.split('_')[0]}-${String(index+1).padStart(2,'0')}`,work:`WO20260804${String(index+1).padStart(3,'0')}`,algorithm,review,total:2350+index*130,ok:algorithm==='良好'?2480+index*100:2338+index*126,time:`2026-08-04 14:${String(stamp).padStart(2,'0')}:18`,duration:(9.41+index*.37).toFixed(2),reviewer:['J20678 · 张三','J20542 · 王芳','J20911 · 陈杰'][index%3]};
+      });
+      const pcbBody = document.querySelector('[data-project-pcb-rows]');
+      const renderPcb = device => {
+        const rows = device ? pcbRows.filter(row => row.device===device) : pcbRows;
+        pcbBody.innerHTML = rows.map((row,index) => { const ok = Math.min(row.total,row.ok); return `<tr data-pcb-device="${row.device}"><td>${index+1}</td><td><a class="pcb-link" href="02A-检测结果详情.html?pcb=${encodeURIComponent(row.id)}">${row.id}</a></td><td title="${row.barcode}">${row.barcode}</td><td>${row.sn}</td><td>${row.device}</td><td>${row.work}</td><td><span class="status ${row.algorithm==='良好'?'good':'bad'}">${row.algorithm}</span></td><td><span class="status ${row.review==='直通'||row.review==='良好'?'good':row.review==='不良'?'bad':'review'}">${row.review}</span></td><td class="num">${number(row.total)}</td><td class="num">${number(ok)}</td><td class="num">${(ok/row.total*100).toFixed(2)}%</td><td>${row.time}</td><td class="num">${row.duration}</td><td>${row.reviewer}</td><td>${row.time.slice(0,16)}:42</td></tr>`; }).join('');
+        document.querySelector('[data-project-pcb-count]').textContent = `共${rows.length}条`;
+        document.querySelector('[data-pcb-scope]').innerHTML = device ? `当前项目 · <b>${device}</b>` : '当前项目 · 全部设备';
+        deviceRows.querySelectorAll('tr').forEach(row => row.classList.toggle('device-row-selected',row.dataset.deviceRow===device));
+      };
+      renderPcb('');
+      document.querySelectorAll('[data-filter-device]').forEach(button => button.addEventListener('click',() => { deviceSelect.value=button.dataset.filterDevice; renderPcb(button.dataset.filterDevice); }));
+      deviceSelect.addEventListener('change',() => renderPcb(deviceSelect.value));
+      document.querySelector('[data-project-query]').addEventListener('click',() => renderPcb(deviceSelect.value));
+      document.querySelector('[data-project-reset]').addEventListener('click',event => { event.preventDefault(); deviceSelect.value=''; renderPcb(''); });
+      document.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click',() => { document.querySelector('[data-project-mouth]').textContent=seg.textContent.trim(); }));
+    })();
+  </script>
+</body>
+</html>
