@@ -43,7 +43,7 @@
   const menuPermissionTree = [
     { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出报表', '导出图', '查看项目明细'] },
     { id: 'device-quality', name: '设备质量分析', selected: true, features: ['查看与查询', '显示列', '导出报表', '查看设备明细'] },
-    { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '显示列', '导出明细', '查看检测结果'] },
+    { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '显示列', '导出明细'] },
     { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出报表'] },
     { id: 'false-positive', name: '误报分析', features: ['查看与查询', '自定义列', '导出报表', '查看设备明细'] },
     { id: 'defect-export', name: '不良导出', features: ['查看与查询', '导出当前报表', '导出所选数据', '查看不良明细'] },
@@ -1182,7 +1182,6 @@
       if (target.matches('[data-project-pick]')) { event.preventDefault(); selectedComparisonProject = target.dataset.projectPick; renderSameProjectComparison(); return; }
       if (target.matches('.project-link')) { event.preventDefault(); window.location.href = `01A-项目明细.html?project=${encodeURIComponent(target.dataset.projectUuid)}&name=${encodeURIComponent(getText(target))}`; return; }
       if (target.matches('.device-link')) { event.preventDefault(); window.location.href = `01-项目统计首页.html?device=${encodeURIComponent(target.dataset.deviceName)}`; return; }
-      if (target.matches('.pcb-link[data-board-analysis]')) { event.preventDefault(); toast('将跳转至单板分析', 'info'); return; }
       if (target.matches('.proto-language-btn')) { event.preventDefault(); openLanguageMenu(target); return; }
       if (target.matches('.proto-theme-btn')) { event.preventDefault(); openThemeMenu(target); return; }
       if (/^查询$|^分析$/.test(text)) { event.preventDefault(); runQuery(target); return; }
