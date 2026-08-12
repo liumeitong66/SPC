@@ -41,7 +41,7 @@
   };
 
   const menuPermissionTree = [
-    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '数据导出', '查看项目明细'] },
+    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出报表', '导出图', '查看项目明细'] },
     { id: 'device-quality', name: '设备质量分析', selected: true, features: ['查看与查询', '显示列', '导出报表', '查看设备明细'] },
     { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '显示列', '导出明细', '查看检测结果'] },
     { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出报表'] },
