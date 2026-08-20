@@ -1655,6 +1655,10 @@
     }
   }
 
+  function removeTitleExplanations() {
+    document.querySelectorAll('.top .title > span').forEach(item => item.remove());
+  }
+
   function removeVisibleProjectUuidColumns() {
     document.querySelectorAll('table').forEach(table => {
       const headers = Array.from(table.querySelectorAll('thead th'));
@@ -1694,6 +1698,7 @@
     normalizeManagementNavigation();
     initializeDeviceQualityPage();
     if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectComparison(); }
+    removeTitleExplanations();
     normalizeTopActions();
     ensureGlobalDataTimestamp();
     normalizeTimeFields();
