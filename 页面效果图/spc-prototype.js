@@ -381,6 +381,32 @@
     });
   }
 
+  function ensureGlobalDataTimestamp(root = document) {
+    const header = root.querySelector('.top,.topbar');
+    if (!header) return;
+    const source = Array.from(root.querySelectorAll('.fresh')).find(item => /数据.*(?:更新|更新时间)/.test(getText(item)));
+    const text = (source && getText(source).match(/数据.*?(?:更新至|更新时间[:：]?)\s*[\d-]+\s*[\d:]+/)?.[0]) || '数据已更新至 2026-08-04 14:32:18';
+    let timestamp = header.querySelector('.proto-global-fresh');
+    if (!timestamp) {
+      timestamp = document.createElement('div');
+      timestamp.className = 'proto-global-fresh';
+      const actions = header.querySelector('.top-actions');
+      if (actions) header.insertBefore(timestamp, actions); else header.appendChild(timestamp);
+    }
+    timestamp.innerHTML = `<i></i><span>${text}</span>`;
+    if (source && source !== timestamp) {
+      const scope = source.closest('.scope,.scope-line');
+      source.remove();
+      if (scope && !getText(scope).trim()) scope.remove();
+    }
+    if (!document.getElementById('proto-global-fresh-style')) {
+      const style = document.createElement('style');
+      style.id = 'proto-global-fresh-style';
+      style.textContent = '.proto-global-fresh{height:32px;margin-left:auto;margin-right:12px;display:flex;align-items:center;gap:7px;color:#64748b;font-size:12px;white-space:nowrap}.proto-global-fresh i{width:8px;height:8px;border-radius:50%;background:#20a464;box-shadow:0 0 0 3px rgba(32,164,100,.12)}';
+      document.head.appendChild(style);
+    }
+  }
+
   function normalizeTimeFields(root = document) {
     root.querySelectorAll('.field').forEach(field => {
       const label = getText(field.querySelector('label'));
@@ -1669,6 +1695,7 @@
     initializeDeviceQualityPage();
     if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectComparison(); }
     normalizeTopActions();
+    ensureGlobalDataTimestamp();
     normalizeTimeFields();
     normalizeDropdownIcons();
     normalizeChartScaling();
