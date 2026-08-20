@@ -471,8 +471,8 @@
     });
   }
 
-  function openGenericColumnManager() {
-    const table = document.querySelector('.records table');
+  function openGenericColumnManager(source) {
+    const table = source?.closest('.table-panel,.records,.detail-panel,.component-panel')?.querySelector('table') || document.querySelector('.records table');
     if (!table || !table.tHead) return;
     const headers = Array.from(table.tHead.rows[0].cells).map((cell, index) => ({ index, label: getText(cell) })).filter(column => column.index > 0 && column.label);
     const active = new Set(headers.filter(column => getComputedStyle(table.tHead.rows[0].cells[column.index]).display !== 'none').map(column => String(column.index)));
@@ -902,7 +902,7 @@
     toast(`统计口径已切换为${label}，页面数据已同步更新`, 'info');
   }
 
-  function modalForAction(action) {
+  function modalForAction(action, source) {
     if (/新增用户|编辑用户/.test(action)) {
       const editing = action.includes('编辑');
       openModal(editing ? '编辑用户' : '新增用户', `<div class="proto-field"><label>用户名</label><input value="${editing ? 'zhangsan' : ''}" placeholder="请输入用户名"></div><div class="proto-field"><label>姓名</label><input value="${editing ? '张三' : ''}" placeholder="请输入姓名"></div><div class="proto-field"><label>手机号</label><input value="${editing ? '13620861742' : ''}" placeholder="请输入手机号"></div><div class="proto-field"><label>邮箱</label><input value="${editing ? 'zhangsan@factory.com' : ''}" placeholder="请输入邮箱"></div><div class="proto-field"><label>所属角色</label><select><option>质量工程师</option><option>生产主管</option><option>只读用户</option><option>平台管理员</option></select></div>`, editing ? '保存修改' : '创建用户', () => toast(editing ? '用户信息已更新' : '用户已创建'));
@@ -944,7 +944,7 @@
     if (/显示列/.test(action)) {
       if (document.body.dataset.page === 'board-query') return;
       if (document.querySelector('[data-project-table],[data-device-table]')) openProjectColumnManager();
-      else openGenericColumnManager();
+      else openGenericColumnManager(source);
       return;
     }
     if (/自定义列/.test(action)) {
@@ -1753,7 +1753,7 @@
       if (/^重置$/.test(text)) { event.preventDefault(); window.location.reload(); return; }
       if (/^(数据导出|导出报表|导出图|导出明细|导出设备明细|导出监控记录|导出该页报表|导出所选)/.test(text)) { event.preventDefault(); exportTable(target); return; }
       if (/刷新状态/.test(text)) { event.preventDefault(); toast('设备上传状态已刷新'); document.querySelectorAll('tbody tr').forEach(row => row.classList.add('proto-row-flash')); return; }
-      if (/自定义列|显示列|新增设备|立即分配|^分配$|^编辑$|管理区域|新增用户|编辑用户|分配角色|新增角色|编辑角色|菜单权限|数据权限|修改账号信息/.test(text)) { event.preventDefault(); modalForAction(text); return; }
+      if (/自定义列|显示列|新增设备|立即分配|^分配$|^编辑$|管理区域|新增用户|编辑用户|分配角色|新增角色|菜单权限|数据权限|修改账号信息/.test(text)) { event.preventDefault(); modalForAction(text, target); return; }
       if (/^(启用|停用)$/.test(text)) { event.preventDefault(); toast(`账号状态已${text}`); return; }
       if (/刷新任务/.test(text)) { event.preventDefault(); toast('导出任务状态已刷新'); return; }
       if (/补传/.test(text)) {
