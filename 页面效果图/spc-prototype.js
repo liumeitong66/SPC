@@ -10,7 +10,7 @@
     '不良分析': '04A-不良导出.html',
     '二次复判统计': '06-二次复判统计.html',
     '品质预警': '13-品质预警.html',
-    '告警规则详情': '13-品质预警.html',
+    '告警规则详情': '13A-告警规则详情.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
     '角色管理': '11-角色管理.html',
@@ -1605,6 +1605,7 @@
       };
     });
     document.querySelectorAll('.tab').forEach(tab => { tab.tabIndex = 0; tab.onclick = () => handleTabs(tab); });
+    initializeAlertRuleInteractions();
     document.querySelectorAll('.page').forEach(page => {
       page.tabIndex = 0;
       page.onclick = () => {
@@ -1718,6 +1719,40 @@
       factory.tabIndex = 0;
       factory.style.cursor = 'pointer';
       factory.onclick = () => toast('当前厂房：珠海厂房', 'info');
+    });
+  }
+
+  function initializeAlertRuleInteractions() {
+    document.querySelectorAll('[data-alert-action]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const row = button.closest('.alert-rule-row');
+        if (!row) return;
+        const action = button.dataset.alertAction;
+        if (action === 'toggle') {
+          const enabled = row.dataset.ruleStatus === 'enabled';
+          row.dataset.ruleStatus = enabled ? 'disabled' : 'enabled';
+          button.classList.toggle('on', !enabled);
+          button.setAttribute('aria-label', enabled ? '停用规则' : '启用规则');
+          const state = row.querySelector('.state');
+          if (state) { state.textContent = enabled ? '停用' : '启用'; state.classList.toggle('off', enabled); }
+          toast(enabled ? '规则已停用' : '规则已启用', 'info');
+          return;
+        }
+        if (row.dataset.ruleStatus === 'enabled') {
+          toast('请先停用规则，再执行编辑或删除操作', 'info');
+          return;
+        }
+        toast(action === 'edit' ? '该规则已停用，可进行编辑' : '该规则已停用，可执行删除', 'info');
+      });
+    });
+    document.querySelectorAll('[data-alert-save]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toast('告警规则已保存', 'info');
+      });
     });
   }
 
