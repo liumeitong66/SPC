@@ -31,6 +31,15 @@
       defectTable.querySelector('.select-all-check').addEventListener('change', event => { defectTable.querySelectorAll('.select-row-check').forEach(check => { check.checked = event.target.checked; }); syncSelection(); });
       defectTable.addEventListener('change', event => { if (event.target.matches('.select-row-check')) syncSelection(); });
     }
+    const listFilter = document.createElement('section');
+    listFilter.className = 'filters table-filters defect-list-filter';
+    listFilter.innerHTML = `<div class="field time"><label>时间范围</label><div class="control"><input type="datetime-local" aria-label="开始时间" value="2026-08-01T00:00"><span>至</span><input type="datetime-local" aria-label="结束时间" value="2026-08-04T14:32"></div></div><div class="field"><label>订单编号</label><div class="control"><input type="search" aria-label="订单编号模糊查询" placeholder="请输入订单编号"></div></div><div class="actions"><button type="button" class="btn defect-filter-reset">重置</button><button type="button" class="btn primary defect-filter-query">查询</button></div>`;
+    defectPanel.querySelector('.table-title').insertAdjacentElement('afterend', listFilter);
+    const orderInput = listFilter.querySelector('input[type="search"]');
+    const dateInputs = listFilter.querySelectorAll('input[type="datetime-local"]');
+    const applyListFilter = () => { const keyword = orderInput.value.trim().toLowerCase(); const orderIndex = [...defectTable.tHead.rows[0].cells].findIndex(cell => cell.textContent.trim() === '订单编号'); defectTable.querySelectorAll('tbody tr').forEach(row => { row.hidden = keyword && !row.cells[orderIndex].textContent.toLowerCase().includes(keyword); }); };
+    listFilter.querySelector('.defect-filter-query').addEventListener('click', applyListFilter);
+    listFilter.querySelector('.defect-filter-reset').addEventListener('click', () => { orderInput.value = ''; dateInputs[0].value = '2026-08-01T00:00'; dateInputs[1].value = '2026-08-04T14:32'; applyListFilter(); });
   }
   const filters = document.querySelector('.filters');
   const tablePanel = document.querySelector('.table-panel');
