@@ -679,11 +679,11 @@
   }
 
   function deviceYieldTrendChart() {
-    const dates = ['03-01', '04-01', '05-01', '06-01', '07-01', '08-01'];
+    const dates = ['08-01', '08-02', '08-03', '08-04'];
     const series = [
-      { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 92.05, 91.65, 91.82] },
-      { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.68, 98.29, 98.38] },
-      { label: '二次复判', color: '#20a464', values: [98.56, 98.87, 98.49, 99.06, 98.74, 98.91] }
+      { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 91.82] },
+      { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.38] },
+      { label: '二次复判', color: '#20a464', values: [98.56, 98.87, 98.49, 98.91] }
     ];
     const width = 680, height = 210, left = 42, right = 12, top = 18, bottom = 30;
     const min = 88, max = 100, chartWidth = width - left - right, chartHeight = height - top - bottom;
