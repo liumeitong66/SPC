@@ -42,3 +42,13 @@
 - `node --check 页面效果图/spc-prototype.js` — passed.
 - `git diff --check 45bf2c2..HEAD` — passed after the fix commit.
 - Focused static check verifies the quality-alert mapping, destination file, and shared internal-navigation scrolling rule.
+
+## Script-inclusion follow-up
+
+- Added the established shared-script include immediately before `</body>` in `页面效果图/13-品质预警.html`; the existing `body data-page="quality-alert"` is retained so the shared active-state logic applies.
+
+### Script-inclusion verification
+
+- Focused static check confirms exactly one `spc-prototype.js` include and the `quality-alert` body identifier.
+- `node --check 页面效果图/spc-prototype.js` — passed.
+- `git diff --check 45a3a9d..HEAD` — passed after the script-inclusion fix commit.
