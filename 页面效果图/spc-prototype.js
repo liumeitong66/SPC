@@ -2,14 +2,15 @@
   'use strict';
 
   const pageMap = {
-    '项目统计': '01-项目统计首页.html',
-    '设备质量分析': '09-设备质量分析.html',
+    '订单统计': '01-项目统计首页.html',
+    '设备分析': '09-设备质量分析.html',
     '单板查询': '02-单板查询与结果追溯.html',
     '缺陷分析': '03-缺陷分析.html',
     '误报分析': '04-误报分析.html',
-    '不良导出': '04A-不良导出.html',
+    '不良分析': '04A-不良导出.html',
     '二次复判统计': '06-二次复判统计.html',
-    '数据上传监控': '07-数据上传监控.html',
+    '品质预警': '13-品质预警.html',
+    '告警规则详情': '13-品质预警.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
     '角色管理': '11-角色管理.html',
@@ -41,15 +42,15 @@
   };
 
   const menuPermissionTree = [
-    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出报表', '导出图', '查看项目明细'] },
-    { id: 'device-quality', name: '设备质量分析', selected: true, features: ['查看与查询', '显示列', '导出报表', '查看设备明细'] },
-    { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '显示列', '导出明细'] },
-    { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出报表'] },
-    { id: 'false-positive', name: '误报分析', features: ['查看与查询', '自定义列', '导出报表', '查看设备明细'] },
-    { id: 'defect-export', name: '不良导出', features: ['查看与查询', '导出当前报表', '导出所选数据', '查看不良明细'] },
-    { id: 'second-review', name: '二次复判统计', features: ['查看与查询', '自定义列', '导出明细', '查看人员工作量'] },
-    { id: 'upload-monitor', name: '数据上传监控', features: ['查看与查询', '刷新状态', '查看任务明细', '查看告警记录', '导出监控记录'] },
-    { id: 'device-management', name: '设备管理', features: ['查看与查询', '新增设备', '导入设备', '区域管理', '编辑设备', '启停设备', '删除设备'] },
+    { id: 'project-statistics', name: '订单统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看订单明细'] },
+    { id: 'device-quality', name: '设备分析', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看设备明细', '查看本机 SPC'] },
+    { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '导出所选'] },
+    { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出所选'] },
+    { id: 'false-positive', name: '误报分析', features: ['查看与查询', '自定义列', '导出所选', '查看设备明细'] },
+    { id: 'defect-analysis', name: '不良分析', features: ['查看与查询', '自定义列', '导出所选', '查看不良明细'] },
+    { id: 'second-review', name: '二次复判统计', features: ['查看与查询', '自定义列', '导出所选', '查看人员工作量'] },
+    { id: 'quality-alert', name: '品质预警', features: ['查看与查询', '新增规则', '编辑规则', '查看报警记录'] },
+    { id: 'device-management', name: '设备管理', features: ['查看与查询', '新增设备', '区域管理', '查看本机 SPC', '编辑设备', '启停设备', '删除设备'] },
     { id: 'user-management', name: '用户管理', features: ['查看与查询', '新增用户', '编辑用户', '启停用户', '删除用户'] },
     { id: 'role-management', name: '角色管理', features: ['查看与查询', '新增角色', '编辑角色', '菜单权限', '启停角色', '删除角色'] },
     { id: 'personal-center', name: '个人中心', features: ['查看页面', '修改密码', '基本设置', '导出任务管理'] }
@@ -1087,29 +1088,69 @@
   function ensureQualityNavigation() {
     const nav = document.querySelector('.nav');
     const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
-    if (!nav || navItems.some(item => getText(item).includes('设备质量分析'))) return;
-    const projectItem = navItems.find(item => getText(item).includes('项目统计'));
+    if (!nav || navItems.some(item => getText(item).includes('设备分析'))) return;
+    const projectItem = navItems.find(item => getText(item).includes('订单统计'));
     if (!projectItem) return;
     const item = document.createElement('div');
     const isCompactItem = projectItem.classList.contains('item');
     item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === 'device-quality' ? ' active' : ''}`;
-    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">◈</span>设备质量分析`;
+    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">◈</span>设备分析`;
     projectItem.insertAdjacentElement('afterend', item);
     if (document.body.dataset.page === 'device-quality') projectItem.classList.remove('active');
   }
 
-  function ensureDefectExportNavigation() {
+  function normalizeOrderStatisticsNavigation() {
+    document.querySelectorAll('.nav .nav-item,.nav .item').forEach(item => {
+      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '订单统计');
+    });
+  }
+
+  function normalizeDeviceAnalysisNavigation() {
+    document.querySelectorAll('.nav .nav-item,.nav .item').forEach(item => {
+      if (getText(item).includes('设备质量分析')) item.innerHTML = item.innerHTML.replace('设备质量分析', '设备分析');
+    });
+  }
+
+  function normalizeSharedNavigation() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
+    Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
+      const text = getText(item);
+      if (text.includes('不良导出')) item.innerHTML = item.innerHTML.replace('不良导出', '不良分析');
+      if (text.includes('数据上传监控')) item.remove();
+    });
+    const items = Array.from(nav.querySelectorAll('.nav-item,.item'));
+    const secondReviewItem = items.find(item => getText(item).includes('二次复判统计'));
+    const qualityAlertItem = items.find(item => getText(item).includes('品质预警'));
+    if (secondReviewItem && qualityAlertItem) secondReviewItem.insertAdjacentElement('afterend', qualityAlertItem);
+  }
+
+  function ensureDefectAnalysisNavigation() {
     const nav = document.querySelector('.nav');
     const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
-    if (!nav || navItems.some(item => getText(item).includes('不良导出'))) return;
+    if (!nav || navItems.some(item => getText(item).includes('不良分析'))) return;
     const falseAlarmItem = navItems.find(item => getText(item).includes('误报分析'));
     if (!falseAlarmItem) return;
     const item = document.createElement('div');
     const isCompactItem = falseAlarmItem.classList.contains('item');
-    item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === 'defect-export' ? ' active' : ''}`;
-    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">⇩</span>不良导出`;
+    item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === 'defect-analysis' ? ' active' : ''}`;
+    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">⇩</span>不良分析`;
     falseAlarmItem.insertAdjacentElement('afterend', item);
-    if (document.body.dataset.page === 'defect-export') falseAlarmItem.classList.remove('active');
+    if (document.body.dataset.page === 'defect-analysis') falseAlarmItem.classList.remove('active');
+  }
+
+  function ensureQualityAlertNavigation() {
+    const nav = document.querySelector('.nav');
+    const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
+    if (!nav || navItems.some(item => getText(item).includes('品质预警'))) return;
+    const secondReviewItem = navItems.find(item => getText(item).includes('二次复判统计'));
+    if (!secondReviewItem) return;
+    const item = document.createElement('div');
+    const isCompactItem = secondReviewItem.classList.contains('item');
+    item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === 'quality-alert' ? ' active' : ''}`;
+    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">⚑</span>品质预警`;
+    secondReviewItem.insertAdjacentElement('afterend', item);
+    if (document.body.dataset.page === 'quality-alert') secondReviewItem.classList.remove('active');
   }
 
   function normalizeManagementNavigation() {
@@ -1200,8 +1241,12 @@
 
   function initializePage() {
     enhanceBoardQueryTable();
+    normalizeOrderStatisticsNavigation();
+    normalizeDeviceAnalysisNavigation();
+    normalizeSharedNavigation();
     ensureQualityNavigation();
-    ensureDefectExportNavigation();
+    ensureDefectAnalysisNavigation();
+    ensureQualityAlertNavigation();
     normalizeManagementNavigation();
     initializeDeviceQualityPage();
     if (document.body.dataset.mouthPage === 'project') renderProjectSummary(currentMouth);

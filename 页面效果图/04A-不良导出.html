@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SPC集中管理平台 - 不良导出</title>
+  <title>SPC集中管理平台 - 不良分析</title>
   <link rel="stylesheet" href="spc-common.css">
   <style>
     .export-filters{height:88px!important;flex:0 0 88px!important;display:block!important;padding:10px 16px!important}.filter-row{height:100%;min-width:0;display:grid;grid-template-columns:minmax(160px,280px) minmax(160px,280px) minmax(120px,1fr);align-items:end;gap:12px}.export-filters .query-field{width:auto!important;min-width:0!important;flex:none!important}.export-filters .actions{justify-self:end}.export-filters .control input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#334155;font:inherit}.export-filters .control input::placeholder{color:#9aa7b7}
@@ -15,7 +15,7 @@
     @media(max-width:1000px){.export-charts{height:210px;flex-basis:210px;gap:10px}.export-chart-body{padding:10px}.pie-layout{grid-template-columns:88px minmax(0,1fr);gap:8px}.pie-graphic{width:82px}.pie-graphic:after{inset:30%}.chart-legend{gap:5px}.legend-item{grid-template-columns:7px minmax(0,1fr) auto;gap:4px}.legend-dot{width:7px;height:7px}.export-bar-row{grid-template-columns:minmax(52px,72px) minmax(0,1fr) 42px;gap:6px}.filter-row{grid-template-columns:minmax(140px,1fr) minmax(140px,1fr) auto;gap:8px}.export-workspace{grid-template-columns:1fr;grid-template-rows:minmax(190px,.7fr) minmax(260px,1.3fr);gap:10px}.component-toolbar{align-items:flex-start;height:76px;flex-basis:76px;padding-top:10px}.component-heading{display:block}.component-heading span{display:block;margin-top:4px;max-width:260px}.export-actions{overflow-x:auto;max-width:62%;padding-bottom:3px}}
   </style>
 </head>
-<body data-page="defect-export">
+<body data-page="defect-analysis">
   <aside class="sidebar">
     <div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div>
     <div class="group">质量分析</div>
@@ -35,7 +35,7 @@
     <div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div>
   </aside>
   <div class="app">
-    <header class="top"><div class="title"><h1>不良导出</h1></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <header class="top"><div class="title"><h1>不良分析</h1></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
     <main class="main">
       <section class="dimension-tabs" aria-label="分析维度">
         <button class="dimension-tab on" data-export-dimension="defect">不良类型</button>
