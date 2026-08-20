@@ -1,10 +1,324 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>误报分析</title><link rel="stylesheet" href="spc-common.css"><style>
-.field.dimension{width:180px}.definition{height:36px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:4px;background:#edf4ff;color:#245fbf;font-size:12px;white-space:nowrap}.definition i{font-style:normal;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;background:#3478f6;color:#fff;font-size:10px}.metrics{height:96px;flex:0 0 96px;background:#fff;border:1px solid var(--line);border-radius:8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 4px}.metric{padding:16px 20px;position:relative}.metric+.metric:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:1px;background:#e7ebf0}.metric label{display:block;color:#64748b;font-size:12px;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:7px;color:var(--ink);font-size:25px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong small{font-size:14px;margin-left:3px}.metric p{margin:7px 0 0;color:#7a8798;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.red{color:#d34747}.green{color:#178350}.charts{height:302px;flex:0 0 302px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(480px,.85fr);gap:14px}.chart{display:flex;flex-direction:column}.chart-body{flex:1;min-height:0;padding:10px 14px}.chart-body svg{width:100%;height:100%;display:block}.legend{display:flex;gap:14px;color:#65758a;font-size:11px}.legend span{display:flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:2px}.gridline{stroke:#e8edf2;stroke-width:1}.axis{font-size:10px;fill:#7a899c}.bar{fill:#3478f6}.bar-muted{fill:#a7b7cd}.line{fill:none;stroke:#d99014;stroke-width:2}.table-panel{flex:1;min-height:0;display:flex;flex-direction:column}.tabs{height:42px;display:flex;align-items:end;gap:24px;padding:0 16px;border-bottom:1px solid #e8edf2;flex:0 0 42px}.tab{height:42px;display:flex;align-items:center;position:relative;color:#637287;font-weight:550;white-space:nowrap}.tab.on{color:var(--blue)}.tab.on:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--blue)}.table-title{height:46px;padding:0 16px;display:flex;align-items:center;justify-content:space-between}.table-title b{color:var(--ink)}.table-wrap{flex:1;min-height:0;overflow:auto}.table{width:100%;border-collapse:collapse;table-layout:fixed}.table th{height:38px;background:#f7f9fc;color:#536277;font-size:12px;text-align:left;padding:0 12px;white-space:nowrap;position:sticky;top:0}.table td{height:44px;border-bottom:1px solid #edf0f4;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank{display:inline-grid;width:22px;height:22px;place-items:center;border-radius:4px;background:#eef2f7;color:#526176;font-size:11px}.rank.top{background:#edf4ff;color:#2468e8;font-weight:700}.name{font-weight:650;color:#1f3552}.num{text-align:right!important;font-variant-numeric:tabular-nums}.detail-link{color:var(--blue);text-decoration:none;font-weight:600}.rate-high{color:#c57609;font-weight:650}
-</style></head><body>
-<aside class="sidebar"><div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div><div class="group">质量分析</div><nav class="nav"><div class="item"><span class="ico">◉</span>项目统计</div><div class="item"><span class="ico">▤</span>单板查询</div><div class="item"><span class="ico">▥</span>缺陷分析</div><div class="item active"><span class="ico">⌁</span>误报分析</div><div class="item"><span class="ico">⌇</span>基础 SPC<span class="tag">新增</span></div><div class="divider"></div><div class="item"><span class="ico">◎</span>二次复判统计</div><div class="group" style="padding:17px 10px 7px">平台管理</div><div class="item"><span class="ico">⇅</span>数据上传监控</div><div class="item"><span class="ico">▦</span>设备管理</div></nav><div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div></aside>
-<div class="app"><header class="top"><div class="title"><h1>误报分析</h1><span>算法报出与人工一次复判差异</span></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header><main class="main"><div class="scope"><span><b>当前范围</b>　全部区域 · 12 台设备 · 8 个项目</span><span class="fresh"><i class="dot"></i>数据已更新至 2026-08-04 14:32:18</span></div>
-<section class="filters"><div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00 至 2026-08-04 14:32</span></div></div><div class="field device"><label>设备名称</label><div class="control"><span>▦</span><span>全部设备（12）</span><span class="chev">⌄</span></div></div><div class="field project"><label>项目名称</label><div class="control"><span class="placeholder">全部项目</span><span class="chev">⌄</span></div></div><div class="field dimension"><label>分析维度</label><div class="control"><span>不良类型</span><span class="chev">⌄</span></div></div><div class="field" style="width:288px"><label>误报定义</label><div class="definition"><i>i</i>算法判定 NG，且一次复判判定 OK</div></div><div class="actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>
-<section class="metrics"><div class="metric"><label>算法报出NG器件数</label><strong>18,442<small>个</small></strong><p>涉及 <b>9,197</b> 块 PCB</p></div><div class="metric"><label>误报器件数</label><strong>15,246<small>个</small></strong><p>较前一周期 <span class="green">↓ 6.8%</span></p></div><div class="metric"><label>器件误报率</label><strong>82.67<small>%</small></strong><p>目标参考值 ≤ <b>80.00%</b></p></div><div class="metric"><label>首要误报类型</label><strong style="font-size:21px">定位异常</strong><p>占全部误报 <span class="red">27.4%</span></p></div></section>
-<section class="charts"><div class="panel chart"><div class="phead"><div class="phead-title"><b>误报 Pareto</b><span>按不良类型</span></div><div class="legend"><span><i style="background:#3478f6"></i>误报器件数</span><span><i style="background:#d99014"></i>累计占比</span></div></div><div class="chart-body"><svg viewBox="0 0 820 230" preserveAspectRatio="none"><line class="gridline" x1="48" y1="25" x2="800" y2="25"/><line class="gridline" x1="48" y1="70" x2="800" y2="70"/><line class="gridline" x1="48" y1="115" x2="800" y2="115"/><line class="gridline" x1="48" y1="160" x2="800" y2="160"/><line class="gridline" x1="48" y1="205" x2="800" y2="205"/><text class="axis" x="10" y="29">4,500</text><text class="axis" x="10" y="74">3,375</text><text class="axis" x="10" y="119">2,250</text><text class="axis" x="10" y="164">1,125</text><text class="axis" x="32" y="209">0</text><text class="axis" x="768" y="16">100%</text><rect class="bar" x="75" y="37" width="56" height="168" rx="2"/><rect class="bar" x="169" y="69" width="56" height="136" rx="2"/><rect class="bar" x="263" y="101" width="56" height="104" rx="2"/><rect class="bar" x="357" y="126" width="56" height="79" rx="2"/><rect class="bar" x="451" y="149" width="56" height="56" rx="2"/><rect class="bar" x="545" y="165" width="56" height="40" rx="2"/><rect class="bar" x="639" y="178" width="56" height="27" rx="2"/><rect class="bar" x="733" y="185" width="56" height="20" rx="2"/><path class="line" d="M103 155 L197 111 L291 82 L385 61 L479 46 L573 36 L667 28 L761 24"/><circle fill="#d99014" cx="103" cy="155" r="3"/><circle fill="#d99014" cx="197" cy="111" r="3"/><circle fill="#d99014" cx="291" cy="82" r="3"/><circle fill="#d99014" cx="385" cy="61" r="3"/><circle fill="#d99014" cx="479" cy="46" r="3"/><circle fill="#d99014" cx="573" cy="36" r="3"/><circle fill="#d99014" cx="667" cy="28" r="3"/><circle fill="#d99014" cx="761" cy="24" r="3"/><text class="axis" x="83" y="222">定位异常</text><text class="axis" x="181" y="222">偏移</text><text class="axis" x="275" y="222">少锡</text><text class="axis" x="369" y="222">缺件</text><text class="axis" x="463" y="222">错件</text><text class="axis" x="557" y="222">连锡</text><text class="axis" x="651" y="222">极反</text><text class="axis" x="745" y="222">其他</text></svg></div></div>
-<div class="panel chart"><div class="phead"><div class="phead-title"><b>设备误报率对比</b><span>显示最高 6 台</span></div><button class="link">查看全部设备 →</button></div><div class="chart-body"><svg viewBox="0 0 540 230" preserveAspectRatio="none"><text class="axis" x="8" y="28">区域B · AOI-04</text><rect fill="#edf1f5" x="135" y="16" width="320" height="14" rx="3"/><rect fill="#d99014" x="135" y="16" width="294" height="14" rx="3"/><text class="axis" x="466" y="28" style="font-weight:650;fill:#a7650a">91.84%</text><text class="axis" x="8" y="65">区域A · AOI-02</text><rect fill="#edf1f5" x="135" y="53" width="320" height="14" rx="3"/><rect class="bar" x="135" y="53" width="279" height="14" rx="3"/><text class="axis" x="466" y="65" style="font-weight:650;fill:#1f3552">87.23%</text><text class="axis" x="8" y="102">区域C · AOI-03</text><rect fill="#edf1f5" x="135" y="90" width="320" height="14" rx="3"/><rect class="bar" x="135" y="90" width="268" height="14" rx="3"/><text class="axis" x="466" y="102" style="font-weight:650;fill:#1f3552">83.75%</text><text class="axis" x="8" y="139">区域D · AOI-01</text><rect fill="#edf1f5" x="135" y="127" width="320" height="14" rx="3"/><rect class="bar" x="135" y="127" width="257" height="14" rx="3"/><text class="axis" x="466" y="139" style="font-weight:650;fill:#1f3552">80.31%</text><text class="axis" x="8" y="176">区域A · AOI-01</text><rect fill="#edf1f5" x="135" y="164" width="320" height="14" rx="3"/><rect class="bar-muted" x="135" y="164" width="244" height="14" rx="3"/><text class="axis" x="466" y="176" style="font-weight:650;fill:#1f3552">76.28%</text><line x1="391" y1="8" x2="391" y2="190" stroke="#d99014" stroke-dasharray="4 4"/><text class="axis" x="369" y="207">参考 80%</text></svg></div></div></section>
-<section class="panel table-panel"><div class="tabs"><div class="tab on">不良类型</div><div class="tab">封装类型</div><div class="tab">料号</div><div class="tab">位号</div></div><div class="table-title"><b>误报排名明细</b><div class="tools"><button class="link">自定义列</button><button class="btn">导出报表</button></div></div><div class="table-wrap"><table class="table"><colgroup><col style="width:7%"><col style="width:20%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:11%"><col style="width:10%"></colgroup><thead><tr><th>排名</th><th>不良类型</th><th class="num">算法报出数</th><th class="num">误报数</th><th class="num">误报率</th><th class="num">涉及PCB</th><th>高发设备</th><th>操作</th></tr></thead><tbody><tr><td><span class="rank top">1</span></td><td class="name">定位异常 / Locate</td><td class="num">4,756</td><td class="num">4,178</td><td class="num rate-high">87.85%</td><td class="num">3,610</td><td>区域B · AOI-04</td><td><a class="detail-link" href="#">查看明细</a></td></tr><tr><td><span class="rank top">2</span></td><td class="name">偏移 / MISALIGNED</td><td class="num">3,864</td><td class="num">3,382</td><td class="num rate-high">87.53%</td><td class="num">2,918</td><td>区域A · AOI-02</td><td><a class="detail-link" href="#">查看明细</a></td></tr><tr><td><span class="rank top">3</span></td><td class="name">少锡 / INSUFFICIENT_SOLDER</td><td class="num">3,115</td><td class="num">2,562</td><td class="num">82.25%</td><td class="num">2,208</td><td>区域C · AOI-03</td><td><a class="detail-link" href="#">查看明细</a></td></tr><tr><td><span class="rank">4</span></td><td class="name">缺件 / MISSING</td><td class="num">2,264</td><td class="num">1,734</td><td class="num">76.59%</td><td class="num">1,568</td><td>区域D · AOI-01</td><td><a class="detail-link" href="#">查看明细</a></td></tr></tbody></table></div></section></main></div><script src="spc-prototype.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SPC集中管理平台 - 误报分析</title>
+  <link rel="stylesheet" href="spc-common.css">
+  <style>
+    .analysis-filters{height:auto!important;flex:0 0 auto!important;padding:10px 16px!important;display:flex!important;gap:12px;align-items:flex-end}.analysis-filters .field{width:220px!important;min-width:0!important;flex:1 1 180px}.analysis-filters .actions{margin-left:auto}.metrics{min-height:92px;flex:0 0 92px;background:#fff;border:1px solid var(--line);border-radius:8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 4px}.metric{padding:15px 18px;position:relative}.metric+.metric:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:1px;background:#e7ebf0}.metric label{display:block;color:#64748b;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric strong{display:block;margin-top:6px;color:var(--ink);font-size:24px;line-height:1}.metric strong small{font-size:13px;margin-left:3px}.metric p{margin:7px 0 0;color:#7a8798;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.export-filters{height:66px!important;flex:0 0 66px!important;display:block!important;padding:10px 16px!important}.filter-row{height:100%;min-width:0;display:grid;grid-template-columns:minmax(160px,280px) minmax(160px,280px) minmax(120px,1fr);align-items:end;gap:12px}.export-filters .query-field{width:auto!important;min-width:0!important;flex:none!important}.export-filters .actions{justify-self:end}.export-filters .control input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#334155;font:inherit}.export-filters .control input::placeholder{color:#9aa7b7}
+    .export-charts{height:230px;flex:0 0 230px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;min-width:0}.export-chart{min-width:0;display:flex;flex-direction:column}.export-chart-body{flex:1;min-height:0;padding:12px 16px;overflow:hidden}.pie-layout{height:100%;display:grid;grid-template-columns:170px minmax(0,1fr);align-items:center;gap:22px}.pie-graphic{width:148px;aspect-ratio:1;border-radius:50%;margin:auto;position:relative;box-shadow:inset 0 0 0 1px rgba(16,42,76,.07)}.pie-graphic:after{content:"";position:absolute;inset:28%;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(16,42,76,.06)}.chart-legend{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}.legend-item{min-width:0;display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:7px;align-items:center;color:#526176;font-size:11px}.legend-dot{width:9px;height:9px;border-radius:2px}.legend-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.legend-value{color:#102a4c;font-weight:650;font-variant-numeric:tabular-nums}.export-bar-list{height:100%;display:flex;flex-direction:column;justify-content:center;gap:8px}.export-bar-row{display:grid;grid-template-columns:minmax(70px,120px) minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:11px;color:#526176}.export-bar-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.export-bar-track{height:14px;border-radius:3px;background:#edf1f5;overflow:hidden}.export-bar-fill{height:100%;border-radius:3px;background:#3478f6;min-width:3px}.export-bar-value{text-align:right;color:#102a4c;font-weight:650;font-variant-numeric:tabular-nums}.chart-empty{height:100%;display:grid;place-items:center;text-align:center;color:#718095}.chart-empty b{display:block;color:#334155;margin-bottom:6px}.tree-type.on{background:#edf4ff;color:#245fbf}.tree-type.on .tree-count{background:#dceaff;color:#245fbf}
+    .dimension-tabs{height:46px;flex:0 0 46px;padding:0 18px;background:#fff;border:1px solid var(--line);border-radius:8px;display:flex;align-items:flex-end;gap:24px}.dimension-tab{height:45px;padding:0 2px;border:0;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-weight:600;cursor:pointer}.dimension-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+    .export-workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:14px}.tree-panel,.component-panel{min-height:0;display:flex;flex-direction:column}.tree-body{flex:1;min-height:0;overflow:auto;padding:8px}.tree-summary{font-size:12px;color:#64748b}.tree-group{margin-bottom:4px}.tree-type,.tree-position{width:100%;border:0;background:#fff;color:#334155;text-align:left;display:grid;align-items:center;cursor:pointer}.tree-type{height:42px;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;padding:0 10px;border-radius:5px;font-weight:650}.tree-type:hover,.tree-position:hover{background:#f4f7fb}.tree-arrow{width:14px;height:14px;display:grid;place-items:center;color:#718095;transition:transform 160ms cubic-bezier(.25,1,.5,1)}.tree-type[aria-expanded="true"] .tree-arrow{transform:rotate(90deg)}.tree-count{min-width:36px;height:22px;padding:0 7px;border-radius:11px;background:#eef2f7;color:#637287;display:grid;place-items:center;font-size:11px;font-variant-numeric:tabular-nums}.tree-children{display:none;margin-left:18px;padding-left:12px;border-left:1px solid #dce3ec}.tree-group.expanded .tree-children{display:block}.tree-position{height:36px;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:0 10px;border-radius:4px;font-size:13px}.tree-position.on{background:#edf4ff;color:#245fbf;font-weight:650}.tree-position.on .tree-count{background:#dceaff;color:#245fbf}.tree-empty{height:100%;display:grid;place-items:center;color:#718095;text-align:center;padding:24px}.tree-empty b{display:block;color:#334155;margin-bottom:6px}
+    .component-toolbar{height:50px;flex:0 0 50px;padding:0 14px;border-bottom:1px solid #e8edf2;display:flex;align-items:center;justify-content:space-between;gap:12px}.component-heading{min-width:0;display:flex;align-items:baseline;gap:8px}.component-heading b{font-size:16px;color:var(--ink)}.component-heading span{font-size:12px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.export-actions{display:flex;gap:8px;flex:0 0 auto}.export-actions .btn:disabled{color:#a3adba;background:#f6f8fa;border-color:#e1e6ec;cursor:not-allowed}.component-tablebox{flex:1;min-height:0;overflow:auto}.component-table{width:2440px;min-width:100%;border-collapse:collapse;table-layout:fixed}.component-table th{position:sticky;top:0;z-index:1;height:40px;background:#f7f9fc;border-bottom:1px solid var(--line);padding:0 12px;color:#526176;font-size:12px;text-align:left;font-weight:650;white-space:nowrap}.component-table td{height:44px;border-bottom:1px solid #edf0f4;padding:0 12px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.component-table tr:hover td{background:#f7faff}.image-link{height:28px;padding:0 9px;border:1px solid #b9cef5;border-radius:4px;background:#fff;color:#245fbf;cursor:pointer}.judge{display:inline-flex;align-items:center;gap:5px;font-weight:650}.judge:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}.judge.good{color:#15935b}.judge.bad{color:#dc3e42}.judge.review{color:#2468e8}.empty-row td{text-align:center;color:#718095!important}.empty-row td:before{content:"⌕";display:inline-block;font-size:14px;color:#a0adbc;margin-right:6px}.pager{height:40px;flex:0 0 40px;border-top:1px solid #edf0f4;padding:0 14px;display:flex;align-items:center;justify-content:space-between;color:#738196;font-size:12px}.pages{display:flex;gap:4px}.page{width:26px;height:26px;border-radius:4px;display:grid;place-items:center}.page.on{background:#edf4ff;color:#2468e8;font-weight:650}
+    @media(max-width:1400px){.filter-row{grid-template-columns:minmax(150px,240px) minmax(150px,240px) minmax(110px,1fr)}.export-workspace{grid-template-columns:300px minmax(0,1fr)}.export-actions .btn{padding:0 10px!important}.pie-layout{grid-template-columns:130px minmax(0,1fr);gap:12px}.pie-graphic{width:118px}.chart-legend{grid-template-columns:1fr}}
+    @media(max-width:1000px){.export-charts{height:210px;flex-basis:210px;gap:10px}.export-chart-body{padding:10px}.pie-layout{grid-template-columns:88px minmax(0,1fr);gap:8px}.pie-graphic{width:82px}.pie-graphic:after{inset:30%}.chart-legend{gap:5px}.legend-item{grid-template-columns:7px minmax(0,1fr) auto;gap:4px}.legend-dot{width:7px;height:7px}.export-bar-row{grid-template-columns:minmax(52px,72px) minmax(0,1fr) 42px;gap:6px}.filter-row{grid-template-columns:minmax(140px,1fr) minmax(140px,1fr) auto;gap:8px}.export-workspace{grid-template-columns:1fr;grid-template-rows:minmax(190px,.7fr) minmax(260px,1.3fr);gap:10px}.component-toolbar{align-items:flex-start;height:76px;flex-basis:76px;padding-top:10px}.component-heading{display:block}.component-heading span{display:block;margin-top:4px;max-width:260px}.export-actions{overflow-x:auto;max-width:62%;padding-bottom:3px}}
+  </style>
+</head>
+<body data-page="false-analysis">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div>
+    <div class="group">质量分析</div>
+    <nav class="nav">
+      <div class="item"><span class="ico">◉</span>项目统计</div>
+      <div class="item"><span class="ico">▤</span>单板查询</div>
+      <div class="item"><span class="ico">▥</span>缺陷分析</div>
+      <div class="item active"><span class="ico">⌁</span>误报分析</div>
+      <div class="item"><span class="ico">⌇</span>基础 SPC<span class="tag">新增</span></div>
+      <div class="divider"></div>
+      <div class="item"><span class="ico">◎</span>二次复判统计</div>
+      <div class="group" style="padding:17px 10px 7px">平台管理</div>
+      <div class="item"><span class="ico">⇅</span>数据上传监控</div>
+      <div class="item"><span class="ico">▦</span>设备管理</div>
+
+    </nav>
+    <div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div>
+  </aside>
+  <div class="app">
+    <header class="top"><div class="title"><h1>误报分析</h1><span>统计口径：机器判定 NG，且一次复判判定 OK（一次复判误报）</span></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <main class="main">
+      <section class="filters analysis-filters" aria-label="分析筛选">
+        <div class="field"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 至 2026-08-04</span></div></div>
+        <div class="field"><label>订单编号</label><div class="control"><span class="placeholder">全部订单</span><span class="chev">⌄</span></div></div>
+        <div class="field"><label>设备 SN</label><div class="control"><span>全部设备 SN</span><span class="chev">⌄</span></div></div>
+        <div class="actions"><button class="btn">重置</button><button class="btn primary">查询</button></div>
+      </section>
+      <section class="metrics" aria-label="误报分析指标"><div class="metric"><label>一次复判误报器件数</label><strong>18,442<small>个</small></strong><p>统计口径：一次复判误报</p></div><div class="metric"><label>机器判定 NG 器件数</label><strong>8<small>个</small></strong><p>覆盖 12 台设备</p></div><div class="metric"><label>首要误报类型</label><strong style="font-size:21px">定位异常</strong><p>占全部误报 <b>25.79%</b></p></div><div class="metric"><label>误报位号数</label><strong>18<small>个</small></strong><p>可下钻至器件明细</p></div></section>
+      <section class="dimension-tabs" aria-label="分析维度">
+        <button class="dimension-tab on" data-export-dimension="defect">不良类型</button>
+        <button class="dimension-tab" data-export-dimension="package">封装类型</button>
+        <button class="dimension-tab" data-export-dimension="part">料号</button>
+        <button class="dimension-tab" data-export-dimension="position">位号</button>
+      </section>
+      <section class="export-charts">
+        <div class="panel export-chart" data-overview-chart data-chart-type="pie"><div class="phead"><div class="phead-title"><b data-overview-title>误报类型占比</b><span data-overview-summary>全部误报类型</span></div></div><div class="export-chart-body" data-overview-body></div></div>
+        <div class="panel export-chart" data-linked-chart data-chart-type="bar"><div class="phead"><div class="phead-title"><b data-linked-title>位号数量分布</b><span data-linked-summary>请选择不良类型</span></div></div><div class="export-chart-body" data-linked-body></div></div>
+      </section>
+      <section class="filters export-filters">
+        <div class="filter-row">
+          <div class="field query-field"><label data-query-label="root">不良类型名称</label><div class="control"><span>⌕</span><input data-query-input="root" type="text" placeholder="输入不良类型名称"></div></div>
+          <div class="field query-field"><label data-query-label="leaf">位号</label><div class="control"><span>⌕</span><input data-query-input="leaf" type="text" placeholder="输入位号"></div></div>
+          <div class="actions"><button class="btn" data-query-action="reset">重置</button><button class="btn primary" data-query-action="search">查询</button></div>
+        </div>
+      </section>
+      <section class="export-workspace">
+        <div class="panel tree-panel">
+          <div class="phead"><div class="phead-title"><b data-tree-title>不良类型</b><span class="tree-summary" data-tree-summary>共 5 类 · 18 个位号</span></div></div>
+          <div class="tree-body" data-defect-tree></div>
+        </div>
+        <div class="panel component-panel">
+          <div class="component-toolbar">
+            <div class="component-heading"><b>器件明细</b><span data-selection-path>请选择具体位号</span></div>
+            <div class="export-actions"><button class="btn">导出该页报表</button><button class="btn" data-export-root disabled>导出所选不良类型</button><button class="btn" data-export-leaf disabled>导出所选位号</button></div>
+          </div>
+          <div class="component-tablebox"><table class="component-table"><colgroup><col style="width:60px"><col style="width:110px"><col style="width:150px"><col style="width:180px"><col style="width:100px"><col style="width:150px"><col style="width:170px"><col style="width:90px"><col style="width:90px"><col style="width:220px"><col style="width:140px"><col style="width:180px"><col style="width:110px"><col style="width:110px"></colgroup><thead><tr><th>序号</th><th>封装类型</th><th>不良类型</th><th>料号</th><th>位号</th><th>设备 SN</th><th>订单编号</th><th>RGB白图</th><th>白图</th><th>板边条码</th><th>拼板ID</th><th>检测开始时间</th><th>机器判定</th><th>一次复判</th></tr></thead><tbody data-component-rows><tr class="empty-row"><td colspan="14">请在左侧选择一个具体位号</td></tr></tbody></table></div>
+          <div class="pager"><span data-component-count>共0条</span><div class="pages"><span class="page">‹</span><span class="page on">1</span><span class="page">›</span></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="spc-prototype.js"></script>
+  <script>
+    (() => {
+      const dimensionData = {
+        defect: {
+          label:'不良类型', rootLabel:'不良类型', leafLabel:'位号', summaryUnit:'类', leafUnit:'个位号', seed:'DF',
+          roots:[
+            {name:'定位异常', code:'LOCATE', count:4756, leaves:[['R118',326],['C56',218],['D2',164],['U15',142]]},
+            {name:'偏移', code:'MISALIGNED', count:3864, leaves:[['R203',286],['C107',244],['U8',196],['Q3',112]]},
+            {name:'少锡', code:'INSUFFICIENT_SOLDER', count:3115, leaves:[['C28',252],['R76',205],['D16',138],['U21',96]]},
+            {name:'缺件', code:'MISSING', count:2264, leaves:[['R45',184],['C92',156],['D9',91]]},
+            {name:'连锡', code:'BRIDGE', count:1836, leaves:[['U6',173],['R12',118],['C33',87]]}
+          ]
+        },
+        package: {
+          label:'封装类型', rootLabel:'封装类型', leafLabel:'不良类型', summaryUnit:'种', leafUnit:'个不良类型', seed:'PK',
+          roots:[
+            {name:'0402', code:'PKG-0402', count:5826, leaves:[['少锡 / INSUFFICIENT_SOLDER',1352],['偏移 / MISALIGNED',986],['缺件 / MISSING',728]]},
+            {name:'0603', code:'PKG-0603', count:4638, leaves:[['定位异常 / LOCATE',1108],['连锡 / BRIDGE',764],['少锡 / INSUFFICIENT_SOLDER',632]]},
+            {name:'SOT-23', code:'PKG-SOT23', count:2954, leaves:[['偏移 / MISALIGNED',684],['缺件 / MISSING',519],['极性反 / POLARITY',308]]},
+            {name:'QFN-32', code:'PKG-QFN32', count:1876, leaves:[['连锡 / BRIDGE',472],['少锡 / INSUFFICIENT_SOLDER',386],['偏移 / MISALIGNED',264]]}
+          ]
+        },
+        part: {
+          label:'料号', rootLabel:'料号', leafLabel:'不良类型', summaryUnit:'个', leafUnit:'个不良类型', seed:'PN',
+          roots:[
+            {name:'RC0402FR-0710KL', code:'PN-RC0402', count:3248, leaves:[['偏移 / MISALIGNED',618],['少锡 / INSUFFICIENT_SOLDER',506],['缺件 / MISSING',297]]},
+            {name:'CL10A105KA8NNNC', code:'PN-CL10A', count:2864, leaves:[['定位异常 / LOCATE',589],['少锡 / INSUFFICIENT_SOLDER',441],['连锡 / BRIDGE',276]]},
+            {name:'MMBT3904', code:'PN-MMBT3904', count:1782, leaves:[['偏移 / MISALIGNED',352],['极性反 / POLARITY',284],['缺件 / MISSING',196]]},
+            {name:'STM32G031K8U6', code:'PN-STM32', count:948, leaves:[['连锡 / BRIDGE',188],['偏移 / MISALIGNED',142],['少锡 / INSUFFICIENT_SOLDER',117]]}
+          ]
+        },
+        position: {
+          label:'位号', rootLabel:'位号', leafLabel:'不良类型', summaryUnit:'个', leafUnit:'个不良类型', seed:'PS',
+          roots:[
+            {name:'R118', code:'POS-R118', count:526, leaves:[['偏移 / MISALIGNED',156],['少锡 / INSUFFICIENT_SOLDER',124],['缺件 / MISSING',48]]},
+            {name:'C56', code:'POS-C56', count:418, leaves:[['定位异常 / LOCATE',132],['少锡 / INSUFFICIENT_SOLDER',98],['连锡 / BRIDGE',56]]},
+            {name:'U15', code:'POS-U15', count:364, leaves:[['偏移 / MISALIGNED',116],['极性反 / POLARITY',84],['缺件 / MISSING',51]]},
+            {name:'D2', code:'POS-D2', count:296, leaves:[['定位异常 / LOCATE',92],['偏移 / MISALIGNED',68],['少锡 / INSUFFICIENT_SOLDER',44]]}
+          ]
+        }
+      };
+      const tree = document.querySelector('[data-defect-tree]');
+      const overviewChart = document.querySelector('[data-overview-chart]');
+      const overviewTitle = document.querySelector('[data-overview-title]');
+      const overviewSummary = document.querySelector('[data-overview-summary]');
+      const overviewBody = document.querySelector('[data-overview-body]');
+      const linkedChart = document.querySelector('[data-linked-chart]');
+      const linkedTitle = document.querySelector('[data-linked-title]');
+      const linkedSummary = document.querySelector('[data-linked-summary]');
+      const linkedBody = document.querySelector('[data-linked-body]');
+      const treeTitle = document.querySelector('[data-tree-title]');
+      const treeSummary = document.querySelector('[data-tree-summary]');
+      const rowsBody = document.querySelector('[data-component-rows]');
+      const selectionPath = document.querySelector('[data-selection-path]');
+      const countText = document.querySelector('[data-component-count]');
+      const exportRoot = document.querySelector('[data-export-root]');
+      const exportLeaf = document.querySelector('[data-export-leaf]');
+      const queryLabels = Array.from(document.querySelectorAll('[data-query-label]'));
+      const queryInputs = Array.from(document.querySelectorAll('[data-query-input]'));
+      const queryFieldConfig = {
+        defect:{root:'不良类型名称',leaf:'位号'},
+        package:{root:'封装类型名称',leaf:'不良类型名称'},
+        part:{root:'料号名称',leaf:'不良类型名称'},
+        position:{root:'位号名称',leaf:'不良类型名称'}
+      };
+      const queryState = Object.fromEntries(Object.keys(dimensionData).map(key => [key,{root:'',leaf:''}]));
+      let currentDimension = 'defect';
+      let currentConfig = dimensionData.defect;
+      let selectedRoot = '';
+      let selectedLeaf = '';
+      let lastRowSignature = '';
+      const chartColors = ['#3478f6','#28a06a','#d99014','#8b6bd6','#e15d62','#3da7a3','#8198bb'];
+
+      const pieMarkup = items => {
+        const total = items.reduce((sum,item) => sum + item.count,0) || 1;
+        let cursor = 0;
+        const stops = items.map((item,index) => {
+          const start = cursor;
+          cursor += item.count / total * 100;
+          return `${chartColors[index%chartColors.length]} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`;
+        }).join(',');
+        const legend = items.map((item,index) => `<div class="legend-item" title="${item.name}"><i class="legend-dot" style="background:${chartColors[index%chartColors.length]}"></i><span class="legend-name">${item.name}</span><span class="legend-value">${(item.count/total*100).toFixed(1)}%</span></div>`).join('');
+        return `<div class="pie-layout"><div class="pie-graphic" style="background:conic-gradient(${stops})" aria-label="占比饼图"></div><div class="chart-legend">${legend}</div></div>`;
+      };
+      const barMarkup = items => {
+        const max = Math.max(...items.map(item => item.count),1);
+        return `<div class="export-bar-list">${items.map(item => `<div class="export-bar-row" title="${item.name}：${item.count.toLocaleString()}"><span class="export-bar-label">${item.name}</span><div class="export-bar-track"><div class="export-bar-fill" style="width:${Math.max(2,item.count/max*100).toFixed(2)}%"></div></div><span class="export-bar-value">${item.count.toLocaleString()}</span></div>`).join('')}</div>`;
+      };
+      const rootItems = config => config.roots.map(root => ({name:root.name,count:root.count}));
+      const leafItems = root => root.leaves.map(([name,count]) => ({name,count}));
+      const emptyChartMarkup = message => `<div class="chart-empty"><div><b>暂无匹配数据</b><span>${message}</span></div></div>`;
+      const normalizeQuery = value => value.trim().toLocaleLowerCase('zh-CN');
+      const getFilteredConfig = key => {
+        const base = dimensionData[key];
+        const rootQuery = normalizeQuery(queryState[key].root);
+        const leafQuery = normalizeQuery(queryState[key].leaf);
+        const roots = base.roots.reduce((result,root) => {
+          if (rootQuery && !root.name.toLocaleLowerCase('zh-CN').includes(rootQuery)) return result;
+          const leaves = leafQuery ? root.leaves.filter(([name]) => name.toLocaleLowerCase('zh-CN').includes(leafQuery)) : root.leaves.slice();
+          if (leafQuery && !leaves.length) return result;
+          result.push({...root,leaves,count:leafQuery ? leaves.reduce((sum,[,count]) => sum + count,0) : root.count});
+          return result;
+        },[]);
+        return {...base,roots};
+      };
+      const renderQueryFields = key => {
+        const fields = queryFieldConfig[key];
+        queryLabels.forEach(label => { label.textContent = fields[label.dataset.queryLabel]; });
+        queryInputs.forEach(input => {
+          const field = input.dataset.queryInput;
+          input.placeholder = `输入${fields[field]}`;
+          input.setAttribute('aria-label',fields[field]);
+          input.value = queryState[key][field];
+        });
+      };
+      const renderOverviewChart = config => {
+        const isPie = currentDimension === 'defect';
+        overviewChart.dataset.chartType = isPie ? 'pie' : 'bar';
+        overviewTitle.textContent = isPie ? '误报类型占比' : `${config.label}数量分布`;
+        overviewSummary.textContent = `全部${config.label}`;
+        overviewBody.innerHTML = config.roots.length ? (isPie ? pieMarkup(rootItems(config)) : barMarkup(rootItems(config))) : emptyChartMarkup('请调整当前查询条件');
+      };
+      const clearLinkedChart = config => {
+        const isBar = currentDimension === 'defect';
+        linkedChart.dataset.chartType = isBar ? 'bar' : 'pie';
+        linkedTitle.textContent = isBar ? '位号数量分布' : '不良类型分布';
+        linkedSummary.textContent = `请选择${config.rootLabel}`;
+        linkedBody.innerHTML = `<div class="chart-empty"><div><b>请选择具体${config.rootLabel}</b><span>选择树中的根节点后显示统计分布</span></div></div>`;
+      };
+      const renderLinkedChart = (config,root) => {
+        const isBar = currentDimension === 'defect';
+        linkedChart.dataset.chartType = isBar ? 'bar' : 'pie';
+        linkedTitle.textContent = isBar ? '位号数量分布' : '不良类型分布';
+        linkedSummary.textContent = root.name;
+        linkedBody.innerHTML = isBar ? barMarkup(leafItems(root)) : pieMarkup(leafItems(root));
+      };
+
+      const renderTree = config => {
+        tree.innerHTML = config.roots.length ? config.roots.map((root,index) => `<div class="tree-group ${index===0?'expanded':''}" data-tree-group="${root.code}"><button class="tree-type" type="button" aria-expanded="${index===0?'true':'false'}" data-tree-root="${root.code}"><span class="tree-arrow">›</span><span>${root.name}</span><span class="tree-count">${root.count.toLocaleString()}</span></button><div class="tree-children">${root.leaves.map(([leaf,count]) => `<button class="tree-position" type="button" data-tree-leaf="${leaf}" data-parent-root="${root.code}"><span>${leaf}</span><span class="tree-count">${count}</span></button>`).join('')}</div></div>`).join('') : '<div class="tree-empty"><div><b>暂无匹配数据</b><span>请调整当前查询条件</span></div></div>';
+      };
+      const componentRows = (config,root,leaf) => {
+        const projectsByDimension = {
+          defect:['3267504J2G_A面','1-A','329134S_P129'],
+          package:['155042F_P9','3267504J2G_A面','1-A'],
+          part:['329134S_P129','155042F_P9','3267504J2G_A面'],
+          position:['1-A','329134S_P129','155042F_P9']
+        };
+        return Array.from({length:6},(_,index) => {
+          const packageName = currentDimension==='package' ? root.name : ['0402','0603','SOT-23'][index%3];
+          const partNumber = currentDimension==='part' ? root.name : ['RC0402FR-0710KL','CL10A105KA8NNNC','MMBT3904'][index%3];
+          const defectType = currentDimension==='defect' ? root.name : leaf.split(' / ')[0];
+          const position = currentDimension==='position' ? root.name : (currentDimension==='defect' ? leaf : ['R118','C56','U15'][index%3]);
+          const pcb = `${config.seed}_${root.code}_${String(index+1).padStart(3,'0')}`;
+          return {
+            sn:{defect:['SI1020E1112','SI1020E1148'],package:['SI1020E1206','SI1020E1218'],part:['SI1020E1322','SI1020E1336'],position:['SI1020E1412','SI1020E1428']}[currentDimension][index%2],
+            project:projectsByDimension[currentDimension][index%3], barcode:`BORDER-${config.seed}-${String(8401+index)}`, panel:`PANEL-${config.seed}-${String(index+1).padStart(2,'0')}`,
+            packageName, partNumber, defectType, position, startTime:`2026-08-04 14:${String(29-index*2).padStart(2,'0')}:18`,
+            machine:'NG', human:['OK','OK','OK','OK','OK','OK'][index]
+          };
+        });
+      };
+      const judgeClass = value => value==='良好' ? 'good' : value==='误报' ? 'review' : 'bad';
+      const showRows = (config,root,leaf) => {
+        const rows = componentRows(config,root,leaf);
+        rowsBody.innerHTML = rows.map((row,index) => `<tr><td>${index+1}</td><td>${row.packageName}</td><td>${row.defectType}</td><td title="${row.partNumber}">${row.partNumber}</td><td>${row.position}</td><td>${row.sn}</td><td>${row.project}</td><td><button class="image-link">查看</button></td><td><button class="image-link">查看</button></td><td title="${row.barcode}">${row.barcode}</td><td>${row.panel}</td><td>${row.startTime}</td><td><span class="judge ${judgeClass(row.machine)}">${row.machine}</span></td><td><span class="judge ${judgeClass(row.human)}">${row.human}</span></td></tr>`).join('');
+        selectionPath.innerHTML = `<b>${root.name}</b> / ${leaf}`;
+        countText.textContent = `共${rows.length}条`;
+        exportRoot.disabled = false;
+        exportLeaf.disabled = false;
+        lastRowSignature = rows.map(row => row.pcb).join('|');
+      };
+      const clearRows = message => {
+        rowsBody.innerHTML = `<tr class="empty-row"><td colspan="14">${message}</td></tr>`;
+        selectionPath.textContent = message;
+        countText.textContent = '共0条';
+        exportRoot.disabled = true;
+        exportLeaf.disabled = true;
+        lastRowSignature = '';
+      };
+      const renderDimension = key => {
+        currentDimension = key;
+        selectedRoot = '';
+        selectedLeaf = '';
+        const config = getFilteredConfig(key);
+        currentConfig = config;
+        document.querySelectorAll('[data-export-dimension]').forEach(tab => tab.classList.toggle('on',tab.dataset.exportDimension===key));
+        renderQueryFields(key);
+        treeTitle.textContent = config.label;
+        const leafCount = config.roots.reduce((sum,root) => sum + root.leaves.length,0);
+        treeSummary.textContent = `共 ${config.roots.length} ${config.summaryUnit} · ${leafCount} ${config.leafUnit}`;
+        exportRoot.textContent = `导出所选${config.rootLabel}`;
+        exportLeaf.textContent = `导出所选${config.leafLabel}`;
+        renderOverviewChart(config);
+        clearLinkedChart(config);
+        renderTree(config);
+        clearRows(`请选择具体${config.leafLabel}`);
+      };
+
+      tree.addEventListener('click',event => {
+        const rootButton = event.target.closest('[data-tree-root]');
+        if (rootButton) {
+          const group = rootButton.closest('.tree-group');
+          selectedRoot = rootButton.dataset.treeRoot;
+          selectedLeaf = '';
+          tree.querySelectorAll('[data-tree-root]').forEach(item => item.classList.toggle('on',item===rootButton));
+          tree.querySelectorAll('[data-tree-leaf]').forEach(item => item.classList.remove('on'));
+          group.classList.add('expanded');
+          rootButton.setAttribute('aria-expanded','true');
+          const config = currentConfig;
+          const root = config.roots.find(item => item.code===selectedRoot);
+          renderLinkedChart(config,root);
+          clearRows(`请选择${root.name}中的具体${config.leafLabel}`);
+          exportRoot.disabled = false;
+          return;
+        }
+        const leafButton = event.target.closest('[data-tree-leaf]');
+        if (!leafButton) return;
+        selectedRoot = leafButton.dataset.parentRoot;
+        selectedLeaf = leafButton.dataset.treeLeaf;
+        tree.querySelectorAll('[data-tree-leaf]').forEach(item => item.classList.toggle('on',item===leafButton));
+        const config = currentConfig;
+        const root = config.roots.find(item => item.code===selectedRoot);
+        showRows(config,root,selectedLeaf);
+      });
+      document.querySelectorAll('[data-export-dimension]').forEach(tab => tab.addEventListener('click',() => renderDimension(tab.dataset.exportDimension)));
+      queryInputs.forEach(input => input.addEventListener('input',() => { queryState[currentDimension][input.dataset.queryInput] = input.value; }));
+      document.querySelector('[data-query-action="search"]').addEventListener('click',() => renderDimension(currentDimension));
+      document.querySelector('[data-query-action="reset"]').addEventListener('click',event => {
+        event.stopPropagation();
+        queryState[currentDimension] = {root:'',leaf:''};
+        renderDimension(currentDimension);
+      });
+      renderDimension('defect');
+      window.__falseAnalysisState = {
+        get rowSignature(){ return lastRowSignature; },
+        get currentDimension(){ return currentDimension; },
+        get selectedRoot(){ return selectedRoot; },
+        get selectedLeaf(){ return selectedLeaf; },
+        get queryState(){ return JSON.parse(JSON.stringify(queryState)); }
+      };
+    })();
+  </script>
+</body>
+</html>
