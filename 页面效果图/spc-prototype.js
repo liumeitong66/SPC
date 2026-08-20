@@ -85,6 +85,25 @@
     @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   `;
   document.head.appendChild(style);
+  const deviceChartStyle = document.createElement('style');
+  deviceChartStyle.textContent = `
+    body[data-page="device-quality"] main{min-width:0;overflow-x:hidden!important;overflow-y:auto!important}
+    body[data-page="device-quality"] .quality-content{min-width:0;overflow:visible}
+    body[data-page="device-quality"] .comparison-switch{display:flex;align-items:center;border:1px solid #d5deea;border-radius:4px;padding:2px;background:#f7f9fc}
+    body[data-page="device-quality"] .comparison-tab{height:25px;border:0;border-radius:3px;background:transparent;color:#64748b;padding:0 8px;cursor:pointer;font-size:12px}
+    body[data-page="device-quality"] .comparison-tab.is-active{background:#fff;color:#2468e8;box-shadow:0 1px 2px rgba(16,42,76,.12);font-weight:650}
+    body[data-page="device-quality"] .comparison-grid,body[data-page="device-quality"] .device-chart-grid{stroke:#e7edf4;stroke-width:1}
+    body[data-page="device-quality"] .comparison-bar{fill:#3478f6}
+    body[data-page="device-quality"] .comparison-axis,body[data-page="device-quality"] .comparison-label,body[data-page="device-quality"] .device-chart-axis{fill:#748398;font-size:10px}
+    body[data-page="device-quality"] .comparison-value{fill:#1f3552;font-size:9px;font-weight:650}
+    body[data-page="device-quality"] .comparison-label{text-anchor:middle}
+    body[data-page="device-quality"] .device-quality-charts .phead{min-width:0}
+    body[data-page="device-quality"] .device-quality-charts .phead .phead-title{min-width:0}
+    body[data-page="device-quality"] .device-quality-charts .phead .legend{margin-left:auto;min-width:0;gap:10px;white-space:nowrap}
+    body[data-page="device-quality"] .device-yield-trend{padding:10px 14px}
+    body[data-page="device-quality"] .device-yield-trend svg{width:100%;height:100%;display:block}
+  `;
+  document.head.appendChild(deviceChartStyle);
 
   const normalize = value => String(value || '').replace(/[\s·（）()]/g, '').toLowerCase();
   const getText = element => (element ? element.textContent.trim() : '');
@@ -659,6 +678,34 @@
     return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">二次复判</div></div></section>`;
   }
 
+  function deviceYieldTrendChart() {
+    const dates = ['03-01', '04-01', '05-01', '06-01', '07-01', '08-01'];
+    const series = [
+      { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 92.05, 91.65, 91.82] },
+      { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.68, 98.29, 98.38] },
+      { label: '二次复判', color: '#20a464', values: [98.56, 98.87, 98.49, 99.06, 98.74, 98.91] }
+    ];
+    const width = 680, height = 210, left = 42, right = 12, top = 18, bottom = 30;
+    const min = 88, max = 100, chartWidth = width - left - right, chartHeight = height - top - bottom;
+    const x = index => left + chartWidth * index / (dates.length - 1);
+    const y = value => top + (max - value) / (max - min) * chartHeight;
+    const grid = [88, 92, 96, 100].map(value => `<line class="device-chart-grid" x1="${left}" y1="${y(value)}" x2="${width - right}" y2="${y(value)}"/><text class="device-chart-axis" x="${left - 6}" y="${y(value) + 3}" text-anchor="end">${value}%</text>`).join('');
+    const dateLabels = dates.map((date, index) => `<text class="device-chart-axis" x="${x(index)}" y="${height - 8}" text-anchor="middle">${date}</text>`).join('');
+    const lines = series.map(seriesItem => {
+      const points = seriesItem.values.map((value, index) => `${x(index)},${y(value)}`).join(' ');
+      const dots = seriesItem.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="2.5" fill="#fff" stroke="${seriesItem.color}" stroke-width="2"><title>${seriesItem.label} ${dates[index]}：${value.toFixed(2)}%</title></circle>`).join('');
+      return `<polyline fill="none" stroke="${seriesItem.color}" stroke-width="2.5" points="${points}"/>${dots}`;
+    }).join('');
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="所有设备按天的PCB良率趋势，包含机器判定、一次复判与二次复判">${grid}${lines}${dateLabels}</svg>`;
+  }
+
+  function deviceQualityCharts() {
+    return `<section class="quality-grid device-quality-charts">
+      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>PCB 良率趋势</b><span>按天 · 全部设备</span></div><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
+      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>设备良率对比</b><span>最近半年 · 前十名</span></div><div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div><div class="quality-chart-body" data-comparison-chart></div></section>
+    </section>`;
+  }
+
   function initializeDeviceSelection(root = document) {
     const table = root.querySelector('[data-device-table]');
     if (!table) return;
@@ -793,11 +840,12 @@
         ${metricBlock(`${label}板卡不良率`, `${avgNgRate.toFixed(2)}<small>%</small>`, '', 'boardYield')}
         ${metricBlock(`${label}器件 DPPM`, currentMouth === 'original' ? '2,368' : currentMouth === 'second' ? '884' : '1,042', currentMouth === 'original' ? '一次复判后下降 1,326' : currentMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
       </section>
-      ${deviceQualityFilters()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div><div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
+      ${deviceQualityFilters()}${deviceQualityCharts()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div><div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
     applyDeviceColumns(activeDeviceColumns);
     initializeDeviceSelection(content);
     content.querySelectorAll('.control').forEach(makeControlInteractive);
     content.querySelectorAll('[data-mouth]').forEach(seg => { seg.tabIndex = 0; seg.onclick = () => setMouth(seg.dataset.mouth); });
+    initializeProjectComparison();
   }
 
   function renderDeviceQuality() {
