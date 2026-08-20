@@ -1744,7 +1744,17 @@
           toast('请先停用规则，再执行编辑或删除操作', 'info');
           return;
         }
-        toast(action === 'edit' ? '该规则已停用，可进行编辑' : '该规则已停用，可执行删除', 'info');
+        const ruleName = getText(row.querySelector('.rule-name'));
+        const detailLink = row.querySelector('a[href*="13A-告警规则详情.html"]');
+        const ruleId = detailLink ? new URL(detailLink.href, window.location.href).searchParams.get('rule') : '';
+        if (action === 'edit') {
+          window.location.href = `13B-新增告警规则.html?mode=edit&rule=${encodeURIComponent(ruleId || '')}`;
+          return;
+        }
+        openModal('删除告警规则', `<p style="margin:0;color:#475569">确认删除告警规则“${ruleName}”吗？</p>`, '删除', () => {
+          row.remove();
+          toast('告警规则已删除', 'info');
+        });
       });
     });
     document.querySelectorAll('[data-alert-save]').forEach(button => {
