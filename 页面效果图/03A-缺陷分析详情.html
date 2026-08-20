@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
   if (!main || !filters || !summaryPanel || !boardPanel) return;
   const breadcrumb = main.querySelector('.breadcrumb'); if (breadcrumb && !breadcrumb.querySelector('.defect-back')) breadcrumb.insertAdjacentHTML('beforeend','<a class="defect-back" href="03-缺陷分析.html">返回</a>');
   main.querySelector('.detail-note')?.remove();
+  filters.querySelector('.field.time')?.remove();
   const reviewerLabel = [...filters.querySelectorAll('.field label')].find(label => label.textContent.trim() === '一次复判员'); if (reviewerLabel) reviewerLabel.textContent = '复判员';
   const deviceField = [...filters.querySelectorAll('.field')].find(field => field.querySelector('label')?.textContent.trim() === '设备SN');
   if (deviceField) deviceField.querySelector('.control').outerHTML = `<div class="multi-device"><button type="button" class="multi-device-trigger">全部设备SN</button><div class="multi-device-menu" hidden><label><input type="checkbox" value="AOI-04-0008" checked>AOI-04-0008</label><label><input type="checkbox" value="AOI-02-0016" checked>AOI-02-0016</label><label><input type="checkbox" value="AOI-01-0012" checked>AOI-01-0012</label></div></div>`;
