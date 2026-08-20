@@ -30,3 +30,15 @@
 ## Concerns
 
 - Legacy sidebar markup remains in some static source pages but is deterministically normalized before users can interact with it; this preserves existing page files while making all rendered navigation consistent.
+
+## Fix follow-up
+
+- Included the existing `页面效果图/13-品质预警.html` in the Task 1 fix commit so the new navigation destination is present in repository history; its page design was not changed.
+- Added the shared `.sidebar > .nav` flex and internal-scroll rule so analytics and management sidebars keep all menu entries accessible at short viewport heights.
+- Removed the two reviewed trailing-whitespace lines in `04A-不良导出.html` and `spc-prototype.js`.
+
+### Fix verification
+
+- `node --check 页面效果图/spc-prototype.js` — passed.
+- `git diff --check 45bf2c2..HEAD` — passed after the fix commit.
+- Focused static check verifies the quality-alert mapping, destination file, and shared internal-navigation scrolling rule.
