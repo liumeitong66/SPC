@@ -99,9 +99,18 @@
     body[data-page="device-quality"] .comparison-label{text-anchor:middle}
     body[data-page="device-quality"] .device-quality-charts .phead{min-width:0}
     body[data-page="device-quality"] .device-quality-charts .phead .phead-title{min-width:0}
-    body[data-page="device-quality"] .device-quality-charts .phead .legend{margin-left:auto;min-width:0;gap:10px;white-space:nowrap}
+    body[data-page="device-quality"] .chart-head-actions{margin-left:auto;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+    body[data-page="device-quality"] .chart-period-picker{display:flex;align-items:center;border:1px solid #d5deea;border-radius:4px;padding:2px;background:#f7f9fc;white-space:nowrap}
+    body[data-page="device-quality"] .chart-period{height:25px;border:0;border-radius:3px;background:transparent;color:#64748b;padding:0 7px;cursor:pointer;font-size:12px;white-space:nowrap}
+    body[data-page="device-quality"] .chart-period.is-active{background:#fff;color:#2468e8;box-shadow:0 1px 2px rgba(16,42,76,.12);font-weight:650}
+    body[data-page="device-quality"] .device-quality-charts .phead .legend{min-width:0;gap:10px;white-space:nowrap}
     body[data-page="device-quality"] .device-yield-trend{padding:10px 14px}
     body[data-page="device-quality"] .device-yield-trend svg{width:100%;height:100%;display:block}
+    body[data-page="device-quality"] .table-panel .quality-filter{height:auto!important;min-height:76px;flex:0 0 auto;border:0;border-bottom:1px solid #e8edf2;border-radius:0;padding:14px 16px}
+    body[data-page="device-quality"] .table-panel .table-wrap{height:calc(100% - 126px)}
+    .proto-comparison-modal{width:min(960px,calc(100vw - 40px))!important}.comparison-modal-toolbar{display:flex;align-items:center;gap:12px}.comparison-modal-toolbar .chart-period-picker{margin-left:auto}
+    @media(max-width:1180px){body[data-page="device-quality"] .chart-head-actions{gap:5px}body[data-page="device-quality"] .chart-period{padding:0 5px;font-size:11px}body[data-page="device-quality"] .device-quality-charts .phead .legend{gap:6px;font-size:10px}}
+    @media(max-width:900px){body[data-page="device-quality"] .quality-grid{height:auto;grid-template-columns:1fr}body[data-page="device-quality"] .quality-chart{min-height:250px}body[data-page="device-quality"] .chart-head-actions{flex-wrap:wrap}body[data-page="device-quality"] .table-panel .table-wrap{height:420px}.comparison-modal-toolbar{align-items:flex-start;flex-wrap:wrap}.comparison-modal-toolbar .chart-period-picker{margin-left:0}}
   `;
   document.head.appendChild(deviceChartStyle);
 
@@ -157,6 +166,8 @@
   let activeDeviceColumns = new Set(defaultDeviceColumnKeys);
   let currentMouth = 'review';
   let currentComparisonType = 'device';
+  let currentTrendPeriod = '7d';
+  let currentComparisonPeriod = 'halfYear';
 
   const projectSamples = [
     { name: '3267504J2G_A面', uuid: '6d7c21c8-9c32-4a10-a501-08e8fe634912', devices: ['AOI-01','AOI-03','AOI-04'], boardTotal: 60680, componentTotal: 5311420, original: { yield: 92.84, falseRate: 6.28, passRate: 92.84, componentNgRate: .194, componentFalseDppm: 1180, componentPassRate: 96.72 }, review: { yield: 98.76, falseRate: .86, passRate: 97.91, componentNgRate: .082, componentFalseDppm: 812, componentPassRate: 98.43 } },
@@ -556,7 +567,7 @@
   }
 
   function openProjectComparisonModal() {
-    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button></div><span class="comparison-modal-note" data-comparison-count></span></div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
+    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button></div><span class="comparison-modal-note" data-comparison-count></span>${chartPeriodPicker('comparison', currentComparisonPeriod)}</div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
     const backdrop = openModal('全部良率对比', body, '关闭');
     backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
     backdrop.querySelector('[data-close]').remove();
@@ -574,6 +585,7 @@
     backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
       button.onclick = () => { modalType = button.dataset.modalComparisonType; draw(); };
     });
+    initializeChartPeriodControls(backdrop);
     draw();
   }
 
@@ -674,6 +686,27 @@
     return `<section class="filters quality-filter"><div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="muted">至</span><span>2026-08-04 14:32</span></div></div><div class="field device device-search"><label>设备名称</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" aria-label="设备名称" placeholder="输入设备名称"></div></div><div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>`;
   }
 
+  function chartPeriodPicker(context, selected) {
+    const options = [['7d', '最近7天'], ['month', '最近一个月'], ['halfYear', '最近半年']];
+    return `<div class="chart-period-picker" data-chart-period-context="${context}" role="group" aria-label="时间选择">${options.map(([value, label]) => `<button type="button" class="chart-period${value === selected ? ' is-active' : ''}" data-chart-period="${value}" aria-pressed="${value === selected}">${label}</button>`).join('')}</div>`;
+  }
+
+  function initializeChartPeriodControls(root = document) {
+    root.querySelectorAll('[data-chart-period]').forEach(button => {
+      button.onclick = () => {
+        const picker = button.closest('.chart-period-picker');
+        if (!picker) return;
+        picker.querySelectorAll('[data-chart-period]').forEach(item => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        if (picker.dataset.chartPeriodContext === 'trend') currentTrendPeriod = button.dataset.chartPeriod;
+        if (picker.dataset.chartPeriodContext === 'comparison') currentComparisonPeriod = button.dataset.chartPeriod;
+      };
+    });
+  }
+
   function deviceQualityMouthToolbar() {
     return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">二次复判</div></div></section>`;
   }
@@ -701,8 +734,8 @@
 
   function deviceQualityCharts() {
     return `<section class="quality-grid device-quality-charts">
-      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>PCB 良率趋势</b><span>按天 · 全部设备</span></div><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
-      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>设备良率对比</b><span>最近半年 · 前十名</span></div><div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div><div class="quality-chart-body" data-comparison-chart></div></section>
+      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>PCB 良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div>${chartPeriodPicker('trend', currentTrendPeriod)}</div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
+      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>设备良率对比</b></div><div class="chart-head-actions">${chartPeriodPicker('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
     </section>`;
   }
 
@@ -840,11 +873,12 @@
         ${metricBlock(`${label}板卡不良率`, `${avgNgRate.toFixed(2)}<small>%</small>`, '', 'boardYield')}
         ${metricBlock(`${label}器件 DPPM`, currentMouth === 'original' ? '2,368' : currentMouth === 'second' ? '884' : '1,042', currentMouth === 'original' ? '一次复判后下降 1,326' : currentMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
       </section>
-      ${deviceQualityFilters()}${deviceQualityCharts()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div><div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
+      ${deviceQualityCharts()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div>${deviceQualityFilters()}<div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
     applyDeviceColumns(activeDeviceColumns);
     initializeDeviceSelection(content);
     content.querySelectorAll('.control').forEach(makeControlInteractive);
     content.querySelectorAll('[data-mouth]').forEach(seg => { seg.tabIndex = 0; seg.onclick = () => setMouth(seg.dataset.mouth); });
+    initializeChartPeriodControls(content);
     initializeProjectComparison();
   }
 
