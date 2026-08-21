@@ -238,15 +238,23 @@
         });
       };
       const judgeClass = value => value==='良好' ? 'good' : value==='误报' ? 'review' : 'bad';
-      const showRows = (config,root,leaf) => {
-        const rows = componentRows(config,root,leaf);
+      const renderComponentRows = (rows,path,{leafSelected=false}={}) => {
         rowsBody.innerHTML = rows.map((row,index) => `<tr><td>${index+1}</td><td>${row.packageName}</td><td>${row.defectType}</td><td title="${row.partNumber}">${row.partNumber}</td><td>${row.position}</td><td>${row.sn}</td><td>${row.project}</td><td><button class="image-link">查看</button></td><td><button class="image-link">查看</button></td><td title="${row.barcode}">${row.barcode}</td><td>${row.panel}</td><td>${row.startTime}</td><td><span class="judge ${judgeClass(row.machine)}">${row.machine}</span></td><td><span class="judge ${judgeClass(row.human)}">${row.human}</span></td></tr>`).join('');
-        selectionPath.innerHTML = `<b>${root.name}</b> / ${leaf}`;
+        selectionPath.innerHTML = path;
         countText.textContent = `共${rows.length}条`;
         exportRoot.disabled = false;
-        exportLeaf.disabled = false;
+        exportLeaf.disabled = !leafSelected;
         lastRowSignature = rows.map(row => row.pcb).join('|');
       };
+      const showRows = (config,root,leaf) => renderComponentRows(
+        componentRows(config,root,leaf),
+        `<b>${root.name}</b> / ${leaf}`,
+        {leafSelected:true}
+      );
+      const showRootRows = (config,root) => renderComponentRows(
+        root.leaves.flatMap(([leaf]) => componentRows(config,root,leaf)),
+        `<b>${root.name}</b> / 全部${config.leafLabel}`
+      );
       const clearRows = message => {
         rowsBody.innerHTML = `<tr class="empty-row"><td colspan="14">${message}</td></tr>`;
         selectionPath.textContent = message;
@@ -287,8 +295,7 @@
           const config = currentConfig;
           const root = config.roots.find(item => item.code===selectedRoot);
           renderLinkedChart(config,root);
-          clearRows(`请选择${root.name}中的具体${config.leafLabel}`);
-          exportRoot.disabled = false;
+          showRootRows(config,root);
           return;
         }
         const leafButton = event.target.closest('[data-tree-leaf]');
