@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>告警日志 - SPC集中管理平台</title>
+  <link rel="stylesheet" href="spc-common.css">
+  <style>
+    .log-content{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}.log-filters{flex:0 0 auto;display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,.8fr) minmax(160px,.8fr) minmax(290px,1.35fr) auto;align-items:end;gap:12px;padding:14px;background:#fff;border:1px solid #e3e9f1;border-radius:6px}.log-filters .field{min-width:0}.log-filters label{display:block;margin-bottom:6px;color:#536277;font-size:12px;font-weight:600}.filter-control{width:100%;height:34px;border:1px solid #d8e1ec;border-radius:4px;background:#fff;color:#35465c;font:12px/1.4 inherit;padding:0 10px;outline:none}.filter-control:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,119,246,.08)}.time-control{display:flex;align-items:center;gap:7px;height:34px;padding:0 10px;border:1px solid #d8e1ec;border-radius:4px;background:#fff}.time-control input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#35465c;font-size:12px}.time-separator{flex:0 0 auto;color:#8996a8;font-size:12px}.log-filters .actions{display:flex;align-items:center;gap:8px;white-space:nowrap}.log-panel{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}.phead{height:50px;flex:0 0 50px;padding:0 14px;border-bottom:1px solid #e8edf2;display:flex;align-items:center;justify-content:space-between;gap:12px}.phead b{color:var(--ink);font-size:16px}.tablebox{flex:1;min-height:0;overflow:auto}.tbl{width:100%;min-width:820px;border-collapse:collapse;table-layout:fixed}.tbl th{height:40px;padding:0 14px;background:#f7f9fc;color:#536277;font-size:12px;font-weight:600;text-align:left}.tbl td{height:46px;padding:0 14px;border-bottom:1px solid #edf0f4;color:#35465c;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tbl tr:hover td{background:#f7faff}.pager{height:46px;flex:0 0 46px;border-top:1px solid #edf0f4;padding:0 14px;display:flex;align-items:center;justify-content:space-between;color:#738196;font-size:12px}.empty-row{display:none}.empty-row td{text-align:center;color:#8996a8}@media(max-width:1500px){.log-filters{grid-template-columns:repeat(4,minmax(150px,1fr))}.log-filters .actions{grid-column:4;justify-content:flex-end}}@media(max-width:980px){.log-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.log-filters .actions{grid-column:2}.main{overflow:auto}.log-panel{min-height:460px}}@media(max-width:720px){.main{padding-left:14px;padding-right:14px}.log-filters{grid-template-columns:1fr}.log-filters .actions{grid-column:1;justify-content:flex-end}.time-control{min-width:280px}}
+  </style>
+</head>
+<body data-page="alert-management">
+  <aside class="sidebar"><div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div><div class="group nav-label">质量分析</div><nav class="nav"><a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a><a class="item nav-item" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a><a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a><a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a><a class="item nav-item" href="04A-不良导出.html" style="text-decoration:none"><span class="ico nav-icon">⇩</span>不良分析</a><a class="item nav-item" href="13-品质预警.html" style="text-decoration:none"><span class="ico nav-icon">⚑</span>告警分析</a><div class="group nav-label">数据管理</div><a class="item nav-item" href="02-单板查询与结果追溯.html" style="text-decoration:none"><span class="ico nav-icon">▤</span>单板查询</a><a class="item nav-item" href="08-设备与区域管理.html" style="text-decoration:none"><span class="ico nav-icon">▦</span>设备管理</a><a class="item nav-item active" href="14-告警管理.html" style="text-decoration:none"><span class="ico nav-icon">⚙</span>告警管理</a><div class="group nav-label">系统管理</div><a class="item nav-item" href="10-用户管理.html" style="text-decoration:none"><span class="ico nav-icon">♟</span>用户管理</a><a class="item nav-item" href="11-角色管理.html" style="text-decoration:none"><span class="ico nav-icon">♧</span>角色管理</a><a class="item nav-item" href="12-个人中心.html" style="text-decoration:none"><span class="ico nav-icon">☻</span>个人中心</a></nav></aside>
+  <div class="app">
+    <header class="top"><div class="title"><h1>告警日志</h1></div><div class="top-actions"><button class="iconbtn" title="帮助">?</button><button class="iconbtn" title="刷新">◌</button><a class="account-entry" href="12-个人中心.html"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <main class="main"><div class="detail-breadcrumb"><a href="14-告警管理.html">告警管理</a><span>›</span><span>告警日志</span><a class="detail-back" href="14-告警管理.html">返回</a></div><div class="log-content">
+      <section class="log-filters" aria-label="告警日志查询条件">
+        <div class="field"><label for="order-number">订单编号</label><input id="order-number" class="filter-control" type="text" placeholder="输入订单编号"></div>
+        <div class="field"><label for="device-name">设备名称</label><select id="device-name" class="filter-control"><option value="">全部设备</option><option>AOI-01</option><option>AOI-02</option><option>AOI-03</option><option>AOI-05</option></select></div>
+        <div class="field"><label for="area-name">所属区域</label><select id="area-name" class="filter-control"><option value="">全部区域</option><option>区域A</option><option>区域B</option><option>区域C</option></select></div>
+        <div class="field"><label>时间范围</label><div class="time-control"><input id="start-date" type="datetime-local" value="2026-08-01T00:00"><span class="time-separator">至</span><input id="end-date" type="datetime-local" value="2026-08-20T23:59"></div></div>
+        <div class="actions"><button class="btn" type="button" id="reset-log">重置</button><button class="btn primary" type="button" id="query-log">查询</button></div>
+      </section>
+      <section class="panel log-panel">
+        <div class="phead"><b id="log-title">告警日志</b></div>
+        <div class="tablebox"><table class="tbl"><thead><tr><th style="width:28%">触发时间</th><th style="width:22%">设备名称</th><th style="width:20%">所属区域</th><th style="width:30%">订单编号</th></tr></thead><tbody id="log-body">
+          <tr data-device="AOI-01" data-area="区域A" data-time="2026-08-20T14:18"><td>2026-08-20 14:18:32</td><td>AOI-01</td><td>区域A</td><td>3267504J2G_A面</td></tr>
+          <tr data-device="AOI-03" data-area="区域B" data-time="2026-08-20T11:42"><td>2026-08-20 11:42:08</td><td>AOI-03</td><td>区域B</td><td>C509048_B面</td></tr>
+          <tr data-device="AOI-02" data-area="区域A" data-time="2026-08-19T20:07"><td>2026-08-19 20:07:45</td><td>AOI-02</td><td>区域A</td><td>329134S_P129</td></tr>
+          <tr data-device="AOI-05" data-area="区域C" data-time="2026-08-19T16:35"><td>2026-08-19 16:35:21</td><td>AOI-05</td><td>区域C</td><td>3267504J2G_A面</td></tr>
+          <tr data-device="AOI-01" data-area="区域A" data-time="2026-08-18T10:26"><td>2026-08-18 10:26:09</td><td>AOI-01</td><td>区域A</td><td>C509048_B面</td></tr>
+          <tr data-device="AOI-03" data-area="区域B" data-time="2026-08-17T09:14"><td>2026-08-17 09:14:36</td><td>AOI-03</td><td>区域B</td><td>3267504J2G_A面</td></tr>
+          <tr data-device="AOI-02" data-area="区域A" data-time="2026-08-16T21:03"><td>2026-08-16 21:03:18</td><td>AOI-02</td><td>区域A</td><td>329134S_P129</td></tr>
+          <tr class="empty-row"><td colspan="4">暂无符合条件的告警日志</td></tr>
+        </tbody></table></div>
+        <div class="pager" id="log-pager">共 7 条</div>
+      </section>
+    </div></main>
+  </div>
+  <script src="spc-prototype.js"></script>
+  <script>
+    (function(){
+      var params=new URLSearchParams(location.search),ruleNames={'wrong-material':'严重不良报警（错料）','bridge':'严重不良报警（连锡）','board-yield':'板卡良率报警','pass-drop':'直通率突降报警','false-positive':'误报率偏高报警','area-defect':'区不良率波动报警','full-board':'整片不良告警'};
+      var ruleName=ruleNames[params.get('rule')];if(ruleName){document.getElementById('log-title').textContent=ruleName+' · 告警日志'}
+      var order=document.getElementById('order-number'),device=document.getElementById('device-name'),area=document.getElementById('area-name'),start=document.getElementById('start-date'),end=document.getElementById('end-date'),rows=Array.prototype.slice.call(document.querySelectorAll('#log-body tr:not(.empty-row)')),empty=document.querySelector('.empty-row'),pager=document.getElementById('log-pager');
+      function filterRows(){var keyword=order.value.trim().toLowerCase(),startTime=start.value||'',endTime=end.value||'',count=0;rows.forEach(function(row){var orderNumber=row.cells[3].textContent.toLowerCase(),rowTime=row.dataset.time||'',visible=(!keyword||orderNumber.indexOf(keyword)>-1)&&(!device.value||row.dataset.device===device.value)&&(!area.value||row.dataset.area===area.value)&&(!startTime||rowTime>=startTime)&&(!endTime||rowTime<=endTime);row.style.display=visible?'':'none';if(visible){count++}});empty.style.display=count?'none':'table-row';pager.firstChild.nodeValue='共 '+count+' 条'}
+      document.getElementById('query-log').addEventListener('click',filterRows);document.getElementById('reset-log').addEventListener('click',function(){order.value='';device.value='';area.value='';start.value='2026-08-01T00:00';end.value='2026-08-20T23:59';filterRows()});
+    })();
+  </script>
+</body>
+</html>

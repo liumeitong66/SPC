@@ -9,7 +9,8 @@
     '误报分析': '04-误报分析.html',
     '不良分析': '04A-不良导出.html',
     '二次复判统计': '06-二次复判统计.html',
-    '品质预警': '13-品质预警.html',
+    '告警分析': '13-品质预警.html',
+    '告警管理': '14-告警管理.html',
     '告警规则详情': '13A-告警规则详情.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
@@ -23,7 +24,7 @@
     '二次复判时间': ['今天', '最近 7 天', '最近 30 天', '自定义时间范围'],
     '设备': ['全部设备（12）', '区域A · AOI-01', '区域B · AOI-02', '区域C · AOI-03', '区域D · AOI-04'],
     '设备名称': ['全部设备（4）', 'AOI-01', 'AOI-02', 'AOI-03', 'AOI-04'],
-    '设备SN': ['全部设备SN', 'SI1020E1112', 'SI1020E1148', 'SI1020E1186', 'SI1020E1206'],
+    '设备SN': ['全部设备SN', 'SI1020E1112', 'SI1020E1148', 'SI1020E1186', 'SI1020E1206', 'SI1020E1238', 'SI1020E1262', 'SI1020E1284', 'SI1020E1308', 'SI1020E1326', 'SI1020E1342', 'SI1020E1365', 'SI1020E1388'],
     '检测结果': ['全部', '良好', '不良', '直通', '误报', '漏报'],
     '订单编号': ['全部订单', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
     '项目 / 程序': ['3267504J2G_A面', '1-A', '329134S_P129'],
@@ -49,7 +50,8 @@
     { id: 'false-positive', name: '误报分析', features: ['查看与查询', '自定义列', '导出所选', '查看设备明细'] },
     { id: 'defect-analysis-machine', name: '不良分析', features: ['查看与查询', '自定义列', '导出所选', '查看不良明细'] },
     { id: 'second-review', name: '二次复判统计', features: ['查看与查询', '自定义列', '导出所选', '查看人员工作量'] },
-    { id: 'quality-alert', name: '品质预警', features: ['查看与查询', '新增规则', '编辑规则', '查看报警记录'] },
+    { id: 'alert-analysis', name: '告警分析', selected: true, features: ['查看与查询', '查看报警记录'] },
+    { id: 'alert-management', name: '告警管理', features: ['查看与查询', '新增规则', '编辑规则', '启停规则', '删除规则'] },
     { id: 'device-management', name: '设备管理', features: ['查看与查询', '新增设备', '区域管理', '查看本机 SPC', '编辑设备', '启停设备', '删除设备'] },
     { id: 'user-management', name: '用户管理', features: ['查看与查询', '新增用户', '编辑用户', '启停用户', '删除用户'] },
     { id: 'role-management', name: '角色管理', features: ['查看与查询', '新增角色', '编辑角色', '菜单权限', '启停角色', '删除角色'] },
@@ -127,7 +129,7 @@
     { key: 'index', label: '序号', group: '基础信息' },
     { key: 'projectName', label: '订单编号', group: '基础信息' },
     { key: 'deviceCount', label: '覆盖设备数', group: '基础信息' },
-    { key: 'deviceNames', label: '覆盖设备名称', group: '基础信息' },
+    { key: 'deviceNames', label: '检测设备SN', group: '基础信息' },
     { key: 'boardTotal', label: '板卡总数', group: '板卡指标' },
     { key: 'boardGood', label: '板卡良品总数', group: '板卡指标' },
     { key: 'boardDppm', label: '板卡DPPM', group: '板卡指标' },
@@ -167,13 +169,25 @@
   let currentMouth = 'review';
   let currentComparisonType = 'device';
   let currentTrendPeriod = '7d';
-  let currentComparisonPeriod = 'halfYear';
+  let currentComparisonPeriod = '7d';
+  let currentProjectTrendMode = 'day';
 
   const projectSamples = [
     { name: '3267504J2G_A面', uuid: '6d7c21c8-9c32-4a10-a501-08e8fe634912', devices: ['AOI-01','AOI-03','AOI-04'], boardTotal: 60680, componentTotal: 5311420, original: { yield: 92.84, falseRate: 6.28, passRate: 92.84, componentNgRate: .194, componentFalseDppm: 1180, componentPassRate: 96.72 }, review: { yield: 98.76, falseRate: .86, passRate: 97.91, componentNgRate: .082, componentFalseDppm: 812, componentPassRate: 98.43 } },
     { name: '1-A', uuid: '9b40ccad-1ab6-4a21-b791-c3745d0348e2', devices: ['AOI-02','AOI-05'], boardTotal: 28412, componentTotal: 2193680, original: { yield: 91.86, falseRate: 7.12, passRate: 91.86, componentNgRate: .263, componentFalseDppm: 1410, componentPassRate: 95.84 }, review: { yield: 98.72, falseRate: 1.19, passRate: 96.86, componentNgRate: .186, componentFalseDppm: 1024, componentPassRate: 97.32 } },
     { name: '329134S_P129', uuid: 'c1a92c30-53c3-41f4-a031-3b84d623719e', devices: ['AOI-02','AOI-04','AOI-06'], boardTotal: 21596, componentTotal: 1746225, original: { yield: 90.18, falseRate: 8.36, passRate: 90.18, componentNgRate: .342, componentFalseDppm: 2050, componentPassRate: 94.18 }, review: { yield: 97.26, falseRate: 2.58, passRate: 95.70, componentNgRate: .278, componentFalseDppm: 1608, componentPassRate: 96.54 } },
     { name: '155042F_P9', uuid: '744876c1-7837-46e5-b96d-e8c1161ad904', devices: ['AOI-01'], boardTotal: 18340, componentTotal: 1492780, original: { yield: 94.15, falseRate: 4.31, passRate: 94.15, componentNgRate: .221, componentFalseDppm: 1210, componentPassRate: 96.40 }, review: { yield: 98.94, falseRate: .99, passRate: 97.61, componentNgRate: .171, componentFalseDppm: 932, componentPassRate: 98.02 } }
+  ];
+  const comparisonProjects = [
+    ...projectSamples,
+    { name: 'SMT2407301669-T', original: { yield: 93.62 }, review: { yield: 99.04 } },
+    { name: 'A14-POWER', original: { yield: 93.31 }, review: { yield: 98.88 } },
+    { name: '202608-NPI-02', original: { yield: 92.17 }, review: { yield: 98.41 } },
+    { name: 'JLC_AOI_DEMO', original: { yield: 91.72 }, review: { yield: 98.16 } },
+    { name: 'AOI04-BATCH', original: { yield: 91.23 }, review: { yield: 97.82 } },
+    { name: 'D04-NPI', original: { yield: 90.74 }, review: { yield: 97.48 } },
+    { name: 'AOI02-MAIN', original: { yield: 90.31 }, review: { yield: 97.15 } },
+    { name: 'B02-TEST', original: { yield: 89.86 }, review: { yield: 96.78 } }
   ];
   const deviceSamples = [
     { name: 'AOI-01', ip: '192.168.10.21', sn: 'SI1020E1112', projects: [{ name: '3267504J2G_A面', uuid: '6d7c21c8-9c32-4a10-a501-08e8fe634912' }, { name: '155042F_P9', uuid: '744876c1-7837-46e5-b96d-e8c1161ad904' }, { name: 'JLC_AOI_DEMO', uuid: '08db6715-a4d8-4bc2-9f31-a844b7964371' }, { name: '20260804_NPI', uuid: '75095fee-19a5-46d7-9df1-9d21bc370b26' }, { name: '0804-FPC', uuid: 'f2f6c57b-d486-428d-82b5-c29297b28666' }], boardTotal: 34620, lastDataTime: '2026-08-04 14:32:56', original: { yield: 93.20, falseRate: 5.84, passRate: 93.20, componentNgRate: .208, componentFalseDppm: 1240, componentPassRate: 96.40 }, review: { yield: 99.12, falseRate: .74, passRate: 98.34, componentNgRate: .076, componentFalseDppm: 760, componentPassRate: 98.82 } },
@@ -502,7 +516,12 @@
     if (!table || !table.tHead) return;
     const headers = Array.from(table.tHead.rows[0].cells).map((cell, index) => ({ index, label: getText(cell) })).filter(column => column.index > 0 && column.label);
     const active = new Set(headers.filter(column => getComputedStyle(table.tHead.rows[0].cells[column.index]).display !== 'none').map(column => String(column.index)));
-    const lockedIndexes = new Set(document.body.dataset.page === 'board-query' ? headers.filter(column => column.label === '板边条码' || column.label === '操作').map(column => column.index) : []);
+    const page = document.body.dataset.page;
+    const lockedIndexes = new Set(headers.filter(column => {
+      if (page === 'board-query') return column.label === '板边条码' || column.label === '操作';
+      if (page === 'defect-analysis') return column.label === '订单编号' || column.label === '板边条码';
+      return false;
+    }).map(column => column.index));
     const options = headers.map(column => `<label class="proto-column-option"><input type="checkbox" value="${column.index}" ${(active.has(String(column.index)) || lockedIndexes.has(column.index)) ? 'checked' : ''} ${lockedIndexes.has(column.index) ? 'disabled' : ''}><span title="${column.label}">${column.label}${lockedIndexes.has(column.index) ? '（必选）' : ''}</span></label>`).join('');
     const backdrop = openModal('显示列', `<div class="proto-column-toolbar"><span class="proto-column-note">已选择 <b data-column-count>${active.size}</b> / ${headers.length} 列</span><div class="proto-column-actions"><button type="button" data-column-action="all">全选</button><button type="button" data-column-action="none">取消全选</button><button type="button" data-column-action="default">恢复默认</button></div></div><section class="proto-column-group"><h4>列表字段</h4><div class="proto-column-grid">${options}</div></section>`, '应用列设置', modal => {
       const selected = new Set(Array.from(modal.querySelectorAll('.proto-column-option input:checked')).map(input => Number(input.value)));
@@ -547,14 +566,43 @@
   }
 
   function comparisonDataset(type = currentComparisonType) {
+    if (type === 'project') return comparisonProjects;
     return type === 'area' ? comparisonAreas : comparisonDevices;
+  }
+
+  function comparisonPeriodAdjustment(index) {
+    const adjustments = {
+      '7d': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      month: [-.18, -.12, -.22, -.16, -.24, -.15, -.19, -.21, -.17, -.23, -.14, -.20],
+      halfYear: [-.42, -.35, -.48, -.31, -.44, -.39, -.33, -.46, -.37, -.41, -.29, -.45]
+    };
+    return (adjustments[currentComparisonPeriod] || adjustments['7d'])[index] || 0;
   }
 
   function comparisonChartMarkup(type = currentComparisonType, showAll = false) {
     const data = comparisonDataset(type)
-      .map(item => ({ ...item, value: mouthData(item, currentMouth).yield }))
+      .map((item, index) => ({ ...item, value: Math.max(88, mouthData(item, currentMouth).yield + comparisonPeriodAdjustment(index)) }))
       .sort((a, b) => b.value - a.value);
     const items = showAll ? data : data.slice(0, 10);
+    if (type === 'project') {
+      const width = 560;
+      const rowHeight = 32;
+      const margin = { top: 14, right: 48, bottom: 26, left: 150 };
+      const height = margin.top + margin.bottom + rowHeight * items.length;
+      const plotWidth = width - margin.left - margin.right;
+      const minimum = 88;
+      const maximum = 100;
+      const x = value => margin.left + (value - minimum) / (maximum - minimum) * plotWidth;
+      const ticks = [88, 91, 94, 97, 100];
+      const grid = ticks.map(value => `<line class="comparison-grid" x1="${x(value)}" y1="${margin.top}" x2="${x(value)}" y2="${height - margin.bottom}"/><text class="comparison-axis" x="${x(value)}" y="${height - 8}" text-anchor="middle">${value}%</text>`).join('');
+      const bars = items.map((item, index) => {
+        const centerY = margin.top + rowHeight * index + rowHeight / 2;
+        const endX = x(item.value);
+        const barWidth = Math.max(2, endX - x(minimum));
+        return `<g><title>订单 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
+      }).join('');
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="订单良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
+    }
     const width = showAll ? 900 : 560;
     const height = showAll ? 330 : 220;
     const margin = { top: 24, right: 16, bottom: showAll ? 54 : 45, left: 38 };
@@ -571,12 +619,13 @@
       const center = margin.left + step * index + step / 2;
       const top = y(item.value);
       const barHeight = Math.max(2, margin.top + plotHeight - top);
-      const label = type === 'device' ? item.name : item.name;
+      const label = item.name;
       const detail = type === 'device' ? `${item.area} · ${item.name}` : item.name;
-      return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text><text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text></g>`;
+      const labelMarkup = `<text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text>`;
+      return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
-    const dimensionLabel = type === 'area' ? '区域' : '设备';
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
+    const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '订单' : '设备';
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
   }
 
   function renderProjectComparison(type = currentComparisonType) {
@@ -589,11 +638,14 @@
       button.setAttribute('aria-selected', String(active));
     });
     const chart = panel.querySelector('[data-comparison-chart]');
-    if (chart) chart.innerHTML = comparisonChartMarkup(type, false);
+    if (chart) {
+      chart.classList.toggle('is-horizontal', type === 'project');
+      chart.innerHTML = comparisonChartMarkup(type, false);
+    }
   }
 
   function openProjectComparisonModal() {
-    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button></div><span class="comparison-modal-note" data-comparison-count></span>${chartPeriodPicker('comparison', currentComparisonPeriod)}</div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
+    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button></div><span class="comparison-modal-note" data-comparison-count></span>${chartPeriodPicker('comparison', currentComparisonPeriod)}</div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
     const backdrop = openModal('全部良率对比', body, '关闭');
     backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
     backdrop.querySelector('[data-close]').remove();
@@ -611,7 +663,26 @@
     backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
       button.onclick = () => { modalType = button.dataset.modalComparisonType; draw(); };
     });
-    initializeChartPeriodControls(backdrop);
+    backdrop.querySelectorAll('[data-chart-period]').forEach(button => {
+      button.onclick = () => {
+        currentComparisonPeriod = button.dataset.chartPeriod;
+        backdrop.querySelectorAll('[data-chart-period]').forEach(item => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        const projectPanel = document.querySelector('[data-comparison-panel]');
+        if (projectPanel) {
+          projectPanel.querySelectorAll('[data-chart-period]').forEach(item => {
+            const active = item.dataset.chartPeriod === currentComparisonPeriod;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-pressed', String(active));
+          });
+          renderProjectComparison(currentComparisonType);
+        }
+        draw();
+      };
+    });
     draw();
   }
 
@@ -619,12 +690,86 @@
     const panel = document.querySelector('[data-comparison-panel]');
     if (!panel || panel.dataset.comparisonEnhanced) return;
     panel.dataset.comparisonEnhanced = 'true';
+    if (panel.dataset.comparisonScope === 'project') currentComparisonType = 'project';
     panel.querySelectorAll('[data-comparison-type]').forEach(button => {
       button.onclick = () => renderProjectComparison(button.dataset.comparisonType);
+    });
+    panel.querySelectorAll('[data-chart-period]').forEach(button => {
+      button.onclick = () => {
+        currentComparisonPeriod = button.dataset.chartPeriod;
+        panel.querySelectorAll('[data-chart-period]').forEach(item => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        renderProjectComparison(currentComparisonType);
+      };
     });
     const allButton = panel.querySelector('[data-comparison-all]');
     if (allButton) allButton.onclick = openProjectComparisonModal;
     renderProjectComparison(currentComparisonType);
+  }
+
+  function projectTrendDataset(mode = currentProjectTrendMode) {
+    if (mode === 'month') {
+      return {
+        labels: ['03月', '04月', '05月', '06月', '07月', '08月'],
+        original: [91.2, 91.8, 92.1, 91.7, 92.4, 92.8],
+        review: [97.2, 97.6, 97.9, 97.5, 98.1, 98.4],
+        second: [98.1, 98.4, 98.6, 98.3, 98.8, 99.0]
+      };
+    }
+    return {
+      labels: ['07-29', '07-30', '07-31', '08-01', '08-02', '08-03', '08-04'],
+      original: [91.4, 91.8, 91.2, 92.0, 91.6, 92.2, 92.8],
+      review: [97.4, 97.8, 97.2, 98.0, 97.6, 98.2, 98.5],
+      second: [98.2, 98.5, 98.1, 98.7, 98.4, 98.9, 99.1]
+    };
+  }
+
+  function projectTrendMarkup(mode = currentProjectTrendMode) {
+    const data = projectTrendDataset(mode);
+    const width = 860;
+    const height = 220;
+    const margin = { top: 18, right: 18, bottom: 34, left: 44 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+    const x = index => margin.left + (plotWidth / Math.max(1, data.labels.length - 1)) * index;
+    const y = value => margin.top + (100 - value) / 12 * plotHeight;
+    const ticks = [88, 91, 94, 97, 100];
+    const grid = ticks.map(value => `<line class="gridline" x1="${margin.left}" y1="${y(value)}" x2="${width - margin.right}" y2="${y(value)}"/><text class="axis" x="${margin.left - 8}" y="${y(value) + 3}" text-anchor="end">${value}%</text>`).join('');
+    const path = values => values.map((value, index) => `${index ? 'L' : 'M'}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(' ');
+    const dots = (values, className, label) => values.map((value, index) => `<circle class="dot ${className}" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3"><title>${data.labels[index]} ${label}：${value.toFixed(2)}%</title></circle>`).join('');
+    const labels = data.labels.map((label, index) => `<text class="axis" x="${x(index).toFixed(1)}" y="${height - 10}" text-anchor="middle">${label}</text>`).join('');
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${mode === 'day' ? '按天最近7天' : '按月最近6个月'}质量趋势">${grid}<path class="line-original" d="${path(data.original)}"/><path class="line-review" d="${path(data.review)}"/><path class="line-second" d="${path(data.second)}"/>${dots(data.original, 'trend-original-dot', '机器判定')}${dots(data.review, 'trend-review-dot', '一次复判')}${dots(data.second, 'trend-second-dot', '二次复判')}${labels}</svg>`;
+  }
+
+  function renderProjectTrend(mode = currentProjectTrendMode) {
+    const panel = document.querySelector('[data-project-trend]');
+    if (!panel) return;
+    currentProjectTrendMode = mode;
+    panel.querySelectorAll('[data-project-trend-mode]').forEach(button => {
+      const active = button.dataset.projectTrendMode === mode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-selected', String(active));
+    });
+    const range = panel.querySelector('[data-project-trend-range]');
+    if (range) range.classList.toggle('is-hidden', mode === 'month');
+    const chart = panel.querySelector('[data-project-trend-chart]');
+    if (chart) chart.innerHTML = projectTrendMarkup(mode);
+  }
+
+  function initializeProjectTrend() {
+    const panel = document.querySelector('[data-project-trend]');
+    if (!panel || panel.dataset.trendEnhanced) return;
+    panel.dataset.trendEnhanced = 'true';
+    panel.querySelectorAll('[data-project-trend-mode]').forEach(button => {
+      button.onclick = () => renderProjectTrend(button.dataset.projectTrendMode);
+    });
+    panel.querySelectorAll('input[type="date"]').forEach(input => {
+      input.onchange = () => renderProjectTrend('day');
+    });
+    renderProjectTrend('day');
   }
 
   function summarizeProjectMetrics(projects, mouth) {
@@ -667,7 +812,9 @@
     currentMouth = mouth;
     const selectedDevice = new URLSearchParams(location.search).get('device') || '';
     const sourceProjects = selectedDevice ? projectSamples.filter(project => project.devices.includes(selectedDevice)) : projectSamples;
-    const rows = sourceProjects.map((project, index) => ({ index: index + 1, projectName: project.name, projectUuid: project.uuid, deviceCount: `${selectedDevice ? 1 : project.devices.length} 台`, deviceNames: selectedDevice || project.devices.join('、'), ...statsFor(project, mouth) }));
+    const prototypeDeviceSn = { 'AOI-01': 'SI1020E1112', 'AOI-02': 'SI1020E1186', 'AOI-03': 'SI1020E1148', 'AOI-04': 'SI1020E1206', 'AOI-05': 'SI1020E1238', 'AOI-06': 'SI1020E1262', 'AOI-07': 'SI1020E1284', 'AOI-08': 'SI1020E1308', 'AOI-09': 'SI1020E1326', 'AOI-10': 'SI1020E1342', 'AOI-11': 'SI1020E1365', 'AOI-12': 'SI1020E1388' };
+    const deviceSn = name => deviceSamples.find(device => device.name === name)?.sn || prototypeDeviceSn[name] || name;
+    const rows = sourceProjects.map((project, index) => ({ index: index + 1, projectName: project.name, projectUuid: project.uuid, deviceCount: `${selectedDevice ? 1 : project.devices.length} 台`, deviceNames: selectedDevice ? deviceSn(selectedDevice) : project.devices.map(deviceSn).join('、'), ...statsFor(project, mouth) }));
     table.innerHTML = tableMarkup(projectColumns, rows, 'data-project-table');
     delete table.dataset.selectExportEnhanced;
     const exportButton = table.closest('.table-panel')?.querySelector('.table-tools .btn');
@@ -713,7 +860,7 @@
   }
 
   function chartPeriodPicker(context, selected) {
-    const options = [['7d', '最近7天'], ['month', '最近一个月'], ['halfYear', '最近半年']];
+    const options = [['7d', '最近7天'], ['month', '最近1个月'], ['halfYear', '最近半年']];
     return `<div class="chart-period-picker" data-chart-period-context="${context}" role="group" aria-label="时间选择">${options.map(([value, label]) => `<button type="button" class="chart-period${value === selected ? ' is-active' : ''}" data-chart-period="${value}" aria-pressed="${value === selected}">${label}</button>`).join('')}</div>`;
   }
 
@@ -1228,6 +1375,7 @@
   function makeControlInteractive(control) {
     const field = control.closest('.field');
     const label = getText(field && field.querySelector('label'));
+    if (control.dataset.customHistory === 'true') return;
     control.setAttribute('role', 'button');
     control.tabIndex = 0;
     control.dataset.label = label;
@@ -1550,12 +1698,8 @@
     Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
       const text = getText(item);
       if (text.includes('不良导出')) item.innerHTML = item.innerHTML.replace('不良导出', '不良分析');
-      if (text.includes('数据上传监控')) item.remove();
+      if (text.includes('数据上传监控') || text.includes('二次复判统计')) item.remove();
     });
-    const items = Array.from(nav.querySelectorAll('.nav-item,.item'));
-    const secondReviewItem = items.find(item => getText(item).includes('二次复判统计'));
-    const qualityAlertItem = items.find(item => getText(item).includes('品质预警'));
-    if (secondReviewItem && qualityAlertItem) secondReviewItem.insertAdjacentElement('afterend', qualityAlertItem);
   }
 
   function ensureDefectAnalysisNavigation() {
@@ -1570,51 +1714,6 @@
     item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">⇩</span>不良分析`;
     falseAlarmItem.insertAdjacentElement('afterend', item);
     if (document.body.dataset.page === 'defect-analysis-machine') falseAlarmItem.classList.remove('active');
-  }
-
-  function ensureQualityAlertNavigation() {
-    const nav = document.querySelector('.nav');
-    const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
-    if (!nav || navItems.some(item => getText(item).includes('品质预警'))) return;
-    const secondReviewItem = navItems.find(item => getText(item).includes('二次复判统计'));
-    if (!secondReviewItem) return;
-    const item = document.createElement('div');
-    const isCompactItem = secondReviewItem.classList.contains('item');
-    item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === 'quality-alert' ? ' active' : ''}`;
-    item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">⚑</span>品质预警`;
-    secondReviewItem.insertAdjacentElement('afterend', item);
-    if (document.body.dataset.page === 'quality-alert') secondReviewItem.classList.remove('active');
-  }
-
-  function normalizeManagementNavigation() {
-    const nav = document.querySelector('.nav');
-    if (!nav) return;
-    Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
-      const text = getText(item);
-      if (text.includes('基础 SPC') || text.includes('数据上传监控') || text.includes('用户管理') || text.includes('角色管理') || text.includes('个人中心') || text.includes('系统设置')) item.remove();
-    });
-    const items = Array.from(nav.querySelectorAll('.nav-item,.item'));
-    const deviceItem = items.find(item => getText(item).includes('设备管理'));
-    if (!deviceItem) return;
-    const isCompactItem = deviceItem.classList.contains('item');
-    const definitions = [
-      { label:'用户管理', icon:'♙', page:'user-management' },
-      { label:'角色管理', icon:'♧', page:'role-management' },
-      { label:'个人中心', icon:'◎', page:'personal-center' }
-    ];
-    let anchor = deviceItem;
-    definitions.forEach(definition => {
-      const item = document.createElement('div');
-      item.className = `${isCompactItem ? 'item' : 'nav-item'}${document.body.dataset.page === definition.page ? ' active' : ''}`;
-      item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">${definition.icon}</span>${definition.label}`;
-      anchor.insertAdjacentElement('afterend', item);
-      anchor = item;
-    });
-    if (definitions.some(definition => document.body.dataset.page === definition.page)) {
-      nav.querySelectorAll('.nav-item.active,.item.active').forEach(item => {
-        if (!definitions.some(definition => getText(item).includes(definition.label))) item.classList.remove('active');
-      });
-    }
   }
 
   function openTopMenu(button, items) {
@@ -1694,10 +1793,8 @@
     normalizeSharedNavigation();
     ensureQualityNavigation();
     ensureDefectAnalysisNavigation();
-    ensureQualityAlertNavigation();
-    normalizeManagementNavigation();
     initializeDeviceQualityPage();
-    if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectComparison(); }
+    if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectTrend(); initializeProjectComparison(); }
     removeTitleExplanations();
     normalizeTopActions();
     ensureGlobalDataTimestamp();
@@ -1880,5 +1977,48 @@
     });
   }
 
+  function initializeListSequences() {
+    const tableSelectors = {
+      'device-management': '.records .table',
+      'alert-management': '.table-panel .tbl',
+      'user-management': '.records .table',
+      'role-management': '.records .table'
+    };
+    const selector = tableSelectors[document.body.dataset.page];
+    const table = selector ? document.querySelector(selector) : null;
+    if (!table) return;
+
+    const headerRow = table.querySelector('thead tr');
+    if (headerRow && !headerRow.querySelector('.sequence-cell')) {
+      const header = document.createElement('th');
+      header.className = 'sequence-cell';
+      header.textContent = '序号';
+      headerRow.prepend(header);
+    }
+
+    const tbody = table.tBodies[0];
+    if (!tbody) return;
+    function renderSequence() {
+      let sequence = 0;
+      Array.from(tbody.rows).forEach(row => {
+        let cell = row.querySelector(':scope > .sequence-cell');
+        if (!cell) {
+          cell = document.createElement('td');
+          cell.className = 'sequence-cell';
+          row.prepend(cell);
+        }
+        const visible = row.style.display !== 'none';
+        cell.textContent = visible ? String(++sequence) : '';
+      });
+    }
+    renderSequence();
+    new MutationObserver(renderSequence).observe(tbody, {
+      childList: true,
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+
+  initializeListSequences();
   initializePage();
 })();

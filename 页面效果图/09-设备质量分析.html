@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SPC集中管理平台 - 设备质量分析</title>
+  <title>SPC集中管理平台 - 设备分析</title>
   <link rel="stylesheet" href="spc-common.css">
   <style>
     :root{--primary:#3478f6;--primary-dark:#2468e8;--nav:#1e2c42;--nav-active:#101b2d;--bg:#f3f6fa;--surface:#fff;--ink:#102a4c;--body:#334155;--muted:#64748b;--line:#dce3ec;--success:#20a464;--danger:#e14b4b;--warning:#d99014}
@@ -25,30 +25,32 @@
 <body data-page="device-quality" data-mouth-page="device">
   <aside class="sidebar">
     <div class="brand"><div class="brand-mark"></div><div><div class="brand-title">AOI SPC</div><div class="brand-sub">集中管理平台</div></div></div>
-    <div class="nav-label">质量分析</div>
-    <nav class="nav">
-      <div class="nav-item active"><span class="nav-icon">◉</span>项目统计</div>
-      <div class="nav-item"><span class="nav-icon">▤</span>单板查询</div>
-      <div class="nav-item"><span class="nav-icon">▥</span>缺陷分析</div>
-      <div class="nav-item"><span class="nav-icon">⌁</span>误报分析</div>
-      <div class="nav-item"><span class="nav-icon">⌇</span>基础 SPC<span class="nav-tag">新增</span></div>
-      <div class="nav-divider"></div>
-      <div class="nav-item"><span class="nav-icon">◎</span>二次复判统计</div>
-      <div class="nav-label" style="padding:17px 10px 7px">平台管理</div>
-      <div class="nav-item"><span class="nav-icon">⇅</span>数据上传监控</div>
-      <div class="nav-item"><span class="nav-icon">▦</span>设备管理</div>
-      
-    </nav>
+    <div class="group nav-label">质量分析</div>
+<nav class="nav">
+<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a>
+<a class="item nav-item active" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a>
+<a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a>
+<a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a>
+<a class="item nav-item" href="04A-不良导出.html" style="text-decoration:none"><span class="ico nav-icon">⇩</span>不良分析</a>
+<a class="item nav-item" href="13-品质预警.html" style="text-decoration:none"><span class="ico nav-icon">⚑</span>告警分析</a>
+<div class="group nav-label">数据管理</div>
+<a class="item nav-item" href="02-单板查询与结果追溯.html" style="text-decoration:none"><span class="ico nav-icon">▤</span>单板查询</a>
+<a class="item nav-item" href="08-设备与区域管理.html" style="text-decoration:none"><span class="ico nav-icon">▦</span>设备管理</a>
+<a class="item nav-item" href="14-告警管理.html" style="text-decoration:none"><span class="ico nav-icon">⚙</span>告警管理</a>
+<div class="group nav-label">系统管理</div>
+<a class="item nav-item" href="10-用户管理.html" style="text-decoration:none"><span class="ico nav-icon">♟</span>用户管理</a>
+<a class="item nav-item" href="11-角色管理.html" style="text-decoration:none"><span class="ico nav-icon">♧</span>角色管理</a>
+<a class="item nav-item" href="12-个人中心.html" style="text-decoration:none"><span class="ico nav-icon">☻</span>个人中心</a>
+</nav>
     <div class="sidebar-foot"><div class="avatar">管</div><div><div class="user-name">admin</div><div class="user-role">平台管理员</div></div><span style="margin-left:auto">⌄</span></div>
   </aside>
   <div class="app">
-    <header class="topbar"><div class="top-title"><h1>设备质量分析</h1></div><div class="top-actions"><button class="icon-btn">?</button><button class="icon-btn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <header class="topbar"><div class="top-title"><h1>设备分析</h1></div><div class="top-actions"><button class="icon-btn">?</button><button class="icon-btn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
     <main>
       <div class="scope-line"><div class="scope-note"><b>当前范围</b><span>全部区域 · 12 台设备 · 8 个项目</span></div><div class="fresh"><span class="fresh-dot"></span>数据已更新至 2026-08-04 14:32:18</div></div>
       <section class="filters">
         <div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="muted">至</span><span>2026-08-04 14:32</span></div></div>
         <div class="field device"><label>设备名称</label><div class="control"><span>▦</span><span>全部设备（12）</span><span class="chev">⌄</span></div></div>
-        <div class="field project"><label>项目名称</label><div class="control"><span class="muted">⌕</span><span class="muted">全部项目</span><span class="chev">⌄</span></div></div>
         <div class="field"><label>统计口径</label><div class="segmented"><div class="seg">原始判定</div><div class="seg active">一次复判</div></div></div>
         <div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div>
       </section>
@@ -85,12 +87,12 @@
         <div class="table-scroll">
         <table class="data-table" data-project-table>
           <colgroup>
-            <col data-column-key="index" style="width:60px"><col data-column-key="deviceName" style="width:140px"><col data-column-key="projectName" style="width:170px"><col data-column-key="projectUuid" style="width:240px">
+            <col data-column-key="index" style="width:60px"><col data-column-key="deviceName" style="width:140px"><col data-column-key="projectName" style="width:170px">
             <col data-column-key="boardTotal" style="width:120px"><col data-column-key="boardGood" style="width:140px"><col data-column-key="boardDppm" style="width:120px"><col data-column-key="boardYield" style="width:130px"><col data-column-key="boardNg" style="width:140px"><col data-column-key="boardNgRate" style="width:140px"><col data-column-key="boardFalse" style="width:140px"><col data-column-key="boardFalseRate" style="width:140px"><col data-column-key="boardPass" style="width:140px"><col data-column-key="boardPassRate" style="width:140px">
             <col data-column-key="componentTotal" style="width:120px"><col data-column-key="componentOk" style="width:130px"><col data-column-key="componentDppm" style="width:120px"><col data-column-key="componentFalseDppm" style="width:140px"><col data-column-key="componentOkRate" style="width:140px"><col data-column-key="componentNg" style="width:130px"><col data-column-key="componentNgRate" style="width:130px"><col data-column-key="componentSpecialNg" style="width:190px"><col data-column-key="componentPass" style="width:150px"><col data-column-key="componentPassRate" style="width:150px"><col data-column-key="componentFalse" style="width:140px"><col data-column-key="componentSpecialFalse" style="width:210px"><col data-column-key="componentMiss" style="width:140px"><col data-column-key="componentSpecialMiss" style="width:210px">
           </colgroup>
           <thead><tr>
-            <th data-column-key="index">序号</th><th data-column-key="deviceName">设备名称</th><th data-column-key="projectName">项目名称</th><th data-column-key="projectUuid">项目UUID</th>
+            <th data-column-key="index">序号</th><th data-column-key="deviceName">设备名称</th><th data-column-key="projectName">订单编号</th>
             <th class="num" data-column-key="boardTotal">板卡总数</th><th class="num" data-column-key="boardGood">板卡良品总数</th><th class="num" data-column-key="boardDppm">板卡DPPM</th><th class="num" data-column-key="boardYield">板卡良率（%）</th><th class="num" data-column-key="boardNg">板卡不良总数</th><th class="num" data-column-key="boardNgRate">板卡不良率（%）</th><th class="num" data-column-key="boardFalse">板卡误报总数</th><th class="num" data-column-key="boardFalseRate">板卡误报率（%）</th><th class="num" data-column-key="boardPass">板卡直通总数</th><th class="num" data-column-key="boardPassRate">板卡直通率（%）</th>
             <th class="num" data-column-key="componentTotal">器件总数</th><th class="num" data-column-key="componentOk">器件OK总数</th><th class="num" data-column-key="componentDppm">器件DPPM</th><th class="num" data-column-key="componentFalseDppm">器件误报DPPM</th><th class="num" data-column-key="componentOkRate">器件OK率（%）</th><th class="num" data-column-key="componentNg">器件NG总数</th><th class="num" data-column-key="componentNgRate">器件NG率（%）</th><th class="num" data-column-key="componentSpecialNg">器件NG数（特殊缺陷）</th><th class="num" data-column-key="componentPass">器件直通总数</th><th class="num" data-column-key="componentPassRate">器件直通率（%）</th><th class="num" data-column-key="componentFalse">器件误报数</th><th class="num" data-column-key="componentSpecialFalse">器件误报数（特殊缺陷）</th><th class="num" data-column-key="componentMiss">器件漏报数</th><th class="num" data-column-key="componentSpecialMiss">器件漏报数（特殊缺陷）</th>
           </tr></thead>
