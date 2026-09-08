@@ -67,5 +67,5 @@
 
 - [x] Remove the yield-range label from the yield-card header.
 - [x] Remove device SN and percentage markup from the device-distribution legend.
-- [x] Tighten legend row sizing and spacing without changing donut hover content.
+- [x] Tighten legend row sizing and spacing, and remove SN and percentage from donut hover content.
 - [x] Validate inline script syntax and render at the annotated viewport and 1440×900.
