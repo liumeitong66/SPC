@@ -25,8 +25,8 @@
 **Interfaces:**
 - Produces: `.chart-time-range` and `.chart-period-select` styles used by all three pages.
 
-- [ ] Add shared one-line date-range and period-select styles.
-- [ ] Add compact desktop-width rules that keep controls within chart cards.
+- [x] Add shared one-line date-range and period-select styles.
+- [x] Add compact desktop-width rules that keep controls within chart cards.
 
 ### Task 2: Project and device comparison controls
 
@@ -38,10 +38,10 @@
 - Consumes: `comparisonDateRange`, `currentComparisonPeriod`, `setComparisonPeriod()`, and `renderProjectComparison()`.
 - Produces: native `select[data-chart-period-context="comparison"]` controls synchronized across the page and comparison modal.
 
-- [ ] Replace the project comparison shortcut button group with a period select.
-- [ ] Change project comparison header CSS from wrapped two-row layout to one row.
-- [ ] Generate the same date-range and period-select component for device comparison and the comparison modal.
-- [ ] Update synchronization and change handlers for select values and custom dates.
+- [x] Replace the project comparison shortcut button group with a period select.
+- [x] Change project comparison header CSS from wrapped two-row layout to one row.
+- [x] Generate the same date-range and period-select component for device comparison and the comparison modal.
+- [x] Update synchronization and change handlers for select values and custom dates.
 
 ### Task 3: Defect comparison control
 
@@ -52,9 +52,9 @@
 - Consumes: `periodRanges`, `dateRangeState`, `period`, and `render()`.
 - Produces: `.defect-period-select` with the same preset/custom behavior.
 
-- [ ] Replace the three defect period buttons with one select.
-- [ ] Keep device/region mode controls, date range, and period select on one line.
-- [ ] Preserve chart redraw behavior for preset and manual date changes.
+- [x] Replace the three defect period buttons with one select.
+- [x] Keep device/region mode controls, date range, and period select on one line.
+- [x] Preserve chart redraw behavior for preset and manual date changes.
 
 ### Task 4: Verification
 
@@ -68,8 +68,8 @@
 - Consumes: all updated HTML, CSS, and JavaScript.
 - Produces: syntax, structure, interaction, and rendering verification results.
 
-- [ ] Parse all updated scripts with Node.js syntax validation.
-- [ ] Verify each target exposes one date range and one period select with the required options.
-- [ ] Exercise preset and custom-date changes in a browser.
-- [ ] Render all three pages at the annotated viewport and 1440×900 and inspect for overflow.
-- [ ] Run `git diff --check` on the changed files.
+- [x] Parse all updated scripts with Node.js syntax validation.
+- [x] Verify each target exposes one date range and one period select with the required options.
+- [x] Exercise preset and custom-date changes in a browser.
+- [x] Render all three pages at the annotated viewport and 1440×900 and inspect for overflow.
+- [x] Run `git diff --check` on the changed files.
