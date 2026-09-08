@@ -55,3 +55,17 @@
 - [x] Parse all inline scripts with Node.js syntax validation.
 - [x] Verify the selector is absent, both chart targets exist in separate cards, and old review labels are absent from the requested locations.
 - [x] Run `git diff --check` for both pages.
+
+### Task 4: Compact device-card content
+
+**Files:**
+- Modify: `页面效果图/01A-项目明细.html`
+
+**Interfaces:**
+- Consumes: the existing `renderDevicePie()` renderer and device-card CSS.
+- Produces: compact legend rows containing only color, device name, and detection count.
+
+- [x] Remove the yield-range label from the yield-card header.
+- [x] Remove device SN and percentage markup from the device-distribution legend.
+- [x] Tighten legend row sizing and spacing without changing donut hover content.
+- [x] Validate inline script syntax and render at the annotated viewport and 1440×900.
