@@ -2,16 +2,16 @@
   'use strict';
 
   const pageMap = {
-    '订单统计': '01-项目统计首页.html',
+    '项目统计': '01-项目统计首页.html',
     '设备分析': '09-设备质量分析.html',
     '单板查询': '02-单板查询与结果追溯.html',
     '缺陷分析': '03-缺陷分析.html',
     '误报分析': '04-误报分析.html',
     '不良分析': '04A-不良导出.html',
-    '二次复判统计': '06-二次复判统计.html',
     '告警分析': '13-品质预警.html',
     '告警管理': '14-告警管理.html',
     '告警规则详情': '13A-告警规则详情.html',
+    '设备运行监控': '07-数据上传监控.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
     '角色管理': '11-角色管理.html',
@@ -21,37 +21,38 @@
   const choices = {
     '时间范围': ['最近 24 小时', '最近 7 天', '最近 30 天', '自定义时间范围'],
     '监控时间': ['最近 1 小时', '最近 24 小时', '最近 7 天'],
-    '二次复判时间': ['今天', '最近 7 天', '最近 30 天', '自定义时间范围'],
     '设备': ['全部设备（12）', '区域A · AOI-01', '区域B · AOI-02', '区域C · AOI-03', '区域D · AOI-04'],
     '设备名称': ['全部设备（4）', 'AOI-01', 'AOI-02', 'AOI-03', 'AOI-04'],
     '设备SN': ['全部设备SN', 'SI1020E1112', 'SI1020E1148', 'SI1020E1186', 'SI1020E1206', 'SI1020E1238', 'SI1020E1262', 'SI1020E1284', 'SI1020E1308', 'SI1020E1326', 'SI1020E1342', 'SI1020E1365', 'SI1020E1388'],
     '检测结果': ['全部', '良好', '不良', '直通', '误报', '漏报'],
-    '订单编号': ['全部订单', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
+    '模板名称': ['全部订单', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
     '项目 / 程序': ['3267504J2G_A面', '1-A', '329134S_P129'],
     '分析维度': ['不良类型', '封装类型', '料号', '位号'],
     '位号': ['R118', 'D2', 'C56', '全部位号'],
     '检测项': ['X偏移（mm）', 'Y偏移（mm）', '角度（°）'],
     '控制图': ['I-MR', 'Xbar-R'],
-    '复判工作站': ['全部工作站（4）', '复判站-01', '复判站-02', '复判站-03', '复判站-04'],
-    '复判人员': ['全部人员', 'J20816 · 李明', 'J20542 · 王芳', 'J20911 · 陈杰'],
-    '复判结果': ['全部结果', 'OK', 'NG'],
     '上传状态': ['全部状态', '正常', '延迟', '中断'],
+    '连接状态': ['全部状态', '已连接', '未连接', '未监控'],
+    '传输状态': ['全部状态', '正常', '延迟', '中断', '未监控'],
+    '记录类型': ['全部类型', '连接变化', '传输异常', '数据缺失', '补传任务', '人工操作'],
+    '处理结果': ['全部结果', '待处理', '处理中', '成功', '部分成功', '失败', '无需处理'],
     '数据类型': ['全部类型', 'MES JSON', '项目文件', 'NG图片'],
     '所属区域': ['全部区域', '区域A', '区域B', '区域C', '区域D', '未分配'],
     '设备状态': ['全部状态', '启用', '停用'],
+    '启用状态': ['全部状态', '启用', '停用'],
     '状态': ['全部', '启用', '停用']
   };
 
   const menuPermissionTree = [
-    { id: 'project-statistics', name: '订单统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看订单明细'] },
+    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看项目明细'] },
     { id: 'device-quality', name: '设备分析', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看设备明细', '查看本机 SPC'] },
     { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '导出所选'] },
     { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出所选'] },
     { id: 'false-positive', name: '误报分析', features: ['查看与查询', '自定义列', '导出所选', '查看设备明细'] },
     { id: 'defect-analysis-machine', name: '不良分析', features: ['查看与查询', '自定义列', '导出所选', '查看不良明细'] },
-    { id: 'second-review', name: '二次复判统计', features: ['查看与查询', '自定义列', '导出所选', '查看人员工作量'] },
     { id: 'alert-analysis', name: '告警分析', selected: true, features: ['查看与查询', '查看报警记录'] },
     { id: 'alert-management', name: '告警管理', features: ['查看与查询', '新增规则', '编辑规则', '启停规则', '删除规则'] },
+    { id: 'device-runtime-monitor', name: '设备运行监控', features: ['查看与查询', '查看运行记录', '重新连接', '断开连接', '补传', '诊断'] },
     { id: 'device-management', name: '设备管理', features: ['查看与查询', '新增设备', '区域管理', '查看本机 SPC', '编辑设备', '启停设备', '删除设备'] },
     { id: 'user-management', name: '用户管理', features: ['查看与查询', '新增用户', '编辑用户', '启停用户', '删除用户'] },
     { id: 'role-management', name: '角色管理', features: ['查看与查询', '新增角色', '编辑角色', '菜单权限', '启停角色', '删除角色'] },
@@ -60,7 +61,11 @@
 
   const style = document.createElement('style');
   style.textContent = `
+    .nav-item[href="12-个人中心.html"],.nav .item[href="12-个人中心.html"]{display:none!important}
+    .account-menu-wrap{position:relative;display:flex;align-items:center;min-width:0}.account-menu-wrap .account-entry{min-height:34px;margin-left:6px;padding:0 2px 0 12px;border:0;border-left:1px solid var(--line,#dfe5ec);display:flex;align-items:center;gap:8px;background:transparent;color:var(--text,#475569);text-decoration:none;white-space:nowrap;cursor:pointer}.account-menu-wrap .account-entry:hover,.account-menu-wrap .account-entry:focus{text-decoration:none;color:var(--blue,#3478f6)}.account-menu-wrap .account-entry:focus-visible{outline:2px solid rgba(52,120,246,.35);outline-offset:2px;border-radius:4px}.account-menu-wrap .account-chevron{width:14px;height:14px;margin-left:2px;position:relative;flex:0 0 14px;font-size:0;color:#8090a5;transition:transform .18s}.account-menu-wrap .account-chevron:before{content:"";position:absolute;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);top:2px;left:3px}.account-menu-wrap.open .account-chevron{transform:rotate(180deg)}.account-menu{position:absolute;z-index:1150;right:0;top:calc(100% + 8px);width:224px;max-width:calc(100vw - 24px);padding:6px;border:1px solid #d9e1eb;border-radius:6px;background:#fff;box-shadow:0 10px 28px rgba(15,32,54,.16)}.account-menu[hidden]{display:none}.account-menu-summary{padding:10px 10px 9px;border-bottom:1px solid #edf0f4}.account-menu-summary-row{display:flex;align-items:center;justify-content:space-between;gap:14px;line-height:22px}.account-menu-summary-row+.account-menu-summary-row{margin-top:2px}.account-menu-summary-row span{color:#7a8798;font-size:12px}.account-menu-summary-row b{max-width:128px;overflow:hidden;text-overflow:ellipsis;color:#263a55;font-size:12px;font-weight:650;white-space:nowrap}.account-menu-actions{padding-top:5px}.account-menu-action{width:100%;height:36px;padding:0 10px;border:0;border-radius:4px;display:flex;align-items:center;background:transparent;color:#334155;text-decoration:none;font-size:13px;text-align:left;cursor:pointer}.account-menu-action:hover,.account-menu-action:focus{background:#f2f6fc;color:var(--blue,#3478f6);text-decoration:none;outline:0}.account-menu-action.danger{color:#d14343}.account-menu-action.danger:hover,.account-menu-action.danger:focus{background:#fff3f3;color:#c93636}
+    .sidebar-account{position:relative;flex:0 0 auto;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.08)}.sidebar-account .account-menu-wrap{width:100%}.sidebar-account .account-entry{width:100%;min-height:46px;margin:0;padding:6px 8px;border:0;border-radius:5px;color:#bdc8d7;gap:10px}.sidebar-account .account-entry:hover,.sidebar-account .account-entry:focus{background:rgba(255,255,255,.06);color:#fff}.sidebar-account .account-avatar{background:#344965;color:#fff}.sidebar-account .account-copy{min-width:0}.sidebar-account .account-copy b{color:#fff}.sidebar-account .account-copy small{display:block;color:#8496ad}.sidebar-account .account-chevron{margin-left:auto;color:#8fa4bf}.sidebar-account .account-chevron:before{top:5px;transform:rotate(225deg)}.sidebar-account .account-menu-wrap.open .account-chevron{transform:rotate(180deg)}.sidebar-account .account-menu{left:0;right:auto;top:auto;bottom:calc(100% + 8px);width:100%;max-width:100%;max-height:min(320px,calc(100vh - 92px));overflow-y:auto;box-sizing:border-box}
     :root{--proto-ease:cubic-bezier(.25,1,.5,1)}
+    .proto-required{margin-left:3px;color:#d34747;font-style:normal}.proto-field textarea{width:100%;min-height:72px;max-height:120px;resize:vertical;border:1px solid #cfd8e4;border-radius:4px;padding:9px 10px;background:#fff;color:#334155;font:inherit;line-height:1.5}.proto-field textarea:focus{outline:3px solid rgba(52,120,246,.16);border-color:#6ea0ff}.proto-field .is-invalid{border-color:#d34747!important;box-shadow:0 0 0 2px rgba(211,71,71,.1)}
     .control,.seg,.tab,.nav-item,.item,.page,.link,.link-btn,.action,.action-link,.detail-link,.view-link,.history,.iconbtn,.icon-btn{cursor:pointer}
     .control:focus-visible,.seg:focus-visible,.tab:focus-visible,.nav-item:focus-visible,.item:focus-visible,.page:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid rgba(52,120,246,.28)!important;outline-offset:2px}
     .control:hover{border-color:#8eabe0!important;background:#fbfdff!important}.tab,.seg,.page,.control,button,a{transition:background-color 160ms var(--proto-ease),border-color 160ms var(--proto-ease),color 160ms var(--proto-ease),opacity 160ms var(--proto-ease)}
@@ -95,24 +100,42 @@
     body[data-page="device-quality"] .comparison-tab{height:25px;border:0;border-radius:3px;background:transparent;color:#64748b;padding:0 8px;cursor:pointer;font-size:12px}
     body[data-page="device-quality"] .comparison-tab.is-active{background:#fff;color:#2468e8;box-shadow:0 1px 2px rgba(16,42,76,.12);font-weight:650}
     body[data-page="device-quality"] .comparison-grid,body[data-page="device-quality"] .device-chart-grid{stroke:#e7edf4;stroke-width:1}
+    body[data-page="device-quality"] .comparison-bar-track{fill:#edf1f5}
     body[data-page="device-quality"] .comparison-bar{fill:#3478f6}
+    body[data-page="device-quality"] .comparison-bar:hover{fill:#2468e8}
     body[data-page="device-quality"] .comparison-axis,body[data-page="device-quality"] .comparison-label,body[data-page="device-quality"] .device-chart-axis{fill:#748398;font-size:10px}
     body[data-page="device-quality"] .comparison-value{fill:#1f3552;font-size:9px;font-weight:650}
     body[data-page="device-quality"] .comparison-label{text-anchor:middle}
+    body[data-page="device-quality"] .comparison-label.project-label{text-anchor:end}
+    body[data-page="device-quality"] .device-horizontal-value{text-anchor:end}
     body[data-page="device-quality"] .device-quality-charts .phead{min-width:0}
     body[data-page="device-quality"] .device-quality-charts .phead .phead-title{min-width:0}
     body[data-page="device-quality"] .chart-head-actions{margin-left:auto;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:8px}
     body[data-page="device-quality"] .chart-period-picker{display:flex;align-items:center;border:1px solid #d5deea;border-radius:4px;padding:2px;background:#f7f9fc;white-space:nowrap}
     body[data-page="device-quality"] .chart-period{height:25px;border:0;border-radius:3px;background:transparent;color:#64748b;padding:0 7px;cursor:pointer;font-size:12px;white-space:nowrap}
     body[data-page="device-quality"] .chart-period.is-active{background:#fff;color:#2468e8;box-shadow:0 1px 2px rgba(16,42,76,.12);font-weight:650}
+    .comparison-date-range{display:flex;align-items:center;gap:5px;flex:0 0 auto;white-space:nowrap}
+    .comparison-date-range input{width:106px;height:29px;border:1px solid #d5deea;border-radius:4px;background:#fff;color:#526176;padding:0 6px;font:inherit;font-size:11px}
+    body[data-page="device-quality"] .device-trend-date-range{display:flex;align-items:center;gap:5px;white-space:nowrap}
+    body[data-page="device-quality"] .device-trend-date-range input{width:106px;height:29px;border:1px solid #d5deea;border-radius:4px;background:#fff;color:#526176;padding:0 6px;font:inherit;font-size:11px}
+    body[data-page="device-quality"] .device-trend-date-range.is-hidden{display:none}
+    body[data-page="device-quality"] [data-device-trend] .comparison-switch{flex:0 0 auto;white-space:nowrap}
+    body[data-page="device-quality"] .device-quality-charts .quality-chart{display:flex;flex-direction:column}
+    body[data-page="device-quality"] .device-quality-charts .quality-chart-body{height:auto;flex:1;min-height:0}
+    body[data-page="device-quality"] [data-comparison-chart].is-device-horizontal,body[data-page="device-quality"] .comparison-modal-chart.is-device-horizontal{overflow-x:hidden;overflow-y:auto;scrollbar-gutter:stable;padding-right:6px}
+    body[data-page="device-quality"] .is-device-horizontal .comparison-chart-scroll-content{width:100%;min-height:100%}
+    body[data-page="device-quality"] .is-device-horizontal .comparison-chart-scroll-content svg{display:block;width:100%;height:100%;min-height:0;overflow:hidden}
+    body[data-page="device-quality"] [data-comparison-panel] .phead{height:auto;min-height:82px;flex-wrap:wrap;padding-top:7px;padding-bottom:7px}
+    body[data-page="device-quality"] [data-comparison-panel] .chart-head-actions{width:100%;justify-content:flex-end;flex-wrap:wrap}
     body[data-page="device-quality"] .device-quality-charts .phead .legend{min-width:0;gap:10px;white-space:nowrap}
     body[data-page="device-quality"] .device-yield-trend{padding:10px 14px}
     body[data-page="device-quality"] .device-yield-trend svg{width:100%;height:100%;display:block}
     body[data-page="device-quality"] .table-panel .quality-filter{height:auto!important;min-height:76px;flex:0 0 auto;border:0;border-bottom:1px solid #e8edf2;border-radius:0;padding:14px 16px}
     body[data-page="device-quality"] .table-panel .table-wrap{height:calc(100% - 126px)}
-    .proto-comparison-modal{width:min(960px,calc(100vw - 40px))!important}.comparison-modal-toolbar{display:flex;align-items:center;gap:12px}.comparison-modal-toolbar .chart-period-picker{margin-left:auto}
-    @media(max-width:1180px){body[data-page="device-quality"] .chart-head-actions{gap:5px}body[data-page="device-quality"] .chart-period{padding:0 5px;font-size:11px}body[data-page="device-quality"] .device-quality-charts .phead .legend{gap:6px;font-size:10px}}
-    @media(max-width:900px){body[data-page="device-quality"] .quality-grid{height:auto;grid-template-columns:1fr}body[data-page="device-quality"] .quality-chart{min-height:250px}body[data-page="device-quality"] .chart-head-actions{flex-wrap:wrap}body[data-page="device-quality"] .table-panel .table-wrap{height:420px}.comparison-modal-toolbar{align-items:flex-start;flex-wrap:wrap}.comparison-modal-toolbar .chart-period-picker{margin-left:0}}
+    .proto-comparison-modal{width:min(960px,calc(100vw - 40px))!important}.comparison-modal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.comparison-modal-toolbar .comparison-modal-note{margin-left:auto;white-space:nowrap}
+    @media(max-width:1180px){body[data-page="device-quality"] [data-device-trend] .phead{height:auto;min-height:50px;flex-wrap:wrap;padding-top:7px;padding-bottom:7px}body[data-page="device-quality"] .chart-head-actions{gap:5px}body[data-page="device-quality"] .chart-period{padding:0 5px;font-size:11px}body[data-page="device-quality"] .device-quality-charts .phead .legend{gap:6px;font-size:10px}body[data-page="device-quality"] .device-trend-date-range input,.comparison-date-range input{width:102px}}
+    @media(max-width:900px){body[data-page="device-quality"] .quality-grid{height:auto;grid-template-columns:1fr}body[data-page="device-quality"] .quality-chart{min-height:250px}body[data-page="device-quality"] .chart-head-actions{flex-wrap:wrap}body[data-page="device-quality"] [data-device-trend] .chart-head-actions{width:100%;justify-content:flex-start}body[data-page="device-quality"] .table-panel .table-wrap{height:420px}.comparison-modal-toolbar{align-items:flex-start;flex-wrap:wrap}}
+    body[data-page="device-quality"] [data-comparison-panel] .phead{height:50px;min-height:50px;flex-wrap:nowrap;padding-top:0;padding-bottom:0;gap:5px}body[data-page="device-quality"] [data-comparison-panel] .phead-title{flex:0 0 auto}body[data-page="device-quality"] [data-comparison-panel] .chart-head-actions{width:auto;flex:1;gap:4px;flex-wrap:nowrap}body[data-page="device-quality"] [data-comparison-panel] .chart-time-range input{width:102px}body[data-page="device-quality"] [data-comparison-panel] .chart-period-select{width:96px;flex-basis:96px}body[data-page="device-quality"] [data-comparison-panel] .comparison-switch{flex:0 0 auto}body[data-page="device-quality"] [data-comparison-panel] .comparison-tab{padding:0 5px;font-size:11px;white-space:nowrap}body[data-page="device-quality"] [data-comparison-panel] .link{padding:0 2px;font-size:11px;flex:0 0 auto;white-space:nowrap}@media(max-width:1500px){body[data-page="device-quality"] .quality-grid{grid-template-columns:minmax(0,1.08fr) minmax(550px,1fr)}}@media(max-width:1180px){body[data-page="device-quality"] .quality-grid{height:auto;grid-template-columns:1fr}body[data-page="device-quality"] .quality-chart{min-height:230px}}
   `;
   document.head.appendChild(deviceChartStyle);
 
@@ -122,12 +145,11 @@
     .filter(span => !/^[▣▦⌕]$/.test(getText(span)))
     .sort((a, b) => getText(b).length - getText(a).length)[0] || control.querySelector('span:not(.chev)');
   let currentPopover = null;
-  let tabOriginal = null;
   let currentLanguage = 'zh';
   let currentTheme = 'light';
   const projectColumns = [
     { key: 'index', label: '序号', group: '基础信息' },
-    { key: 'projectName', label: '订单编号', group: '基础信息' },
+    { key: 'projectName', label: '模板名称', group: '基础信息' },
     { key: 'deviceCount', label: '覆盖设备数', group: '基础信息' },
     { key: 'deviceNames', label: '检测设备SN', group: '基础信息' },
     { key: 'boardTotal', label: '板卡总数', group: '板卡指标' },
@@ -160,16 +182,17 @@
     { key: 'index', label: '序号', group: '基础信息' },
     { key: 'deviceName', label: '设备名称', group: '基础信息' },
     { key: 'deviceSn', label: '设备SN', group: '基础信息' },
-    { key: 'projectCount', label: '检测订单数', group: '基础信息' },
+    { key: 'projectCount', label: '检测模板数', group: '基础信息' },
     ...projectColumns.filter(column => column.group !== '基础信息'),
-    { key: 'lastDataTime', label: '最后数据时间', group: '基础信息' }
+    { key: 'lastDataTime', label: '最后接收数据时间', group: '基础信息' }
   ];
   const defaultDeviceColumnKeys = ['index', 'deviceName', 'deviceSn', 'projectCount', 'boardTotal', 'boardYield', 'boardDppm', 'boardFalseRate', 'boardPassRate', 'componentDppm', 'componentNgRate', 'lastDataTime'];
   let activeDeviceColumns = new Set(defaultDeviceColumnKeys);
   let currentMouth = 'review';
   let currentComparisonType = 'device';
-  let currentTrendPeriod = '7d';
+  let currentTrendPeriod = 'day';
   let currentComparisonPeriod = '7d';
+  let comparisonDateRange = { start: '2026-07-29', end: '2026-08-04' };
   let currentProjectTrendMode = 'day';
 
   const projectSamples = [
@@ -288,6 +311,68 @@
     return backdrop;
   }
 
+  function initializeAccountMenu() {
+    document.querySelectorAll('.nav-item[href="12-个人中心.html"],.nav .item[href="12-个人中心.html"]').forEach(item => item.remove());
+
+    const entry = document.querySelector('.account-entry');
+    const sidebar = document.querySelector('.sidebar');
+    if (!entry || !sidebar || entry.closest('.sidebar-account')) return;
+
+    const accountName = getText(entry.querySelector('.account-copy b')) || 'admin';
+    const roleName = getText(entry.querySelector('.account-copy small')) || '平台管理员';
+    const wrap = document.createElement('div');
+    wrap.className = 'account-menu-wrap';
+    entry.parentNode.insertBefore(wrap, entry);
+    wrap.appendChild(entry);
+    const sidebarAccount = document.createElement('div');
+    sidebarAccount.className = 'sidebar-account';
+    sidebarAccount.setAttribute('aria-label', '当前账号');
+    sidebarAccount.appendChild(wrap);
+    sidebar.appendChild(sidebarAccount);
+
+    entry.setAttribute('role', 'button');
+    entry.setAttribute('aria-haspopup', 'menu');
+    entry.setAttribute('aria-expanded', 'false');
+    entry.setAttribute('title', '账号菜单');
+
+    const menu = document.createElement('div');
+    menu.className = 'account-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', '账号菜单');
+    menu.hidden = true;
+    menu.innerHTML = `<div class="account-menu-summary"><div class="account-menu-summary-row"><span>账号名称</span><b>${accountName}</b></div><div class="account-menu-summary-row"><span>角色名称</span><b>${roleName}</b></div></div><div class="account-menu-actions"><a class="account-menu-action" href="12-个人中心.html" role="menuitem">个人中心</a><button class="account-menu-action danger" type="button" role="menuitem" data-account-logout>退出登录</button></div>`;
+    wrap.appendChild(menu);
+
+    const setOpen = open => {
+      menu.hidden = !open;
+      wrap.classList.toggle('open', open);
+      entry.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    entry.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(menu.hidden);
+    });
+    entry.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      setOpen(menu.hidden);
+    });
+    menu.querySelector('[data-account-logout]').addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      openModal('退出登录', '<p style="margin:0;color:#475569;line-height:1.7">确认退出当前账号吗？</p>', '退出登录', () => toast('已退出登录', 'info'));
+    });
+    document.addEventListener('click', event => {
+      if (!wrap.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+  }
+
   function openHelp() {
     openModal('原型操作说明', `<p style="margin-top:0;line-height:1.7;color:#475569">这是 SPC 集中管理平台的可交互产品原型。你可以切换左侧页面、选择筛选条件、执行查询、切换统计口径和页签，并演示详情、导出、设备分配及补传操作。</p><div style="background:#f7f9fc;border-radius:6px;padding:12px;color:#64748b;font-size:12px;line-height:1.7">原型中的数据用于展示交互和页面结构，不代表现场真实生产数据。</div>`, '知道了');
   }
@@ -296,12 +381,14 @@
   const pct = value => `${Number(value).toFixed(2)}%`;
 
   function mouthLabel(mouth) {
-    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '二次复判' : '一次复判';
+    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '最终复判' : '一次复判';
   }
 
   function mouthData(sample, mouth) {
-    if (mouth !== 'second') return sample[mouth];
+    const sourceMouth = mouth;
+    if (sourceMouth !== 'second') return sample[sourceMouth] || null;
     const review = sample.review;
+    if (!review) return null;
     return {
       yield: Math.min(99.95, review.yield + .28),
       falseRate: Math.max(.12, review.falseRate - .18),
@@ -314,6 +401,7 @@
 
   function statsFor(sample, mouth) {
     const source = mouthData(sample, mouth);
+    if (!source) return null;
     const componentTotal = sample.componentTotal || sample.boardTotal * 82;
     const boardGood = Math.round(sample.boardTotal * source.yield / 100);
     const boardNg = sample.boardTotal - boardGood;
@@ -346,7 +434,7 @@
     const heads = columns.map(column => `<th data-column-key="${column.key}" class="${column.group === '基础信息' ? '' : 'num'}">${column.label}</th>`).join('');
     const body = rows.map(row => `<tr data-device-row="${row.deviceSn || row.index}">${selectable ? `<td class="device-select-cell"><input class="device-row-check" type="checkbox" aria-label="选择设备 ${row.deviceName}"></td>` : ''}${columns.map(column => {
       const numeric = column.group === '基础信息' ? '' : 'num';
-      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部订单编号')}</td>`;
+      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部模板名称')}</td>`;
       if (column.key === 'projectName') return `<td data-column-key="projectName"><a href="#" class="project-link" data-project-uuid="${row.projectUuid}">${row.projectName}</a></td>`;
       if (column.key === 'deviceName') return `<td data-column-key="deviceName"><a href="#" class="device-link" data-device-name="${row.deviceName}" title="点击后提示跳转至本机 SPC">${row.deviceName}</a></td>`;
       return `<td data-column-key="${column.key}" class="${numeric}${column.key === 'projectUuid' ? ' uuid' : ''}">${row[column.key] ?? '—'}</td>`;
@@ -486,7 +574,7 @@
     const columns = isDevice ? deviceColumns : projectColumns;
     const activeColumns = isDevice ? activeDeviceColumns : activeProjectColumns;
     const defaultColumns = isDevice ? new Set(defaultDeviceColumnKeys) : new Set(projectColumns.map(column => column.key));
-    const lockedKeys = isDevice ? new Set(['deviceName']) : new Set(['projectName']);
+    const lockedKeys = isDevice ? new Set(['deviceName', 'deviceSn']) : new Set(['projectName']);
     const groups = ['基础信息', '板卡指标', '器件指标'];
     const groupHtml = groups.map(group => `<section class="proto-column-group"><h4>${group}</h4><div class="proto-column-grid">${columns.filter(column => column.group === group).map(column => `<label class="proto-column-option" ${lockedKeys.has(column.key) ? `title="${column.label}为必选字段"` : ''}><input type="checkbox" value="${column.key}" ${activeColumns.has(column.key) || lockedKeys.has(column.key) ? 'checked' : ''} ${lockedKeys.has(column.key) ? 'disabled data-column-locked="true"' : ''}><span title="${column.label}">${column.label}${lockedKeys.has(column.key) ? '（必选）' : ''}</span></label>`).join('')}</div></section>`).join('');
     const backdrop = openModal('显示列', `<div class="proto-column-toolbar"><span class="proto-column-note">已选择 <b data-column-count>${activeColumns.size}</b> / ${columns.length} 列</span><div class="proto-column-actions"><button type="button" data-column-action="all">全选</button><button type="button" data-column-action="none">取消全选</button><button type="button" data-column-action="default">恢复默认</button></div></div><div class="proto-column-groups">${groupHtml}</div>`, '应用列设置', modal => {
@@ -519,7 +607,7 @@
     const page = document.body.dataset.page;
     const lockedIndexes = new Set(headers.filter(column => {
       if (page === 'board-query') return column.label === '板边条码' || column.label === '操作';
-      if (page === 'defect-analysis') return column.label === '订单编号' || column.label === '板边条码';
+      if (page === 'defect-analysis') return column.label === '模板名称' || column.label === '板边条码';
       return false;
     }).map(column => column.index));
     const options = headers.map(column => `<label class="proto-column-option"><input type="checkbox" value="${column.index}" ${(active.has(String(column.index)) || lockedIndexes.has(column.index)) ? 'checked' : ''} ${lockedIndexes.has(column.index) ? 'disabled' : ''}><span title="${column.label}">${column.label}${lockedIndexes.has(column.index) ? '（必选）' : ''}</span></label>`).join('');
@@ -571,6 +659,13 @@
   }
 
   function comparisonPeriodAdjustment(index) {
+    if (currentComparisonPeriod === 'custom') {
+      const start = new Date(`${comparisonDateRange.start}T00:00:00`);
+      const end = new Date(`${comparisonDateRange.end}T00:00:00`);
+      const days = Math.max(1, Math.round((end - start) / 86400000) + 1);
+      const base = Math.min(.55, Math.max(.04, days * .012));
+      return -base * (.72 + (index % 5) * .07);
+    }
     const adjustments = {
       '7d': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       month: [-.18, -.12, -.22, -.16, -.24, -.15, -.19, -.21, -.17, -.23, -.14, -.20],
@@ -579,9 +674,57 @@
     return (adjustments[currentComparisonPeriod] || adjustments['7d'])[index] || 0;
   }
 
+  function comparisonDateRangeForPeriod(period) {
+    const ranges = {
+      '7d': { start: '2026-07-29', end: '2026-08-04' },
+      month: { start: '2026-07-05', end: '2026-08-04' },
+      halfYear: { start: '2026-02-05', end: '2026-08-04' }
+    };
+    return ranges[period] || comparisonDateRange;
+  }
+
+  function comparisonDateRangeMarkup() {
+    return `<div class="chart-time-range comparison-date-range" data-comparison-date-range role="group" aria-label="良率对比时间范围"><input type="date" value="${comparisonDateRange.start}" data-comparison-date="start" aria-label="开始时间"><span>至</span><input type="date" value="${comparisonDateRange.end}" data-comparison-date="end" aria-label="结束时间"></div>`;
+  }
+
+  function syncComparisonControls(root = document) {
+    root.querySelectorAll('select[data-chart-period-context="comparison"]').forEach(select => { select.value = currentComparisonPeriod; });
+    root.querySelectorAll('[data-comparison-date]').forEach(input => {
+      input.value = comparisonDateRange[input.dataset.comparisonDate];
+    });
+  }
+
+  function setComparisonPeriod(period) {
+    currentComparisonPeriod = period;
+    comparisonDateRange = comparisonDateRangeForPeriod(period);
+    syncComparisonControls(document);
+  }
+
+  function initializeComparisonDateRange(root, onChange) {
+    root.querySelectorAll('[data-comparison-date]').forEach(input => {
+      input.onchange = () => {
+        const range = input.closest('[data-comparison-date-range]');
+        const start = range?.querySelector('[data-comparison-date="start"]')?.value;
+        const end = range?.querySelector('[data-comparison-date="end"]')?.value;
+        if (!start || !end || start > end) {
+          syncComparisonControls(document);
+          return;
+        }
+        comparisonDateRange = { start, end };
+        currentComparisonPeriod = 'custom';
+        syncComparisonControls(document);
+        onChange();
+      };
+    });
+  }
+
   function comparisonChartMarkup(type = currentComparisonType, showAll = false) {
     const data = comparisonDataset(type)
-      .map((item, index) => ({ ...item, value: Math.max(88, mouthData(item, currentMouth).yield + comparisonPeriodAdjustment(index)) }))
+      .map((item, index) => {
+        const source = mouthData(item, currentMouth);
+        return source ? { ...item, value: Math.max(88, source.yield + comparisonPeriodAdjustment(index)) } : null;
+      })
+      .filter(Boolean)
       .sort((a, b) => b.value - a.value);
     const items = showAll ? data : data.slice(0, 10);
     if (type === 'project') {
@@ -601,7 +744,30 @@
         const barWidth = Math.max(2, endX - x(minimum));
         return `<g><title>订单 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
       }).join('');
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="订单良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
+      const contentHeight = Math.max(height, showAll ? 400 : 360);
+      return `<div class="comparison-chart-scroll-content" style="height:${contentHeight}px"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="订单良率${showAll ? '全部' : '排名前10名'}，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}${bars}</svg></div>`;
+    }
+    if ((type === 'device' || type === 'area') && document.body.dataset.page === 'device-quality') {
+      const width = 560;
+      const rowHeight = 32;
+      const margin = { top: 14, right: 52, bottom: 26, left: 148 };
+      const height = margin.top + margin.bottom + rowHeight * items.length;
+      const plotWidth = width - margin.left - margin.right;
+      const minimum = 88;
+      const maximum = 100;
+      const x = value => margin.left + (value - minimum) / (maximum - minimum) * plotWidth;
+      const ticks = [88, 91, 94, 97, 100];
+      const grid = ticks.map(value => `<line class="comparison-grid" x1="${x(value)}" y1="${margin.top}" x2="${x(value)}" y2="${height - margin.bottom}"/><text class="comparison-axis" x="${x(value)}" y="${height - 8}" text-anchor="middle">${value}%</text>`).join('');
+      const bars = items.map((item, index) => {
+        const centerY = margin.top + rowHeight * index + rowHeight / 2;
+        const endX = x(item.value);
+        const barWidth = Math.max(2, endX - x(minimum));
+        const label = type === 'area' ? item.name : `${item.area} · ${item.name}`;
+        return `<g><title>${label}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${label}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value device-horizontal-value" x="${width - 8}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
+      }).join('');
+      const contentHeight = type === 'area' ? Math.max(height, showAll ? 320 : 180) : Math.max(height, showAll ? 400 : 360);
+      const dimensionLabel = type === 'area' ? '区域' : '设备';
+      return `<div class="comparison-chart-scroll-content" style="height:${contentHeight}px"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率${showAll ? '全部' : '排名前10名'}，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}${bars}</svg></div>`;
     }
     const width = showAll ? 900 : 560;
     const height = showAll ? 330 : 220;
@@ -625,7 +791,7 @@
       return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
     const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '订单' : '设备';
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
   }
 
   function renderProjectComparison(type = currentComparisonType) {
@@ -640,16 +806,20 @@
     const chart = panel.querySelector('[data-comparison-chart]');
     if (chart) {
       chart.classList.toggle('is-horizontal', type === 'project');
+      chart.classList.toggle('is-device-horizontal', (type === 'device' || type === 'area') && document.body.dataset.page === 'device-quality');
       chart.innerHTML = comparisonChartMarkup(type, false);
     }
   }
 
   function openProjectComparisonModal() {
-    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button></div><span class="comparison-modal-note" data-comparison-count></span>${chartPeriodPicker('comparison', currentComparisonPeriod)}</div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
+    const comparisonPanel = document.querySelector('[data-comparison-panel]');
+    const isProjectScope = comparisonPanel?.dataset.comparisonScope === 'project';
+    const dimensionSwitch = isProjectScope ? '' : '<div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button></div>';
+    const body = `<div class="comparison-modal-toolbar">${comparisonDateRangeMarkup()}${chartPeriodSelect('comparison', currentComparisonPeriod)}${dimensionSwitch}<span class="comparison-modal-note" data-comparison-count></span></div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
     const backdrop = openModal('全部良率对比', body, '关闭');
     backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
     backdrop.querySelector('[data-close]').remove();
-    let modalType = currentComparisonType;
+    let modalType = isProjectScope ? 'project' : currentComparisonType;
     const draw = () => {
       backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
         const active = button.dataset.modalComparisonType === modalType;
@@ -657,32 +827,30 @@
         button.setAttribute('aria-selected', String(active));
       });
       const data = comparisonDataset(modalType);
-      backdrop.querySelector('[data-comparison-count]').textContent = `共 ${data.length} 个${modalType === 'area' ? '区域' : '设备'} · 按良率降序`;
-      backdrop.querySelector('[data-modal-comparison-chart]').innerHTML = comparisonChartMarkup(modalType, true);
+      const dimensionLabel = modalType === 'area' ? '区域' : modalType === 'project' ? '订单' : '设备';
+      backdrop.querySelector('[data-comparison-count]').textContent = `共 ${data.length} 个${dimensionLabel} · 按良率降序`;
+      const modalChart = backdrop.querySelector('[data-modal-comparison-chart]');
+      modalChart.classList.toggle('is-horizontal', modalType === 'project');
+      modalChart.classList.toggle('is-device-horizontal', (modalType === 'device' || modalType === 'area') && document.body.dataset.page === 'device-quality');
+      modalChart.innerHTML = comparisonChartMarkup(modalType, true);
     };
     backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
       button.onclick = () => { modalType = button.dataset.modalComparisonType; draw(); };
     });
-    backdrop.querySelectorAll('[data-chart-period]').forEach(button => {
-      button.onclick = () => {
-        currentComparisonPeriod = button.dataset.chartPeriod;
-        backdrop.querySelectorAll('[data-chart-period]').forEach(item => {
-          const active = item === button;
-          item.classList.toggle('is-active', active);
-          item.setAttribute('aria-pressed', String(active));
-        });
+    backdrop.querySelectorAll('select[data-chart-period-context="comparison"]').forEach(select => {
+      select.onchange = () => {
+        setComparisonPeriod(select.value);
         const projectPanel = document.querySelector('[data-comparison-panel]');
-        if (projectPanel) {
-          projectPanel.querySelectorAll('[data-chart-period]').forEach(item => {
-            const active = item.dataset.chartPeriod === currentComparisonPeriod;
-            item.classList.toggle('is-active', active);
-            item.setAttribute('aria-pressed', String(active));
-          });
-          renderProjectComparison(currentComparisonType);
-        }
+        if (projectPanel) renderProjectComparison(currentComparisonType);
         draw();
       };
     });
+    initializeComparisonDateRange(backdrop, () => {
+      const projectPanel = document.querySelector('[data-comparison-panel]');
+      if (projectPanel) renderProjectComparison(currentComparisonType);
+      draw();
+    });
+    syncComparisonControls(backdrop);
     draw();
   }
 
@@ -694,37 +862,34 @@
     panel.querySelectorAll('[data-comparison-type]').forEach(button => {
       button.onclick = () => renderProjectComparison(button.dataset.comparisonType);
     });
-    panel.querySelectorAll('[data-chart-period]').forEach(button => {
-      button.onclick = () => {
-        currentComparisonPeriod = button.dataset.chartPeriod;
-        panel.querySelectorAll('[data-chart-period]').forEach(item => {
-          const active = item === button;
-          item.classList.toggle('is-active', active);
-          item.setAttribute('aria-pressed', String(active));
-        });
+    panel.querySelectorAll('select[data-chart-period-context="comparison"]').forEach(select => {
+      select.onchange = () => {
+        setComparisonPeriod(select.value);
         renderProjectComparison(currentComparisonType);
       };
     });
+    initializeComparisonDateRange(panel, () => renderProjectComparison(currentComparisonType));
+    syncComparisonControls(panel);
     const allButton = panel.querySelector('[data-comparison-all]');
     if (allButton) allButton.onclick = openProjectComparisonModal;
     renderProjectComparison(currentComparisonType);
   }
 
   function projectTrendDataset(mode = currentProjectTrendMode) {
-    if (mode === 'month') {
-      return {
+    const dataset = mode === 'month'
+      ? {
         labels: ['03月', '04月', '05月', '06月', '07月', '08月'],
         original: [91.2, 91.8, 92.1, 91.7, 92.4, 92.8],
         review: [97.2, 97.6, 97.9, 97.5, 98.1, 98.4],
-        second: [98.1, 98.4, 98.6, 98.3, 98.8, 99.0]
-      };
-    }
-    return {
+        second: [97.5, 97.9, 98.2, 97.8, 98.4, 98.7]
+      }
+      : {
       labels: ['07-29', '07-30', '07-31', '08-01', '08-02', '08-03', '08-04'],
       original: [91.4, 91.8, 91.2, 92.0, 91.6, 92.2, 92.8],
       review: [97.4, 97.8, 97.2, 98.0, 97.6, 98.2, 98.5],
-      second: [98.2, 98.5, 98.1, 98.7, 98.4, 98.9, 99.1]
+      second: [97.7, 98.1, 97.5, 98.3, 97.9, 98.5, 98.8]
     };
+    return dataset;
   }
 
   function projectTrendMarkup(mode = currentProjectTrendMode) {
@@ -741,7 +906,7 @@
     const path = values => values.map((value, index) => `${index ? 'L' : 'M'}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(' ');
     const dots = (values, className, label) => values.map((value, index) => `<circle class="dot ${className}" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3"><title>${data.labels[index]} ${label}：${value.toFixed(2)}%</title></circle>`).join('');
     const labels = data.labels.map((label, index) => `<text class="axis" x="${x(index).toFixed(1)}" y="${height - 10}" text-anchor="middle">${label}</text>`).join('');
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${mode === 'day' ? '按天最近7天' : '按月最近6个月'}质量趋势">${grid}<path class="line-original" d="${path(data.original)}"/><path class="line-review" d="${path(data.review)}"/><path class="line-second" d="${path(data.second)}"/>${dots(data.original, 'trend-original-dot', '机器判定')}${dots(data.review, 'trend-review-dot', '一次复判')}${dots(data.second, 'trend-second-dot', '二次复判')}${labels}</svg>`;
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${mode === 'day' ? '按天最近7天' : '按月最近6个月'}质量趋势，包含机器判定、一次复判与最终复判">${grid}<path class="line-original" d="${path(data.original)}"/><path class="line-review" d="${path(data.review)}"/><path class="line-second" d="${path(data.second)}"/>${dots(data.original, 'trend-original-dot', '机器判定')}${dots(data.review, 'trend-review-dot', '一次复判')}${dots(data.second, 'trend-second-dot', '最终复判')}${labels}</svg>`;
   }
 
   function renderProjectTrend(mode = currentProjectTrendMode) {
@@ -772,9 +937,75 @@
     renderProjectTrend('day');
   }
 
+  function initializeProjectCellTooltips() {
+    const table = document.querySelector('[data-project-table]');
+    if (!table || table.dataset.cellTooltipEnhanced) return;
+    table.dataset.cellTooltipEnhanced = 'true';
+
+    if (!document.getElementById('proto-cell-tooltip-style')) {
+      const tooltipStyle = document.createElement('style');
+      tooltipStyle.id = 'proto-cell-tooltip-style';
+      tooltipStyle.textContent = '.proto-cell-tooltip{position:fixed;z-index:1250;width:max-content;max-width:min(520px,calc(100vw - 24px));max-height:min(240px,calc(100vh - 24px));overflow:auto;padding:9px 12px;border:1px solid #263a55;border-radius:5px;background:#17233a;color:#fff;box-shadow:0 8px 24px rgba(15,23,42,.24);font-size:12px;line-height:1.6;overflow-wrap:anywhere;white-space:normal;pointer-events:none}';
+      document.head.appendChild(tooltipStyle);
+    }
+
+    let tooltip = null;
+    let activeCell = null;
+    const close = () => {
+      if (activeCell) activeCell.removeAttribute('aria-describedby');
+      if (tooltip) tooltip.remove();
+      tooltip = null;
+      activeCell = null;
+    };
+    const isTruncated = cell => cell.scrollWidth > cell.clientWidth + 1;
+    const refreshTargets = () => {
+      table.querySelectorAll('tbody td').forEach(cell => {
+        if (isTruncated(cell)) cell.tabIndex = 0;
+        else cell.removeAttribute('tabindex');
+      });
+    };
+    const show = cell => {
+      if (!cell || !isTruncated(cell)) { close(); return; }
+      const text = getText(cell);
+      if (!text) { close(); return; }
+      close();
+      tooltip = document.createElement('div');
+      tooltip.className = 'proto-cell-tooltip';
+      tooltip.id = 'proto-cell-tooltip';
+      tooltip.setAttribute('role', 'tooltip');
+      tooltip.textContent = text;
+      document.body.appendChild(tooltip);
+      activeCell = cell;
+      cell.setAttribute('aria-describedby', tooltip.id);
+      const rect = cell.getBoundingClientRect();
+      const gap = 8;
+      const left = Math.min(Math.max(gap, rect.left), window.innerWidth - tooltip.offsetWidth - gap);
+      const below = rect.bottom + gap;
+      const top = below + tooltip.offsetHeight <= window.innerHeight - gap ? below : Math.max(gap, rect.top - tooltip.offsetHeight - gap);
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    };
+
+    table.addEventListener('mouseover', event => {
+      const cell = event.target.closest('tbody td');
+      if (cell && table.contains(cell)) show(cell);
+    });
+    table.addEventListener('mouseout', event => {
+      const cell = event.target.closest('tbody td');
+      if (cell && !cell.contains(event.relatedTarget)) close();
+    });
+    table.addEventListener('focusin', event => show(event.target.closest('tbody td')));
+    table.addEventListener('focusout', close);
+    table.addEventListener('scroll', close, true);
+    window.addEventListener('resize', () => { close(); refreshTargets(); });
+    new MutationObserver(() => requestAnimationFrame(refreshTargets)).observe(table, { childList: true, subtree: true });
+    requestAnimationFrame(refreshTargets);
+  }
+
   function summarizeProjectMetrics(projects, mouth) {
     const summary = projects.reduce((result, project) => {
       const source = mouthData(project, mouth);
+      if (!source) return result;
       const boardTotal = project.boardTotal;
       const componentTotal = project.componentTotal;
       result.boardTotal += boardTotal;
@@ -814,7 +1045,8 @@
     const sourceProjects = selectedDevice ? projectSamples.filter(project => project.devices.includes(selectedDevice)) : projectSamples;
     const prototypeDeviceSn = { 'AOI-01': 'SI1020E1112', 'AOI-02': 'SI1020E1186', 'AOI-03': 'SI1020E1148', 'AOI-04': 'SI1020E1206', 'AOI-05': 'SI1020E1238', 'AOI-06': 'SI1020E1262', 'AOI-07': 'SI1020E1284', 'AOI-08': 'SI1020E1308', 'AOI-09': 'SI1020E1326', 'AOI-10': 'SI1020E1342', 'AOI-11': 'SI1020E1365', 'AOI-12': 'SI1020E1388' };
     const deviceSn = name => deviceSamples.find(device => device.name === name)?.sn || prototypeDeviceSn[name] || name;
-    const rows = sourceProjects.map((project, index) => ({ index: index + 1, projectName: project.name, projectUuid: project.uuid, deviceCount: `${selectedDevice ? 1 : project.devices.length} 台`, deviceNames: selectedDevice ? deviceSn(selectedDevice) : project.devices.map(deviceSn).join('、'), ...statsFor(project, mouth) }));
+    const statisticalProjects = sourceProjects.filter(project => mouthData(project, mouth));
+    const rows = statisticalProjects.map((project, index) => ({ index: index + 1, projectName: project.name, projectUuid: project.uuid, deviceCount: `${selectedDevice ? 1 : project.devices.length} 台`, deviceNames: selectedDevice ? deviceSn(selectedDevice) : project.devices.map(deviceSn).join('、'), ...statsFor(project, mouth) }));
     table.innerHTML = tableMarkup(projectColumns, rows, 'data-project-table');
     delete table.dataset.selectExportEnhanced;
     const exportButton = table.closest('.table-panel')?.querySelector('.table-tools .btn');
@@ -822,7 +1054,7 @@
     applyProjectColumns(activeProjectColumns);
     const boardMetrics = document.querySelectorAll('[data-metric-group="board"] .metric');
     const componentMetrics = document.querySelectorAll('[data-metric-group="component"] .metric');
-    const summary = summarizeProjectMetrics(sourceProjects, mouth);
+    const summary = summarizeProjectMetrics(statisticalProjects, mouth);
     const isMachineMouth = mouth === 'original';
     setMetric(boardMetrics[0], 'PCB 检测数', `${number(summary.boardTotal)}<small>块</small>`);
     setMetric(boardMetrics[1], isMachineMouth ? '板卡直通率 ⓘ' : '板卡误报率 ⓘ', `${(isMachineMouth ? summary.boardPassRate : summary.boardFalseRate).toFixed(2)}<small>%</small>`);
@@ -833,17 +1065,17 @@
     setMetric(componentMetrics[2], '器件 NG 率 ⓘ', `${summary.componentDetectionNgRate.toFixed(2)}<small>%</small>`);
     setMetric(componentMetrics[3], '器件不良率 ⓘ', `${summary.componentNgRate.toFixed(2)}<small>%</small>`);
     const panelSub = document.querySelector('.table-panel .panel-sub');
-    if (panelSub) panelSub.textContent = `共 ${sourceProjects.length} 个项目`;
+    if (panelSub) panelSub.textContent = `共 ${statisticalProjects.length} 个项目`;
     if (selectedDevice) {
       const deviceControl = document.querySelector('.field.device .control');
       const target = valueSpan(deviceControl);
       if (target) target.textContent = selectedDevice;
     }
-    const legend = document.querySelector('.legend');
-    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '二次复判', '#9fb5a6']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}${key === mouth ? '（当前）' : '参照'}</span>`).join('');
+    const legend = document.querySelector('[data-project-trend] .legend');
+    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '最终复判', '#36a878']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}</span>`).join('');
     document.querySelectorAll('.line-original').forEach(line => { line.style.stroke = mouth === 'original' ? '#3478f6' : '#8ba3c7'; line.style.strokeWidth = mouth === 'original' ? '2.5' : '2'; });
     document.querySelectorAll('.line-review').forEach(line => { line.style.stroke = mouth === 'review' ? '#3478f6' : '#9bb0ce'; line.style.strokeWidth = mouth === 'review' ? '2.5' : '2'; });
-    document.querySelectorAll('.line-second').forEach(line => { line.style.stroke = mouth === 'second' ? '#3478f6' : '#9fb5a6'; line.style.strokeWidth = mouth === 'second' ? '2.5' : '2'; });
+    document.querySelectorAll('.line-second').forEach(line => { line.style.stroke = mouth === 'second' ? '#3478f6' : '#36a878'; line.style.strokeWidth = mouth === 'second' ? '2.5' : '2'; });
     renderProjectComparison(currentComparisonType);
   }
 
@@ -852,45 +1084,50 @@
   }
 
   function deviceOverviewRows(mouth) {
-    return deviceSamples.map((device, index) => ({ index: index + 1, deviceName: device.name, ip: device.ip, deviceSn: device.sn, projectCount: device.projects.length, projectNames: device.projects.map(project => project.name), projectUuids: device.projects.map(project => project.uuid), lastDataTime: device.lastDataTime, ...statsFor(device, mouth) }));
+    return deviceSamples.map(device => {
+      const stats = statsFor(device, mouth);
+      return stats ? { deviceName: device.name, ip: device.ip, deviceSn: device.sn, projectCount: device.projects.length, projectNames: device.projects.map(project => project.name), projectUuids: device.projects.map(project => project.uuid), lastDataTime: device.lastDataTime, ...stats } : null;
+    }).filter(Boolean).map((device, index) => ({ index: index + 1, ...device }));
   }
 
   function deviceQualityFilters() {
-    return `<section class="filters quality-filter"><div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="muted">至</span><span>2026-08-04 14:32</span></div></div><div class="field device device-search"><label>设备名称</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" aria-label="设备名称" placeholder="输入设备名称"></div></div><div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>`;
+    return `<section class="filters quality-filter"><div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="muted">至</span><span>2026-08-04 14:32</span></div></div><div class="field device device-search"><label>设备SN</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" aria-label="设备SN" placeholder="请输入设备SN"></div></div><div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>`;
   }
 
-  function chartPeriodPicker(context, selected) {
+  function chartPeriodSelect(context, selected) {
     const options = [['7d', '最近7天'], ['month', '最近1个月'], ['halfYear', '最近半年']];
-    return `<div class="chart-period-picker" data-chart-period-context="${context}" role="group" aria-label="时间选择">${options.map(([value, label]) => `<button type="button" class="chart-period${value === selected ? ' is-active' : ''}" data-chart-period="${value}" aria-pressed="${value === selected}">${label}</button>`).join('')}</div>`;
-  }
-
-  function initializeChartPeriodControls(root = document) {
-    root.querySelectorAll('[data-chart-period]').forEach(button => {
-      button.onclick = () => {
-        const picker = button.closest('.chart-period-picker');
-        if (!picker) return;
-        picker.querySelectorAll('[data-chart-period]').forEach(item => {
-          const active = item === button;
-          item.classList.toggle('is-active', active);
-          item.setAttribute('aria-pressed', String(active));
-        });
-        if (picker.dataset.chartPeriodContext === 'trend') currentTrendPeriod = button.dataset.chartPeriod;
-        if (picker.dataset.chartPeriodContext === 'comparison') currentComparisonPeriod = button.dataset.chartPeriod;
-      };
-    });
+    return `<select class="chart-period-select" data-chart-period-context="${context}" aria-label="快捷时间">${options.map(([value, label]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${label}</option>`).join('')}<option value="custom"${selected === 'custom' ? ' selected' : ''} disabled>自定义</option></select>`;
   }
 
   function deviceQualityMouthToolbar() {
-    return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">二次复判</div></div></section>`;
+    return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">最终复判</div></div></section>`;
   }
 
-  function deviceYieldTrendChart() {
-    const dates = ['08-01', '08-02', '08-03', '08-04'];
-    const series = [
-      { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 91.82] },
-      { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.38] },
-      { label: '二次复判', color: '#20a464', values: [98.56, 98.87, 98.49, 98.91] }
-    ];
+  function deviceTrendDataset(mode = currentTrendPeriod) {
+    const dataset = mode === 'month'
+      ? {
+        labels: ['03月', '04月', '05月', '06月', '07月', '08月'],
+        series: [
+          { label: '机器判定', color: '#8ba3c7', values: [90.86, 91.14, 91.52, 91.31, 91.65, 91.82] },
+          { label: '一次复判', color: '#3478f6', values: [97.62, 97.88, 98.04, 97.96, 98.17, 98.38] },
+          { label: '最终复判', color: '#36a878', values: [97.91, 98.16, 98.31, 98.24, 98.46, 98.66] }
+        ]
+      }
+      : {
+      labels: ['08-01', '08-02', '08-03', '08-04'],
+      series: [
+        { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 91.82] },
+        { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.38] },
+        { label: '最终复判', color: '#36a878', values: [98.40, 98.74, 98.31, 98.66] }
+      ]
+    };
+    return dataset;
+  }
+
+  function deviceYieldTrendChart(mode = currentTrendPeriod) {
+    const dataset = deviceTrendDataset(mode);
+    const dates = dataset.labels;
+    const series = dataset.series;
     const width = 680, height = 210, left = 42, right = 12, top = 18, bottom = 30;
     const min = 88, max = 100, chartWidth = width - left - right, chartHeight = height - top - bottom;
     const x = index => left + chartWidth * index / (dates.length - 1);
@@ -902,13 +1139,39 @@
       const dots = seriesItem.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="2.5" fill="#fff" stroke="${seriesItem.color}" stroke-width="2"><title>${seriesItem.label} ${dates[index]}：${value.toFixed(2)}%</title></circle>`).join('');
       return `<polyline fill="none" stroke="${seriesItem.color}" stroke-width="2.5" points="${points}"/>${dots}`;
     }).join('');
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="所有设备按天的PCB良率趋势，包含机器判定、一次复判与二次复判">${grid}${lines}${dateLabels}</svg>`;
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="所有设备按${mode === 'month' ? '月' : '天'}的PCB良率趋势，包含机器判定、一次复判、最终复判">${grid}${lines}${dateLabels}</svg>`;
+  }
+
+  function renderDeviceTrend(mode = currentTrendPeriod, root = document) {
+    currentTrendPeriod = mode;
+    const panel = root.querySelector('[data-device-trend]') || document.querySelector('[data-device-trend]');
+    if (!panel) return;
+    panel.querySelectorAll('[data-device-trend-mode]').forEach(button => {
+      const active = button.dataset.deviceTrendMode === mode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    panel.querySelector('[data-device-trend-range]')?.classList.toggle('is-hidden', mode === 'month');
+    const chart = panel.querySelector('.device-yield-trend');
+    if (chart) chart.innerHTML = deviceYieldTrendChart(mode);
+  }
+
+  function initializeDeviceTrendControls(root = document) {
+    const panel = root.querySelector('[data-device-trend]');
+    if (!panel) return;
+    panel.querySelectorAll('[data-device-trend-mode]').forEach(button => {
+      button.onclick = () => renderDeviceTrend(button.dataset.deviceTrendMode, root);
+    });
+    panel.querySelectorAll('[data-device-trend-range] input').forEach(input => {
+      input.onchange = () => renderDeviceTrend('day', root);
+    });
+    renderDeviceTrend(currentTrendPeriod, root);
   }
 
   function deviceQualityCharts() {
     return `<section class="quality-grid device-quality-charts">
-      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div>${chartPeriodPicker('trend', currentTrendPeriod)}</div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
-      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${chartPeriodPicker('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
+      <section class="quality-chart" data-device-trend><div class="phead"><div class="phead-title"><b>良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#36a878"></i>最终复判</span></div><div class="device-trend-date-range" data-device-trend-range><input type="date" value="2026-08-01" aria-label="开始时间"><span>至</span><input type="date" value="2026-08-04" aria-label="结束时间"></div><div class="comparison-switch" role="tablist" aria-label="良率趋势统计周期"><button class="comparison-tab" type="button" data-device-trend-mode="day">按天</button><button class="comparison-tab" type="button" data-device-trend-mode="month">按月</button></div></div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
+      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${comparisonDateRangeMarkup()}${chartPeriodSelect('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
     </section>`;
   }
 
@@ -1035,23 +1298,24 @@
     const content = document.querySelector('.quality-content');
     if (!content) return;
     const label = mouthLabel(currentMouth);
-    const avgYield = currentMouth === 'original' ? 91.82 : currentMouth === 'second' ? 98.91 : 98.38;
+    const sourceMouth = currentMouth;
+    const avgYield = sourceMouth === 'original' ? 91.82 : sourceMouth === 'second' ? 98.91 : 98.38;
     const avgNgRate = 100 - avgYield;
     const rows = deviceOverviewRows(currentMouth);
     content.innerHTML = `${deviceQualityMouthToolbar()}
       <section class="quality-metrics">
         ${metricBlock('参与统计设备', '4<small>台</small>', '覆盖 4 个区域')}
-        ${metricBlock('检测订单数', '8<small>个</small>', '按订单编号去重')}
+        ${metricBlock('检测模板数', '8<small>个</small>', '按模板名称去重')}
         ${metricBlock('板卡总数', '124,450<small>块</small>', '当前筛选范围')}
         ${metricBlock(`${label}板卡不良率`, `${avgNgRate.toFixed(2)}<small>%</small>`, '', 'boardYield')}
-        ${metricBlock(`${label}器件 DPPM`, currentMouth === 'original' ? '2,368' : currentMouth === 'second' ? '884' : '1,042', currentMouth === 'original' ? '一次复判后下降 1,326' : currentMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
+        ${metricBlock(`${label}器件 DPPM`, sourceMouth === 'original' ? '2,368' : sourceMouth === 'second' ? '884' : '1,042', sourceMouth === 'original' ? '一次复判后下降 1,326' : sourceMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
       </section>
-      ${deviceQualityCharts()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div>${deviceQualityFilters()}<div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
+      ${deviceQualityCharts()}${deviceQualityFilters()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div><div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
     applyDeviceColumns(activeDeviceColumns);
     initializeDeviceSelection(content);
     content.querySelectorAll('.control').forEach(makeControlInteractive);
     content.querySelectorAll('[data-mouth]').forEach(seg => { seg.tabIndex = 0; seg.onclick = () => setMouth(seg.dataset.mouth); });
-    initializeChartPeriodControls(content);
+    initializeDeviceTrendControls(content);
     initializeProjectComparison();
   }
 
@@ -1091,7 +1355,7 @@
       return;
     }
     if (/菜单权限/.test(action)) {
-      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>订单统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
+      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>项目统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
       return;
     }
     if (/数据权限/.test(action)) {
@@ -1128,6 +1392,12 @@
   function confirmAction(title, message, onConfirm) {
     openModal(title, `<p style="margin:0;color:#475569;line-height:1.7">${message}</p>`, '确认', onConfirm);
   }
+
+  window.SPCPrototype = Object.assign(window.SPCPrototype || {}, {
+    openModal,
+    confirmAction,
+    toast
+  });
 
   function updateRegionSummary(backdrop) {
     const rows = Array.from(backdrop.querySelectorAll('[data-region-row]'));
@@ -1225,7 +1495,7 @@
 
   function deviceAlreadyExists(ip) {
     return Array.from(document.querySelectorAll('.records tbody tr')).some(row => {
-      const cells = row.querySelectorAll('td');
+      const cells = Array.from(row.querySelectorAll('td')).filter(cell => !cell.classList.contains('sequence-cell'));
       return cells.length > 2 && getText(cells[2]) === ip;
     });
   }
@@ -1241,13 +1511,48 @@
     return { sn: `SI1020E${String(1300 + seed % 700).padStart(4, '0')}`, name: `AOI-${String(5 + seed % 95).padStart(2, '0')}` };
   }
 
+  function validateRequiredDeviceFields(modal) {
+    const requiredFields = Array.from(modal.querySelectorAll('[data-device-required]'));
+    requiredFields.forEach(field => field.classList.remove('is-invalid'));
+    const firstEmpty = requiredFields.find(field => !String(field.value || '').trim());
+    if (!firstEmpty) return true;
+    firstEmpty.classList.add('is-invalid');
+    const label = firstEmpty.closest('.proto-field')?.querySelector('label')?.textContent.replace('*', '').trim() || '必填字段';
+    toast(`请填写${label}`, 'error');
+    firstEmpty.focus();
+    return false;
+  }
+
+  function bindDeviceOrganizationSelectors(backdrop) {
+    const region = backdrop.querySelector('[data-device-region]');
+    const line = backdrop.querySelector('[data-device-line]');
+    if (!region || !line) return;
+    const dynamicLeaves = typeof window.getSPCDeviceOrganizationLeaves === 'function' ? window.getSPCDeviceOrganizationLeaves() : [];
+    const linesByRegion = dynamicLeaves.length
+      ? dynamicLeaves.reduce((result, item) => { (result[item.parentName] ||= []).push(item.name); return result; }, {})
+      : { '区域A': ['产线A1'], '区域B': ['产线B1'], '区域C': ['产线C1'], '区域D': ['产线D1'] };
+    const currentRegion = region.value;
+    region.innerHTML = Object.keys(linesByRegion).map(name => `<option>${name}</option>`).join('');
+    if (linesByRegion[currentRegion]) region.value = currentRegion;
+    const syncLines = () => {
+      const current = line.value;
+      const options = linesByRegion[region.value] || [];
+      line.innerHTML = options.map(name => `<option>${name}</option>`).join('');
+      if (options.includes(current)) line.value = current;
+    };
+    region.addEventListener('change', syncLines);
+    syncLines();
+  }
+
   function openAddDeviceModal() {
-    const backdrop = openModal('新增设备', `<div class="proto-field"><label>设备IP</label><div class="proto-device-identify-row"><input data-device-ip inputmode="decimal" autocomplete="off" placeholder="例如：192.168.10.25"><button type="button" class="proto-device-identify-button" data-identify-device>识别设备</button></div><p class="proto-device-status" data-device-status>填写设备 IP 后识别设备信息</p></div><div class="proto-device-divider"></div><div class="proto-field"><label>设备SN</label><input data-device-sn readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备名称</label><input data-device-name readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>所属区域</label><select data-device-config disabled><option>区域A</option><option>区域B</option><option>区域C</option><option>区域D</option></select></div><div class="proto-field"><label>设备状态</label><select data-device-config disabled><option>启用</option><option>停用</option></select></div>`, '新增设备', modal => {
+    const backdrop = openModal('新增设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><div class="proto-device-identify-row"><input data-device-ip data-device-required inputmode="decimal" autocomplete="off" placeholder="例如：192.168.10.25"><button type="button" class="proto-device-identify-button" data-identify-device>识别设备</button></div><p class="proto-device-status" data-device-status>填写设备 IP 后识别设备信息</p></div><div class="proto-device-divider"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-device-sn data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-device-name data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>所属区域<em class="proto-required">*</em></label><select data-device-region data-device-config data-device-required disabled><option>区域A</option><option>区域B</option><option>区域C</option><option>区域D</option></select></div><div class="proto-field"><label>所属产线<em class="proto-required">*</em></label><select data-device-line data-device-config data-device-required disabled><option>产线A1</option></select></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-device-config data-device-required disabled><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea data-device-config disabled placeholder="请输入备注（选填）"></textarea></div>`, '新增设备', modal => {
+      if (!validateRequiredDeviceFields(modal)) return false;
       const ip = modal.querySelector('[data-device-ip]').value.trim();
       if (modal.dataset.identifiedIp !== ip) { toast('请先识别当前设备 IP', 'error'); return false; }
       toast('设备已新增');
     });
     backdrop.querySelector('.proto-modal').classList.add('proto-device-modal');
+    bindDeviceOrganizationSelectors(backdrop);
     const ipInput = backdrop.querySelector('[data-device-ip]');
     const identifyButton = backdrop.querySelector('[data-identify-device]');
     const status = backdrop.querySelector('[data-device-status]');
@@ -1304,7 +1609,7 @@
         configFields.forEach(field => { field.disabled = false; });
         confirmButton.disabled = false;
         status.className = 'proto-device-status is-success';
-        status.textContent = '设备识别成功，请完善所属区域和设备状态';
+        status.textContent = '设备识别成功，请选择末级组织节点并设置启用状态';
         configFields[0].focus();
       }, 650);
     });
@@ -1312,7 +1617,14 @@
   }
 
   function handleManagementAction(action, target) {
-    const deviceModal = () => openModal('编辑设备', `<div class="proto-field"><label>设备SN</label><input value="SI1020E1112" readonly aria-readonly="true"></div><div class="proto-field"><label>设备名称</label><input value="AOI-01" readonly aria-readonly="true"></div><div class="proto-field"><label>设备IP</label><input value="192.168.10.21" placeholder="例如：192.168.10.21"></div><div class="proto-field"><label>所属区域</label><select><option>区域A</option><option>区域B</option><option>区域C</option><option>区域D</option></select></div><div class="proto-field"><label>设备状态</label><select><option>启用</option><option>停用</option></select></div>`, '保存修改', () => toast('设备信息已保存'));
+    const deviceModal = () => {
+      const backdrop = openModal('编辑设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><input data-device-required value="192.168.10.21" placeholder="例如：192.168.10.21"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-device-required value="SI1020E1112" readonly aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-device-required value="AOI-01" readonly aria-readonly="true"></div><div class="proto-field"><label>所属区域<em class="proto-required">*</em></label><select data-device-region data-device-required><option>区域A</option><option>区域B</option><option>区域C</option><option>区域D</option></select></div><div class="proto-field"><label>所属产线<em class="proto-required">*</em></label><select data-device-line data-device-required><option>产线A1</option></select></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-device-required><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea placeholder="请输入备注（选填）">用于A面检测</textarea></div>`, '保存修改', modal => {
+        if (!validateRequiredDeviceFields(modal)) return false;
+        toast('设备信息已保存');
+      });
+      bindDeviceOrganizationSelectors(backdrop);
+      return backdrop;
+    };
     const userModal = editing => openModal(editing ? '编辑用户' : '新增用户', `<div class="proto-field"><label>用户名称</label><input value="${editing ? 'zhangsan' : ''}" placeholder="请输入用户名称"></div><div class="proto-field"><label>角色名称</label><select><option>质量工程师</option><option>生产主管</option><option>只读用户</option><option>平台管理员</option></select></div>${editing ? '' : '<div class="proto-field"><label>初始密码</label><input type="password" placeholder="请输入初始密码"></div>'}<div class="proto-field"><label>状态</label><select><option>启用</option><option>停用</option></select></div>`, editing ? '保存修改' : '新增用户', () => toast(editing ? '用户信息已保存' : '用户已新增'));
     const roleModal = editing => openModal(editing ? '编辑角色' : '新增角色', `<div class="proto-field"><label>角色名称</label><input value="${editing ? '质量工程师' : ''}" placeholder="请输入角色名称"></div><div class="proto-field"><label>角色说明</label><input value="${editing ? '负责质量数据分析和导出' : ''}" placeholder="请输入角色说明"></div><div class="proto-field"><label>状态</label><select><option>启用</option><option>停用</option></select></div>`, editing ? '保存修改' : '新增角色', () => toast(editing ? '角色信息已保存' : '角色已新增'));
     if (action === 'open-local-spc') {
@@ -1322,8 +1634,31 @@
     if (action === 'edit-device') return deviceModal();
     if (action === 'toggle-device') {
       const disabled = target.dataset.deviceStatus === 'disabled';
-      if (!disabled) return confirmAction('确认停用设备', '停用后平台将不再接收该设备上传的数据，是否继续？', () => { target.dataset.deviceStatus = 'disabled'; target.textContent = '停用'; target.classList.add('off'); const del = target.closest('tr').querySelector('[data-proto-action="delete-device"]'); if (del) del.disabled = false; toast('设备已停用'); });
-      target.dataset.deviceStatus = 'enabled'; target.textContent = '启用'; target.classList.remove('off'); const del = target.closest('tr').querySelector('[data-proto-action="delete-device"]'); if (del) del.disabled = true; return toast('设备已启用');
+      const row = target.closest('tr');
+      const setObservedState = (selector, text, className) => {
+        const cell = row && row.querySelector(selector);
+        if (!cell) return;
+        cell.textContent = text;
+        cell.className = `runtime-status${className ? ` ${className}` : ''}`;
+      };
+      if (!disabled) return confirmAction('确认停用设备', '停用后平台将不再接收该设备上传的数据，是否继续？', () => {
+        target.dataset.deviceStatus = 'disabled';
+        target.textContent = '停用';
+        target.classList.add('off');
+        setObservedState('[data-device-connection-status]', '未监控', 'is-unmonitored');
+        setObservedState('[data-device-transmission-status]', '未监控', 'is-unmonitored');
+        const del = row && row.querySelector('[data-proto-action="delete-device"]');
+        if (del) del.disabled = false;
+        toast('设备已停用');
+      });
+      target.dataset.deviceStatus = 'enabled';
+      target.textContent = '启用';
+      target.classList.remove('off');
+      setObservedState('[data-device-connection-status]', '未知', '');
+      setObservedState('[data-device-transmission-status]', '未知', '');
+      const del = row && row.querySelector('[data-proto-action="delete-device"]');
+      if (del) del.disabled = true;
+      return toast('设备已启用，等待状态更新');
     }
     if (action === 'delete-device') return confirmAction('删除设备', '删除后不可恢复，是否删除当前设备？', () => { target.closest('tr').remove(); toast('设备已删除'); });
     if (action === 'manage-regions') return openRegionManager();
@@ -1456,11 +1791,11 @@
       control.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openMulti(); } });
       return;
     }
-    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '订单编号' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
+    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '模板名称' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
     if (searchable) {
       const openHistory = input => {
         const historyMap = {
-          '订单编号': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
+          '模板名称': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
           '设备名称': ['AOI-01', 'AOI-02', 'AOI-03', 'AOI-04', 'AOI-05'],
           '条码号': ['SY-A01-DEMO-02', 'SY-B02-SMT-1669', 'SY-C03-143873', 'SY-D04-155042F-01', 'SY-A03-SMT-4698'],
           '一次复判员': ['J20678 · 张三', 'J20542 · 王芳', 'J20911 · 陈杰', 'J20816 · 李明', 'J20436 · 刘敏']
@@ -1486,7 +1821,7 @@
             control.dataset.selected = value;
             closePopover();
             input.focus();
-            if (label === '订单编号') toast(`已按订单编号 ${value} 查询`, 'info');
+            if (label === '模板名称') toast(`已按模板名称 ${value} 查询`, 'info');
             if (label === '设备名称') toast(`已选择历史设备 ${value}`, 'info');
           };
           pop.appendChild(option);
@@ -1494,8 +1829,8 @@
         document.body.appendChild(pop);
         currentPopover = pop;
       };
-      if (label === '订单编号') {
-        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="订单编号" placeholder="输入订单编号">';
+      if (label === '模板名称') {
+        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="模板名称" placeholder="输入模板名称">';
       }
       const bindHistoryInput = input => {
         if (!input || input.dataset.historyBound) return;
@@ -1508,7 +1843,7 @@
         event.stopPropagation();
         const existingInput = control.querySelector('input');
         if (existingInput) { bindHistoryInput(existingInput); openHistory(existingInput); return; }
-        const placeholderMap = { '订单编号': '输入订单编号', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
+        const placeholderMap = { '模板名称': '输入模板名称', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
         const placeholder = placeholderMap[label] || (label.includes('设备') ? '输入设备名称或设备SN' : '输入完整或部分PCB标识');
         control.innerHTML = `<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="${label}" placeholder="${placeholder}">`;
         const input = control.querySelector('input');
@@ -1556,6 +1891,7 @@
     const rows = Array.from(table.tBodies[0].rows).filter(row => !row.classList.contains('proto-empty'));
     const filters = [];
     let deviceNameFilter = '';
+    let deviceSnFilter = '';
     let dateRange = null;
     document.querySelectorAll('.field').forEach(field => {
       const label = getText(field.querySelector('label'));
@@ -1564,7 +1900,7 @@
         dateRange = [control.dataset.start.replace('T', ' '), control.dataset.end.replace('T', ' ')];
         return;
       }
-      if (!/设备|项目|PCB|条码|工单|复判员|检测结果|复判工作站|复判人员|复判结果|上传状态|所属区域|设备状态/.test(label)) return;
+      if (!/设备|项目|PCB|条码|工单|复判员|检测结果|复判工作站|复判人员|复判结果|上传状态|所属区域|设备状态|启用状态|连接状态|传输状态|记录类型|处理结果/.test(label)) return;
       const input = field.querySelector('input');
       if (control && control.dataset.selectedValues) {
         let values = [];
@@ -1578,16 +1914,22 @@
         deviceNameFilter = normalize(value);
         return;
       }
+      if (label === '设备SN' && field.classList.contains('device-search')) {
+        deviceSnFilter = normalize(value);
+        return;
+      }
       filters.push(normalize(value));
     });
     const deviceNameColumnIndex = Array.from(table.tHead?.rows[0]?.cells || []).findIndex(cell => getText(cell) === '设备名称');
+    const deviceSnColumnIndex = Array.from(table.tHead?.rows[0]?.cells || []).findIndex(cell => getText(cell) === '设备SN');
     let visible = 0;
     rows.forEach(row => {
       const content = normalize(row.textContent);
       const detectedAt = (row.textContent.match(/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/) || [])[0];
       const matchesDate = !dateRange || (!!detectedAt && detectedAt >= dateRange[0] && detectedAt <= dateRange[1]);
       const matchesDeviceName = !deviceNameFilter || (deviceNameColumnIndex >= 0 && normalize(row.cells[deviceNameColumnIndex]?.textContent).includes(deviceNameFilter));
-      const match = matchesDate && matchesDeviceName && filters.every(value => Array.isArray(value) ? value.some(item => content.includes(item)) : content.includes(value));
+      const matchesDeviceSn = !deviceSnFilter || (deviceSnColumnIndex >= 0 && normalize(row.cells[deviceSnColumnIndex]?.textContent).includes(deviceSnFilter));
+      const match = matchesDate && matchesDeviceName && matchesDeviceSn && filters.every(value => Array.isArray(value) ? value.some(item => content.includes(item)) : content.includes(value));
       row.style.display = match ? '' : 'none';
       if (match) visible += 1;
     });
@@ -1641,17 +1983,9 @@
     group.querySelectorAll('.tab').forEach(item => item.classList.remove('on'));
     tab.classList.add('on');
     const label = getText(tab).replace(/（.*?）/g, '');
-    if (document.title.includes('检测结果详情')) {
-      const body = document.querySelector('.detail-body');
-      if (!body) return;
-      if (!tabOriginal) tabOriginal = body.innerHTML;
-      if (label === '缺陷器件') body.innerHTML = tabOriginal;
-      else body.innerHTML = `<div class="proto-tab-empty" style="grid-column:1/-1"><div><b>${label}</b>该页签用于展示${label}相关信息，原型中已完成切换效果。</div></div>`;
-    } else {
-      const dimension = document.querySelector('.field.dimension .control span:not(.chev)');
-      if (dimension) dimension.textContent = label;
-      toast(`已切换至${label}分析`, 'info');
-    }
+    const dimension = document.querySelector('.field.dimension .control span:not(.chev)');
+    if (dimension) dimension.textContent = label;
+    toast(`已切换至${label}分析`, 'info');
   }
 
   function initializeNavigation() {
@@ -1670,7 +2004,7 @@
     const nav = document.querySelector('.nav');
     const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
     if (!nav || navItems.some(item => getText(item).includes('设备分析'))) return;
-    const projectItem = navItems.find(item => getText(item).includes('订单统计'));
+    const projectItem = navItems.find(item => getText(item).includes('项目统计'));
     if (!projectItem) return;
     const item = document.createElement('div');
     const isCompactItem = projectItem.classList.contains('item');
@@ -1678,12 +2012,6 @@
     item.innerHTML = `<span class="${isCompactItem ? 'ico' : 'nav-icon'}">◈</span>设备分析`;
     projectItem.insertAdjacentElement('afterend', item);
     if (document.body.dataset.page === 'device-quality') projectItem.classList.remove('active');
-  }
-
-  function normalizeOrderStatisticsNavigation() {
-    document.querySelectorAll('.nav .nav-item,.nav .item').forEach(item => {
-      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '订单统计');
-    });
   }
 
   function normalizeDeviceAnalysisNavigation() {
@@ -1698,8 +2026,31 @@
     Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
       const text = getText(item);
       if (text.includes('不良导出')) item.innerHTML = item.innerHTML.replace('不良导出', '不良分析');
-      if (text.includes('数据上传监控') || text.includes('二次复判统计')) item.remove();
+      if (text.includes('数据上传监控')) item.innerHTML = item.innerHTML.replace('数据上传监控', '设备运行监控');
     });
+  }
+
+  function ensureRuntimeMonitorNavigation() {
+    const nav = document.querySelector('.nav');
+    const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
+    if (!nav) return;
+    const existing = navItems.find(item => getText(item).includes('设备运行监控'));
+    if (existing) {
+      existing.classList.toggle('active', document.body.dataset.page === 'device-runtime-monitor');
+      return;
+    }
+    const deviceItem = navItems.find(item => getText(item).includes('设备管理'));
+    if (!deviceItem) return;
+    const item = document.createElement('a');
+    item.className = deviceItem.className;
+    item.classList.remove('active');
+    if (document.body.dataset.page === 'device-runtime-monitor') item.classList.add('active');
+    item.href = '07-数据上传监控.html';
+    item.style.textDecoration = 'none';
+    const deviceIcon = deviceItem.querySelector('.ico,.nav-icon');
+    const iconClass = deviceIcon ? deviceIcon.className : 'ico nav-icon';
+    item.innerHTML = `<span class="${iconClass}">▧</span>设备运行监控`;
+    deviceItem.insertAdjacentElement('beforebegin', item);
   }
 
   function ensureDefectAnalysisNavigation() {
@@ -1788,15 +2139,16 @@
   function initializePage() {
     removeVisibleProjectUuidColumns();
     enhanceBoardQueryTable();
-    normalizeOrderStatisticsNavigation();
     normalizeDeviceAnalysisNavigation();
     normalizeSharedNavigation();
+    ensureRuntimeMonitorNavigation();
     ensureQualityNavigation();
     ensureDefectAnalysisNavigation();
     initializeDeviceQualityPage();
-    if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectTrend(); initializeProjectComparison(); }
+    if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectTrend(); initializeProjectComparison(); initializeProjectCellTooltips(); }
     removeTitleExplanations();
     normalizeTopActions();
+    initializeAccountMenu();
     ensureGlobalDataTimestamp();
     normalizeTimeFields();
     normalizeDropdownIcons();
@@ -1898,7 +2250,7 @@
       if (/查看计算说明/.test(text)) { event.preventDefault(); openModal('过程能力计算说明', '<div style="line-height:1.8;color:#475569">Cp、Cpk只对具备连续测量值、单位及规格上下限的检测项计算。控制界限根据当前查询样本动态计算，仅用于分析，不作为正式报警依据。</div>', '知道了'); return; }
       if (/查看图片/.test(text)) { event.preventDefault(); const row = target.closest('tr'); if (row) { row.parentElement.querySelectorAll('tr').forEach(item => item.classList.remove('on')); row.classList.add('on'); } toast('已切换右侧器件图像', 'info'); return; }
       if (/查看原图/.test(text)) { event.preventDefault(); openModal('器件原图', '<div style="height:320px;border-radius:6px;background:linear-gradient(135deg,#d8d2b9,#bdb59b 52%,#7c745f);display:grid;place-items:center;color:#fff"><strong style="padding:8px 12px;background:rgba(16,27,45,.78);border-radius:4px">D2 · RGB 原图</strong></div>', '关闭图片'); return; }
-      if (/查看明细|查看PCB|^详情$/.test(text) && target.getAttribute('href') === '#') { event.preventDefault(); window.location.href = '02A-检测结果详情.html'; return; }
+      if (/查看明细|查看PCB|^详情$/.test(text) && target.getAttribute('href') === '#') { event.preventDefault(); window.location.href = '02B-单板记录详情.html'; return; }
       if (/查看全部|查看人员工作量|告警记录|任务明细|历史|记录/.test(text) && (!target.getAttribute('href') || target.getAttribute('href') === '#')) { event.preventDefault(); toast(`${text}已展开为演示状态`, 'info'); }
     });
     document.addEventListener('change', event => {

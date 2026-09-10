@@ -6,10 +6,9 @@
   <title>SPC集中管理平台 - 个人中心</title>
   <link rel="stylesheet" href="spc-common.css">
   <style>
-    .profile{height:142px;flex:0 0 142px;display:flex;align-items:stretch}
-    .identity{width:100%;padding:20px 24px;display:flex;align-items:center;gap:16px}
-    .profile-avatar{width:68px;height:68px;flex:0 0 68px;border-radius:50%;background:#e7f0ff;color:#2468e8;display:grid;place-items:center;font-size:26px;font-weight:700}
-    .identity h2{margin:0;color:var(--ink);font-size:20px}.identity p{margin:7px 0 0;color:#64748b}
+    .profile{height:88px;flex:0 0 88px;display:flex;align-items:stretch}
+    .identity{width:100%;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .profile-account-fields{display:flex;align-items:center;gap:56px;min-width:0}.profile-account-field{display:flex;align-items:baseline;gap:10px;min-width:0}.profile-account-field small{color:#7a8798;font-size:12px;white-space:nowrap}.profile-account-field b{max-width:240px;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-size:15px;white-space:nowrap}
     .center-tabs{height:46px;flex:0 0 46px;display:flex;align-items:stretch;padding:0 16px;gap:28px}
     .center-tab{position:relative;border:0;background:transparent;padding:0 2px;color:#526176;font-weight:650;cursor:pointer;white-space:nowrap}
     .center-tab.active{color:var(--blue)}.center-tab.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--blue);border-radius:2px 2px 0 0}
@@ -26,8 +25,8 @@
     .basic-settings{display:flex;flex-direction:column;overflow:hidden}.settings-list{flex:1;min-height:0;overflow:auto;padding:0 20px}
     .settings-section{margin:14px 0 0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#fff}.settings-section:first-child{margin-top:14px}.settings-section-title{margin:0;padding:11px 14px;color:var(--ink);font-size:15px;line-height:24px;background:#f8fafc;border-bottom:1px solid #e2e8f0}.settings-section.platform-settings{border-color:#c9dbfb;background:#fbfdff}.settings-section.platform-settings .settings-section-title{color:#1f5fbd;background:#edf4ff;border-bottom-color:#c9dbfb}.settings-section.other-settings .settings-section-title{color:#526176;background:#f8fafc}
     .setting-row{min-height:60px;margin:0 14px;padding:10px 0;display:grid;grid-template-columns:minmax(240px,1fr) minmax(300px,auto);align-items:center;gap:24px;border-bottom:1px solid #e8edf2}
-    .settings-section:last-child .setting-row:last-child{border-bottom:0}.setting-copy{min-width:0}.setting-copy h3,.setting-label{margin:0;color:var(--ink);font-size:14px;font-weight:700;line-height:22px}
-    .setting-control{display:flex;align-items:center;justify-content:flex-end;gap:20px;min-width:0}.radio-option{display:inline-flex;align-items:center;gap:7px;color:#334155;white-space:nowrap;cursor:pointer}.radio-option input{width:17px;height:17px;margin:0;accent-color:var(--blue)}
+    .settings-section:last-child .setting-row:last-child{border-bottom:0}.setting-copy{min-width:0}.setting-copy h3,.setting-label{margin:0;color:var(--ink);font-size:14px;font-weight:700;line-height:22px}.setting-copy p{margin:3px 0 0;color:#7b899b;font-size:12px;line-height:18px}
+    .setting-control{display:flex;align-items:center;justify-content:flex-end;gap:20px;min-width:0}.radio-option,.mouth-option{display:inline-flex;align-items:center;gap:7px;color:#334155;white-space:nowrap;cursor:pointer}.radio-option input{width:17px;height:17px;margin:0;accent-color:var(--blue)}.mouth-options{gap:12px 34px;flex-wrap:wrap}.mouth-option input{appearance:none;width:17px;height:17px;margin:0;border:2px solid #cfd8e4;border-radius:50%;background:#fff;cursor:pointer}.mouth-option input:checked{border-color:#3478f6;background:#3478f6;box-shadow:inset 0 0 0 4px #fff}.mouth-option input:focus-visible{outline:2px solid rgba(52,120,246,.28);outline-offset:2px}
     .date-range{display:grid;grid-template-columns:minmax(180px,230px) 18px minmax(180px,230px);align-items:center;gap:8px}.date-range span{text-align:center;color:#7b899b}.date-range input{width:100%;height:36px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155}
     .settings-actions{height:58px;flex:0 0 58px;padding:0 20px;border-top:1px solid #e8edf2;display:flex;align-items:center;justify-content:flex-end;gap:8px}.settings-feedback{margin-right:auto;color:#168052;font-size:12px;opacity:0;transition:opacity .2s}.settings-feedback.show{opacity:1}
     .pc-modal[hidden]{display:none}.pc-modal{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:20px}.pc-modal-backdrop{position:absolute;inset:0;background:rgba(15,32,54,.42)}.pc-modal-card{position:relative;width:min(440px,calc(100vw - 40px));max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:6px;box-shadow:0 20px 60px rgba(15,32,54,.24)}
@@ -35,8 +34,8 @@
     .pc-modal-body{padding:18px}.password-field{display:grid;gap:6px;margin-bottom:14px}.password-field:last-child{margin-bottom:0}.password-field label{color:#526176;font-size:12px;font-weight:650}.password-field input{width:100%;height:36px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;color:#334155}.password-field input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 2px rgba(36,104,232,.1)}.form-error{min-height:18px;margin-top:10px;color:#d14343;font-size:12px}
     .pc-modal-actions{height:58px;padding:0 18px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;gap:8px}.confirm-copy{margin:0;color:#334155;line-height:1.7}
     .page-toast{position:fixed;left:50%;top:76px;z-index:1300;max-width:min(440px,calc(100vw - 32px));padding:10px 16px;border:1px solid #b9e2ca;border-radius:4px;background:#f1fbf5;color:#168052;box-shadow:0 8px 28px rgba(15,32,54,.12);transform:translate(-50%,-12px);opacity:0;pointer-events:none;transition:.2s}.page-toast.show{transform:translate(-50%,0);opacity:1}
-    @media(max-width:1100px){.identity{padding:18px}.setting-row{grid-template-columns:1fr;gap:10px}.setting-control{justify-content:flex-start}.date-range{width:100%;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)}}
-    @media(max-width:760px){.profile{height:132px;flex-basis:132px}.profile-avatar{width:54px;height:54px;flex-basis:54px;font-size:22px}.identity{gap:10px}.identity h2{font-size:17px}.center-tabs{padding:0 12px}.task-toolbar{align-items:stretch;flex-direction:column}.task-filter{grid-template-columns:minmax(0,1fr)}.task-tools{justify-content:flex-start}.settings-list{padding:0 14px}.setting-row{min-height:78px}.date-range{grid-template-columns:1fr}.date-range span{display:none}.settings-actions{padding:0 14px}}
+    @media(max-width:1100px){.identity{padding:14px 18px}.profile-account-fields{gap:28px}.setting-row{grid-template-columns:1fr;gap:10px}.setting-control{justify-content:flex-start}.date-range{width:100%;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)}}
+    @media(max-width:760px){.profile{height:auto;min-height:104px;flex-basis:auto}.identity{align-items:flex-start;flex-wrap:wrap;gap:12px}.profile-account-fields{width:100%;align-items:flex-start;flex-direction:column;gap:8px}.identity>.btn{margin-left:auto}.center-tabs{padding:0 12px}.task-toolbar{align-items:stretch;flex-direction:column}.task-filter{grid-template-columns:minmax(0,1fr)}.task-tools{justify-content:flex-start}.settings-list{padding:0 14px}.setting-row{min-height:78px}.date-range{grid-template-columns:1fr}.date-range span{display:none}.settings-actions{padding:0 14px}}
   </style>
 </head>
 <body data-page="personal-center">
@@ -44,7 +43,7 @@
     <div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div>
     <div class="group nav-label">质量分析</div>
 <nav class="nav">
-<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a>
+<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>项目统计</a>
 <a class="item nav-item" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a>
 <a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a>
 <a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a>
@@ -57,7 +56,6 @@
 <div class="group nav-label">系统管理</div>
 <a class="item nav-item" href="10-用户管理.html" style="text-decoration:none"><span class="ico nav-icon">♟</span>用户管理</a>
 <a class="item nav-item" href="11-角色管理.html" style="text-decoration:none"><span class="ico nav-icon">♧</span>角色管理</a>
-<a class="item nav-item active" href="12-个人中心.html" style="text-decoration:none"><span class="ico nav-icon">☻</span>个人中心</a>
 </nav>
     <div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div>
   </aside>
@@ -65,7 +63,7 @@
     <header class="top"><div class="title"><h1>个人中心</h1></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
     <main class="main">
       <section class="panel profile">
-        <div class="identity"><div class="profile-avatar">管</div><div><h2>系统管理员</h2><p>admin · 平台管理员</p><button class="btn" type="button" data-password-open style="margin-top:14px">修改密码</button></div></div>
+        <div class="identity"><div class="profile-account-fields"><div class="profile-account-field"><small>账号名称</small><b>admin</b></div><div class="profile-account-field"><small>角色名称</small><b>平台管理员</b></div></div><button class="btn" type="button" data-password-open>修改密码</button></div>
       </section>
       <section class="panel center-tabs" aria-label="个人中心内容切换"><button class="center-tab active" type="button" data-center-tab="tasks" aria-selected="true">导出任务</button><button class="center-tab" type="button" data-center-tab="settings" aria-selected="false">基本设置</button></section>
       <section class="panel center-panel tasks" data-center-panel="tasks">
@@ -77,7 +75,8 @@
         <div class="settings-list">
           <section class="settings-section platform-settings" aria-labelledby="platform-settings-title"><h2 class="settings-section-title" id="platform-settings-title">平台设置</h2>
             <div class="setting-row"><div class="setting-copy"><h3>项目统计计算维度</h3></div><div class="setting-control"><label class="radio-option"><input type="radio" name="project-dimension" value="panel">拼板</label><label class="radio-option"><input type="radio" name="project-dimension" value="board">整板</label></div></div>
-            <div class="setting-row"><div class="setting-copy"><h3>导出是否包含误报结果</h3></div><div class="setting-control"><label class="radio-option"><input type="radio" name="include-false-alarm" value="off">关闭</label><label class="radio-option"><input type="radio" name="include-false-alarm" value="on">打开</label></div></div>
+            <div class="setting-row"><div class="setting-copy"><h3>统计口径</h3><p>统计采用的数据，可选择多个统计口径</p></div><div class="setting-control mouth-options" role="group" aria-label="统计口径"><label class="mouth-option"><input type="checkbox" name="statistical-mouth" value="machine">机器判定</label><label class="mouth-option"><input type="checkbox" name="statistical-mouth" value="first">一次复判结果</label><label class="mouth-option"><input type="checkbox" name="statistical-mouth" value="final">最终复判结果</label></div></div>
+            <div class="setting-row"><div class="setting-copy"><h3>导出包含误报结果</h3></div><div class="setting-control"><label class="radio-option"><input type="radio" name="include-false-alarm" value="off">关闭</label><label class="radio-option"><input type="radio" name="include-false-alarm" value="on">打开</label></div></div>
             <div class="setting-row"><div class="setting-copy"><h3>统计汇总</h3></div><div class="setting-control"><label class="radio-option"><input type="radio" name="summary" value="off">关闭</label><label class="radio-option"><input type="radio" name="summary" value="on">打开</label></div></div>
             <div class="setting-row"><div class="setting-copy"><h3>显示图表</h3></div><div class="setting-control"><label class="radio-option"><input type="radio" name="charts" value="off">关闭</label><label class="radio-option"><input type="radio" name="charts" value="on">打开</label></div></div>
             <div class="setting-row"><div class="setting-copy"><h3>数据加载范围</h3></div><div class="setting-control date-range"><input type="datetime-local" name="range-start" aria-label="数据加载开始时间"><span>至</span><input type="datetime-local" name="range-end" aria-label="数据加载结束时间"></div></div>
@@ -106,7 +105,7 @@
   <script>
     (() => {
       const storageKey = 'aoi-spc:basic-settings:admin';
-      const defaults = { dimension:'board', includeFalseAlarm:'on', summary:'on', charts:'off', anonymousLogin:'off', rangeStart:'2022-08-18T00:00', rangeEnd:'2026-08-11T10:42' };
+      const defaults = { dimension:'board', statisticalMouths:['machine','first'], includeFalseAlarm:'on', summary:'on', charts:'off', anonymousLogin:'off', rangeStart:'2022-08-18T00:00', rangeEnd:'2026-08-11T10:42' };
       const settingsPanel = document.querySelector('[data-center-panel="settings"]');
       const feedback = document.querySelector('.settings-feedback');
       const taskBody = document.querySelector('[data-task-body]');
@@ -137,18 +136,57 @@
       let snapshot;
 
       function readSettings() {
-        try { return { ...defaults, ...JSON.parse(localStorage.getItem(storageKey) || '{}') }; }
-        catch (error) { return { ...defaults }; }
+        try {
+          const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+          if (!Array.isArray(stored.statisticalMouths)) {
+            const legacyMouth = stored.reviewResultMouth || (Object.prototype.hasOwnProperty.call(stored, 'secondReviewAsOriginal') ? (stored.secondReviewAsOriginal === 'on' ? 'second' : 'first') : 'first');
+            stored.statisticalMouths = ['machine', legacyMouth === 'second' ? 'final' : legacyMouth];
+          }
+          return { ...defaults, ...stored };
+        } catch (error) { return { ...defaults }; }
+      }
+      function localDateTimeValue(date) {
+        const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0,16);
+      }
+      function dataRangeBounds() {
+        const now = new Date();
+        const earliest = new Date(now);
+        const day = earliest.getDate();
+        earliest.setDate(1);
+        earliest.setMonth(earliest.getMonth() - 6);
+        const lastDay = new Date(earliest.getFullYear(), earliest.getMonth() + 1, 0).getDate();
+        earliest.setDate(Math.min(day, lastDay));
+        return { min:localDateTimeValue(earliest), max:localDateTimeValue(now) };
+      }
+      function clampDateTime(value, min, max, fallback) {
+        if (!value) return fallback;
+        return value < min ? min : value > max ? max : value;
+      }
+      function applyDataRangeConstraints() {
+        const start = settingsPanel.querySelector('[name="range-start"]');
+        const end = settingsPanel.querySelector('[name="range-end"]');
+        const bounds = dataRangeBounds();
+        start.min = bounds.min; start.max = bounds.max;
+        end.min = start.value && start.value > bounds.min ? start.value : bounds.min;
+        end.max = bounds.max;
+        return { start, end, bounds };
       }
       function applySettings(settings) {
         const values = { 'project-dimension':settings.dimension, 'include-false-alarm':settings.includeFalseAlarm, summary:settings.summary, charts:settings.charts, 'anonymous-login':settings.anonymousLogin };
         Object.entries(values).forEach(([name,value]) => { const input = settingsPanel.querySelector(`[name="${name}"][value="${value}"]`); if (input) input.checked = true; });
-        settingsPanel.querySelector('[name="range-start"]').value = settings.rangeStart;
-        settingsPanel.querySelector('[name="range-end"]').value = settings.rangeEnd;
+        settingsPanel.querySelectorAll('[name="statistical-mouth"]').forEach(input => { input.checked = settings.statisticalMouths.includes(input.value); });
+        const bounds = dataRangeBounds();
+        const start = settingsPanel.querySelector('[name="range-start"]');
+        const end = settingsPanel.querySelector('[name="range-end"]');
+        start.value = clampDateTime(settings.rangeStart, bounds.min, bounds.max, bounds.min);
+        end.value = clampDateTime(settings.rangeEnd, start.value, bounds.max, bounds.max);
+        applyDataRangeConstraints();
       }
       function collectSettings() {
         return {
           dimension:settingsPanel.querySelector('[name="project-dimension"]:checked').value,
+          statisticalMouths:[...settingsPanel.querySelectorAll('[name="statistical-mouth"]:checked')].map(input => input.value),
           includeFalseAlarm:settingsPanel.querySelector('[name="include-false-alarm"]:checked').value,
           summary:settingsPanel.querySelector('[name="summary"]:checked').value,
           charts:settingsPanel.querySelector('[name="charts"]:checked').value,
@@ -160,6 +198,13 @@
       function showFeedback(message) {
         feedback.textContent = message; feedback.classList.add('show');
         window.clearTimeout(showFeedback.timer); showFeedback.timer = window.setTimeout(() => feedback.classList.remove('show'), 1800);
+      }
+      function validateDataRange() {
+        const { start, end, bounds } = applyDataRangeConstraints();
+        if (!start.value || start.value < bounds.min || start.value > bounds.max) return '开始时间仅支持选择最近半年内的时间';
+        if (!end.value || end.value > bounds.max) return '结束时间不能晚于当前时间';
+        if (end.value < start.value) return '结束时间不能早于开始时间';
+        return '';
       }
       function showToast(message) {
         toast.textContent = message; toast.classList.add('show');
@@ -214,7 +259,9 @@
       renderTasks();
       document.querySelectorAll('[data-center-tab]').forEach(tab => tab.addEventListener('click', () => showPanel(tab.dataset.centerTab)));
       document.querySelector('[data-settings-action="cancel"]').addEventListener('click', () => { applySettings(snapshot); showFeedback('已恢复为上次保存的设置'); });
-      document.querySelector('[data-settings-action="save"]').addEventListener('click', () => { snapshot = collectSettings(); localStorage.setItem(storageKey, JSON.stringify(snapshot)); showFeedback('基本设置已保存'); });
+      document.querySelector('[data-settings-action="save"]').addEventListener('click', () => { const rangeError = validateDataRange(); if (rangeError) { showFeedback(rangeError); return; } snapshot = collectSettings(); localStorage.setItem(storageKey, JSON.stringify(snapshot)); showFeedback('基本设置已保存'); });
+      settingsPanel.querySelector('[name="range-start"]').addEventListener('change', () => { const { start, end } = applyDataRangeConstraints(); if (end.value < start.value) end.value = start.value; });
+      settingsPanel.querySelector('[name="range-end"]').addEventListener('change', validateDataRange);
       taskStatus.addEventListener('change', () => { selectedTaskIds.clear(); renderTasks(); });
       taskSelectAll.addEventListener('change', () => { visibleTasks().forEach(task => taskSelectAll.checked ? selectedTaskIds.add(task.id) : selectedTaskIds.delete(task.id)); renderTasks(); });
       taskBody.addEventListener('change', event => {

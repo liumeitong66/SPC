@@ -15,7 +15,7 @@
       <div class="device-card"><b data-device>AOI-01</b><span data-ip>192.168.10.21</span></div>
       <div class="group nav-label">质量分析</div>
 <nav class="nav">
-<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a>
+<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>项目统计</a>
 <a class="item nav-item" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a>
 <a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a>
 <a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a>
@@ -23,12 +23,12 @@
 <a class="item nav-item" href="13-品质预警.html" style="text-decoration:none"><span class="ico nav-icon">⚑</span>告警分析</a>
 <div class="group nav-label">数据管理</div>
 <a class="item nav-item" href="02-单板查询与结果追溯.html" style="text-decoration:none"><span class="ico nav-icon">▤</span>单板查询</a>
+<a class="item nav-item" href="07-数据上传监控.html" style="text-decoration:none"><span class="ico nav-icon">▧</span>设备运行监控</a>
 <a class="item nav-item" href="08-设备与区域管理.html" style="text-decoration:none"><span class="ico nav-icon">▦</span>设备管理</a>
 <a class="item nav-item" href="14-告警管理.html" style="text-decoration:none"><span class="ico nav-icon">⚙</span>告警管理</a>
 <div class="group nav-label">系统管理</div>
 <a class="item nav-item" href="10-用户管理.html" style="text-decoration:none"><span class="ico nav-icon">♟</span>用户管理</a>
 <a class="item nav-item" href="11-角色管理.html" style="text-decoration:none"><span class="ico nav-icon">♧</span>角色管理</a>
-<a class="item nav-item" href="12-个人中心.html" style="text-decoration:none"><span class="ico nav-icon">☻</span>个人中心</a>
 </nav>
       <div class="readonly-foot"><b>集中平台只读访问</b>管理、设置、账号和角色功能已隐藏</div>
     </aside>
@@ -36,12 +36,12 @@
       <header class="topbar"><h1>本机 SPC</h1><div class="top-actions"><button class="round">◉</button><button class="round">☼</button><span class="user">admin</span></div></header>
       <main class="main">
         <div class="readonly-banner"><b>集中平台只读访问</b><span><strong data-device>AOI-01</strong> · <span data-ip>192.168.10.21</span> · 当前用户 admin</span><span class="tag">只读模式</span></div>
-        <section class="query"><div class="page-title"><h2 data-view-title>项目统计</h2><span>数据范围仅限当前设备</span></div><div class="field"><label>时间范围</label><input value="2026-08-01 00:00 至 2026-08-04 14:32" readonly></div><div class="field project"><label>订单编号</label><input placeholder="输入订单编号" list="local-order-history"><datalist id="local-order-history"><option value="3267504J2G_A面"><option value="1-A"><option value="329134S_P129"><option value="155042F_P9"><option value="A14-POWER"></datalist></div><button class="reset">重置</button></section>
+        <section class="query"><div class="page-title"><h2 data-view-title>项目统计</h2><span>数据范围仅限当前设备</span></div><div class="field"><label>时间范围</label><input value="2026-08-01 00:00 至 2026-08-04 14:32" readonly></div><div class="field project"><label>模板名称</label><input placeholder="输入模板名称" list="local-order-history"><datalist id="local-order-history"><option value="3267504J2G_A面"><option value="1-A"><option value="329134S_P129"><option value="155042F_P9"><option value="A14-POWER"></datalist></div><button class="reset">重置</button></section>
         <section class="content">
           <div class="tabs panel"><button class="tab active">项目统计</button><button class="tab">单板统计</button></div>
           <section class="panel records" data-project-content>
-            <div class="phead"><b>项目</b><div class="columns"><span>显示列：</span><span class="chip">订单编号</span><span class="chip">板卡指标</span></div></div>
-            <div class="tablebox"><table class="table"><thead><tr><th style="width:60px">序号</th><th style="width:180px">订单编号</th><th>板卡总数</th><th>板卡良品总数</th><th>板卡DPPM</th><th>板卡良率（%）</th><th>板卡不良总数</th><th>板卡误报总数</th></tr></thead><tbody><tr><td>1</td><td>3267504J2G_A面</td><td>34,620</td><td>34,315</td><td>8,810</td><td>99.12%</td><td>305</td><td>256</td></tr><tr><td>2</td><td>155042F_P9</td><td>18,340</td><td>18,146</td><td>10,578</td><td>98.94%</td><td>194</td><td>181</td></tr><tr class="summary"><td></td><td>统计</td><td>52,960</td><td>52,461</td><td>9,423</td><td>99.06%</td><td>499</td><td>437</td></tr></tbody></table></div>
+            <div class="phead"><b>项目</b><div class="columns"><span>显示列：</span><span class="chip">模板名称</span><span class="chip">板卡指标</span></div></div>
+            <div class="tablebox"><table class="table"><thead><tr><th style="width:60px">序号</th><th style="width:180px">模板名称</th><th>板卡总数</th><th>板卡良品总数</th><th>板卡DPPM</th><th>板卡良率（%）</th><th>板卡不良总数</th><th>板卡误报总数</th></tr></thead><tbody><tr><td>1</td><td>3267504J2G_A面</td><td>34,620</td><td>34,315</td><td>8,810</td><td>99.12%</td><td>305</td><td>256</td></tr><tr><td>2</td><td>155042F_P9</td><td>18,340</td><td>18,146</td><td>10,578</td><td>98.94%</td><td>194</td><td>181</td></tr><tr class="summary"><td></td><td>统计</td><td>52,960</td><td>52,461</td><td>9,423</td><td>99.06%</td><td>499</td><td>437</td></tr></tbody></table></div>
             <div class="pager"><span>总计：2</span><span>‹　1　›　　10 条/页</span></div>
           </section>
           <section class="charts" data-project-content>

@@ -30,15 +30,15 @@
 - Consumes: `data-mouth`、`data-defect-mouth`、`mouthData()`、`setMouth()`。
 - Produces: 使用内部值 `second` 的“最终复判”入口。
 
-- [ ] **Step 1: 添加第三个 segmented 选项**
+- [x] **Step 1: 添加第三个 segmented 选项**
 
 在四处统计口径末尾增加内部值为 `second` 的“最终复判”。
 
-- [ ] **Step 2: 补齐缺陷分析最终复判数据**
+- [x] **Step 2: 补齐缺陷分析最终复判数据**
 
 在 `mouthDatasets` 中增加 `final` 数据集，并由 `data-defect-mouth="final"` 驱动。
 
-- [ ] **Step 3: 补齐项目详情数据联动**
+- [x] **Step 3: 补齐项目详情数据联动**
 
 依据当前口径计算板卡、器件指标和设备良率，点击 segmented 后重新渲染。
 
@@ -60,11 +60,11 @@
 - Consumes: 现有页面文案与 `second` 数据值。
 - Produces: 全平台统一的“最终复判”用户文案。
 
-- [ ] **Step 1: 替换用户可见名称**
+- [x] **Step 1: 替换用户可见名称**
 
 将所有“二次复判”标签、表头、选项、提示和可访问文本改为“最终复判”。
 
-- [ ] **Step 2: 保留内部字段**
+- [x] **Step 2: 保留内部字段**
 
 确认 `second`、`secondReviewer` 等内部字段和 URL 参数未被改名。
 
@@ -78,14 +78,14 @@
 - Consumes: 修改后的静态页面和脚本。
 - Produces: 文案、结构、脚本语法和格式检查结果。
 
-- [ ] **Step 1: 检查四处统计口径结构**
+- [x] **Step 1: 检查四处统计口径结构**
 
 确认每处均包含 `original`、`review`、`second` 三项。
 
-- [ ] **Step 2: 检查旧文案**
+- [x] **Step 2: 检查旧文案**
 
 全局搜索“二次复判”，预期无用户可见结果。
 
-- [ ] **Step 3: 检查脚本与格式**
+- [x] **Step 3: 检查脚本与格式**
 
 使用 `node --check` 校验共享脚本和所有 HTML 内联脚本，并运行 `git diff --check`。

@@ -1,9 +1,35 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>设备管理</title><link rel="stylesheet" href="management-common.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>设备管理</title><link rel="stylesheet" href="management-common.css"><style>
+.management-page[data-page="device-management"] .main{gap:12px;overflow:hidden}
+.management-page[data-page="device-management"] .management-filters{flex:0 0 auto;min-height:72px}
+.management-page[data-page="device-management"] .management-filters .status{width:180px}
+.device-management-workspace{display:grid;grid-template-columns:240px minmax(0,1fr);gap:12px;flex:1;min-height:0;overflow:hidden}
+.device-org-panel,.device-list-pane{min-height:0;min-width:0}
+.device-org-panel{display:flex;flex-direction:column;overflow:hidden}
+.device-org-head{height:54px;flex:0 0 54px;padding:0 14px;border-bottom:1px solid #e6ebf1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.device-org-head b{color:#17365f;font-size:14px}.device-org-head .btn{height:30px;padding:0 9px}
+.device-org-tree{flex:1;min-height:0;overflow:auto;padding:8px}
+.org-tree-row{position:relative;height:36px;padding:0 6px 0 calc(7px + var(--org-depth,0)*18px);border-radius:5px;display:flex;align-items:center;gap:4px;color:#41536a;cursor:pointer;user-select:none}
+.org-tree-row:hover{background:#f5f8fc}.org-tree-row.is-active{background:#eaf2ff;color:#2468e8;font-weight:650}
+.org-tree-toggle{position:relative;width:22px;height:28px;flex:0 0 22px;border:0;background:transparent;color:#7b899b;cursor:pointer;font-size:0}
+.org-tree-toggle:before{content:"";position:absolute;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);left:7px;top:8px}
+.org-tree-toggle.is-collapsed:before{transform:rotate(-45deg);left:5px;top:10px}.org-tree-toggle.is-leaf:before{display:none}
+.org-tree-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.org-tree-count{min-width:22px;margin-left:auto;padding-right:8px;flex:0 0 auto;color:#8a97a8;font-size:12px;font-weight:400;text-align:right}.org-tree-more{position:relative;width:28px;height:26px;margin-left:4px;padding-left:7px;flex:0 0 28px;border:0;border-left:1px solid #edf1f5;border-radius:0 4px 4px 0;background:transparent;color:#78869a;cursor:pointer;font-size:0;line-height:1}.org-tree-more:before{content:"";position:absolute;left:16px;top:11px;width:3px;height:3px;border-radius:50%;background:currentColor;box-shadow:0 -5px 0 currentColor,0 5px 0 currentColor}.org-tree-more:hover{background:#fff;color:#2468e8}
+.org-node-menu{position:absolute;right:5px;top:31px;z-index:12;width:116px;padding:4px;background:#fff;border:1px solid #dce4ee;border-radius:6px;box-shadow:0 8px 20px rgba(32,55,84,.16)}
+.org-node-menu button{width:100%;height:30px;padding:0 9px;border:0;border-radius:4px;background:#fff;text-align:left;color:#475569;cursor:pointer}.org-node-menu button:hover{background:#f2f7ff;color:#2468e8}.org-node-menu button.danger{color:#df4a4a}
+.device-list-pane{display:flex;flex-direction:column;gap:12px;overflow:hidden}.device-list-pane .management-toolbar{flex:0 0 58px;min-height:58px}.device-list-pane .records{min-height:0}.device-list-pane .tablebox{min-width:0;overflow:auto}.device-list-pane .table{min-width:1210px}
+.runtime-status{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:#526176}.runtime-status:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#a9b3c1}.runtime-status.is-connected,.runtime-status.is-normal{color:#267a55}.runtime-status.is-connected:before,.runtime-status.is-normal:before{background:#20a464;box-shadow:0 0 0 2px rgba(32,164,100,.12)}.runtime-status.is-delayed{color:#a7650a}.runtime-status.is-delayed:before{background:#e6a23c}.runtime-status.is-interrupted{color:#c43d3d}.runtime-status.is-interrupted:before{background:#df4a4a}.runtime-status.is-unmonitored{color:#8995a5}.runtime-status.is-unmonitored:before{background:#b7c0cb}
+.device-action-cell{overflow:visible!important;position:relative}.device-action-cell:hover:after{display:none}.device-operation{display:inline-flex;align-items:center;gap:14px}.device-operation>.action-btn+.action-btn{margin-left:0!important}.device-more-wrap{position:relative;display:inline-flex}.device-more-trigger{display:inline-flex;align-items:center}.device-more-trigger:after{content:"";width:6px;height:6px;margin:-3px 1px 0 7px;border-right:1px solid #77879d;border-bottom:1px solid #77879d;transform:rotate(45deg);flex:0 0 6px}.device-more-menu{position:absolute;right:0;top:26px;z-index:20;width:132px;max-width:calc(100vw - 32px);padding:4px;background:#fff;border:1px solid #dce4ee;border-radius:6px;box-shadow:0 8px 20px rgba(32,55,84,.16);display:flex;flex-direction:column;align-items:stretch;gap:2px}.device-more-menu[hidden]{display:none}.device-menu-item{display:block;width:100%;height:32px;flex:0 0 32px;padding:0 10px;border:0;border-radius:4px;background:#fff;color:#475569;text-align:left;cursor:pointer;white-space:nowrap}.device-menu-item:hover{background:#f2f7ff;color:#2468e8}.device-menu-item.danger{color:#df4a4a}.device-menu-item:disabled{color:#b7c0cb;background:#fff;cursor:not-allowed}.device-menu-item.local-spc-action:hover{text-decoration:none}.device-menu-item.local-spc-action:after{content:none}
+.org-modal-note{margin:0;color:#64748b;font-size:12px;line-height:1.7}.org-level-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}.org-level-item{display:grid;grid-template-columns:68px minmax(0,1fr);gap:10px;align-items:center}.org-level-item span{color:#64748b;font-size:12px}.org-structure-card{padding:12px;border:1px solid #e1e7ef;border-radius:6px;background:#f7f9fc;display:flex;align-items:center;justify-content:space-between;gap:12px}.org-structure-path{color:#334155;font-weight:650}
+.org-node-menu,.device-more-menu{width:132px;padding:4px;border:1px solid #dce4ee;border-radius:6px;background:#fff;box-shadow:0 8px 20px rgba(32,55,84,.16);display:flex;flex-direction:column;align-items:stretch;gap:2px}.org-node-menu button,.device-menu-item{height:32px;flex:0 0 32px;padding:0 10px;border:0;border-radius:4px;background:#fff;color:#475569;text-align:left;cursor:pointer;white-space:nowrap;transition:background-color 160ms ease,color 160ms ease}.org-node-menu button:hover,.device-menu-item:hover{background:#f2f7ff;color:#2468e8}.device-management-workspace button:focus-visible,.management-filters button:focus-visible,.management-filters select:focus-visible,.management-filters input:focus-visible{outline:2px solid #3478f6;outline-offset:2px}@media(prefers-reduced-motion:reduce){.org-node-menu button,.device-menu-item{transition:none}}
+@media(max-width:1180px){.device-management-workspace{grid-template-columns:220px minmax(0,1fr)}}
+@media(max-width:900px){.management-page[data-page="device-management"] .main{overflow:auto}.device-management-workspace{grid-template-columns:1fr;grid-template-rows:230px minmax(520px,1fr);overflow:visible}.device-org-panel{min-height:230px}.device-list-pane{min-height:520px}}
+</style></head>
 <body class="management-page" data-page="device-management">
 <aside class="sidebar"><div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div><div class="group nav-label">质量分析</div>
 <nav class="nav">
-<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a>
+<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>项目统计</a>
 <a class="item nav-item" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a>
 <a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a>
 <a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a>
@@ -19,10 +45,192 @@
 <a class="item nav-item" href="12-个人中心.html" style="text-decoration:none"><span class="ico nav-icon">☻</span>个人中心</a>
 </nav><div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div></div></aside>
 <div class="app"><header class="top"><div class="title"><h1>设备管理</h1></div><div class="top-actions"><button class="iconbtn proto-language-btn" title="切换语言">◎</button><button class="iconbtn proto-theme-btn" title="切换外观">☼</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
-<main class="main"><section class="panel filters management-filters"><div class="field keyword"><label for="device-keyword">设备名称/SN</label><div class="control search-control"><span>⌕</span><input id="device-keyword" type="text" placeholder="请输入设备名称或设备SN"></div></div><div class="field status"><label>设备状态</label><div class="control" aria-label="设备状态筛选"><span aria-hidden="true">▦</span><span>全部状态</span><span class="chev" aria-hidden="true">⌄</span></div></div><div class="field region"><label>所属区域</label><div class="control" aria-label="所属区域筛选"><span aria-hidden="true">▦</span><span>全部区域</span><span class="chev" aria-hidden="true">⌄</span></div></div><div class="filter-actions"><button class="btn" type="button">重置</button><button class="btn primary" type="button">查询</button></div></section><section class="panel management-toolbar"><div class="phead-title"><b>设备列表</b></div><div class="tools"><button class="btn primary" data-proto-action="add-device">新增设备</button><button class="btn" data-proto-action="manage-regions">区域管理</button></div></section>
-<section class="panel records"><div class="tablebox"><table class="table"><thead><tr><th>设备SN</th><th>设备名称</th><th>设备IP</th><th>所属区域</th><th>设备状态</th><th>最后接收数据时间</th><th>创建时间</th><th>更新时间</th><th>操作人</th><th>操作</th></tr></thead><tbody>
-<tr><td title="SI1020E1112">SI1020E1112</td><td title="AOI-01">AOI-01</td><td>192.168.10.21</td><td>区域A</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td>2026-08-04 14:32:18</td><td>2026-07-28 09:20:14</td><td>2026-08-04 14:20:34</td><td>admin</td><td><button class="action-btn local-spc-action" data-proto-action="open-local-spc" title="点击后提示跳转至本机 SPC">本机 SPC</button><button class="action-btn" data-proto-action="edit-device">编辑</button><button class="action-btn danger" data-proto-action="delete-device" disabled>删除</button></td></tr>
-<tr><td>SI1020E1148</td><td>AOI-02</td><td>192.168.10.22</td><td>区域B</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td>2026-08-04 14:31:42</td><td>2026-07-29 10:08:35</td><td>2026-08-04 14:18:09</td><td>admin</td><td><button class="action-btn local-spc-action" data-proto-action="open-local-spc" title="点击后提示跳转至本机 SPC">本机 SPC</button><button class="action-btn" data-proto-action="edit-device">编辑</button><button class="action-btn danger" data-proto-action="delete-device" disabled>删除</button></td></tr>
-<tr><td>SI1020E1186</td><td>AOI-03</td><td>192.168.10.23</td><td>区域C</td><td><button class="status-button off" data-proto-action="toggle-device" data-device-status="disabled">停用</button></td><td>2026-08-03 22:16:08</td><td>2026-07-30 14:45:21</td><td>2026-08-03 22:16:10</td><td>admin</td><td><button class="action-btn local-spc-action" data-proto-action="open-local-spc" title="点击后提示跳转至本机 SPC">本机 SPC</button><button class="action-btn" data-proto-action="edit-device">编辑</button><button class="action-btn danger" data-proto-action="delete-device">删除</button></td></tr>
-<tr><td>SI1020E1206</td><td>AOI-04</td><td>192.168.10.24</td><td>区域D</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td>2026-08-04 14:29:56</td><td>2026-08-01 16:12:39</td><td>2026-08-04 14:10:52</td><td>admin</td><td><button class="action-btn local-spc-action" data-proto-action="open-local-spc" title="点击后提示跳转至本机 SPC">本机 SPC</button><button class="action-btn" data-proto-action="edit-device">编辑</button><button class="action-btn danger" data-proto-action="delete-device" disabled>删除</button></td></tr>
-</tbody></table></div><div class="pager"><span>共 4 条</span><span>‹　1　›　　10 条/页</span></div></section></main></div><script src="spc-prototype.js"></script></body></html>
+<main class="main">
+<section class="panel filters management-filters"><div class="field keyword"><label for="device-keyword">设备名称/SN</label><div class="control search-control"><span>⌕</span><input id="device-keyword" type="text" placeholder="请输入设备名称或设备SN"></div></div><div class="field status"><label>启用状态</label><div class="control" id="device-status-filter" aria-label="启用状态筛选"><span aria-hidden="true">▦</span><span data-filter-value>全部状态</span><span class="chev" aria-hidden="true">⌄</span></div></div><div class="filter-actions"><button class="btn" type="button" data-org-reset>重置</button><button class="btn primary" type="button" data-org-query>查询</button></div></section>
+<section class="device-management-workspace">
+<aside class="panel device-org-panel"><header class="device-org-head"><b>设备组织</b><button class="btn" type="button" data-org-level-settings>层级设置</button></header><div class="device-org-tree" data-org-tree aria-label="设备组织树"></div></aside>
+<section class="device-list-pane"><section class="panel management-toolbar"><div class="phead-title"><b data-device-list-title>设备列表 · 区域</b></div><div class="tools"><button class="btn primary" data-proto-action="add-device">新增设备</button></div></section>
+<section class="panel records"><div class="tablebox"><table class="table" data-device-table><thead><tr><th>设备SN</th><th>设备名称</th><th>设备IP</th><th>所属区域</th><th>启用状态</th><th>连接状态</th><th>最后接收数据时间</th><th>创建时间</th><th>更新时间</th><th>操作人</th><th>操作</th></tr></thead><tbody>
+<tr data-org-leaf="line-a1" data-device-sn="SI1020E1112" data-device-name="AOI-01"><td title="SI1020E1112">SI1020E1112</td><td title="AOI-01">AOI-01</td><td>192.168.10.21</td><td>区域A</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td><span class="runtime-status is-connected" data-device-connection-status>已连接</span></td><td>2026-08-04 14:32:18</td><td>2026-07-28 09:20:14</td><td>2026-08-04 14:20:34</td><td>admin</td><td class="device-action-cell"><div class="device-operation"><button class="action-btn" data-proto-action="edit-device">编辑</button><span class="device-more-wrap"><button class="action-btn device-more-trigger" type="button" data-device-more>更多</button><span class="device-more-menu" hidden><button class="device-menu-item" type="button" data-device-connection-action="disconnect">断开连接</button><button class="device-menu-item local-spc-action" type="button" data-proto-action="open-local-spc">本机 SPC</button><button class="device-menu-item danger" type="button" data-proto-action="delete-device" disabled>删除</button></span></span></div></td></tr>
+<tr data-org-leaf="line-b1" data-device-sn="SI1020E1148" data-device-name="AOI-02"><td>SI1020E1148</td><td>AOI-02</td><td>192.168.10.22</td><td>区域B</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td><span class="runtime-status is-connected" data-device-connection-status>已连接</span></td><td>2026-08-04 14:10:12</td><td>2026-07-29 10:08:35</td><td>2026-08-04 14:18:09</td><td>admin</td><td class="device-action-cell"><div class="device-operation"><button class="action-btn" data-proto-action="edit-device">编辑</button><span class="device-more-wrap"><button class="action-btn device-more-trigger" type="button" data-device-more>更多</button><span class="device-more-menu" hidden><button class="device-menu-item" type="button" data-device-connection-action="disconnect">断开连接</button><button class="device-menu-item local-spc-action" type="button" data-proto-action="open-local-spc">本机 SPC</button><button class="device-menu-item danger" type="button" data-proto-action="delete-device" disabled>删除</button></span></span></div></td></tr>
+<tr data-org-leaf="line-c1" data-device-sn="SI1020E1186" data-device-name="AOI-03"><td>SI1020E1186</td><td>AOI-03</td><td>192.168.10.23</td><td>区域C</td><td><button class="status-button off" data-proto-action="toggle-device" data-device-status="disabled">停用</button></td><td><span class="runtime-status is-unmonitored" data-device-connection-status>未监控</span></td><td>2026-08-03 22:16:08</td><td>2026-07-30 14:45:21</td><td>2026-08-03 22:16:10</td><td>admin</td><td class="device-action-cell"><div class="device-operation"><button class="action-btn" data-proto-action="edit-device">编辑</button><span class="device-more-wrap"><button class="action-btn device-more-trigger" type="button" data-device-more>更多</button><span class="device-more-menu" hidden><button class="device-menu-item" type="button" data-device-connection-action="reconnect" disabled title="请先启用设备">重新连接</button><button class="device-menu-item local-spc-action" type="button" data-proto-action="open-local-spc">本机 SPC</button><button class="device-menu-item danger" type="button" data-proto-action="delete-device">删除</button></span></span></div></td></tr>
+<tr data-org-leaf="line-d1" data-device-sn="SI1020E1206" data-device-name="AOI-04"><td>SI1020E1206</td><td>AOI-04</td><td>192.168.10.24</td><td>区域D</td><td><button class="status-button" data-proto-action="toggle-device" data-device-status="enabled">启用</button></td><td><span class="runtime-status" data-device-connection-status>未连接</span></td><td>2026-08-04 12:58:16</td><td>2026-08-01 16:12:39</td><td>2026-08-04 14:10:52</td><td>admin</td><td class="device-action-cell"><div class="device-operation"><button class="action-btn" data-proto-action="edit-device">编辑</button><span class="device-more-wrap"><button class="action-btn device-more-trigger" type="button" data-device-more>更多</button><span class="device-more-menu" hidden><button class="device-menu-item" type="button" data-device-connection-action="reconnect">重新连接</button><button class="device-menu-item local-spc-action" type="button" data-proto-action="open-local-spc">本机 SPC</button><button class="device-menu-item danger" type="button" data-proto-action="delete-device" disabled>删除</button></span></span></div></td></tr>
+</tbody></table></div><div class="pager"><span data-device-total>共 4 条</span><span>‹　1　›　　10 条/页</span></div></section></section>
+</section></main></div><script src="spc-prototype.js"></script><script>
+(function(){
+  const workspace=document.querySelector('.device-management-workspace');
+  if(!workspace)return;
+  const tree=document.querySelector('[data-org-tree]');
+  const table=document.querySelector('[data-device-table]');
+  const tbody=table.tBodies[0];
+  let rows=Array.from(tbody.querySelectorAll('tr[data-org-leaf]'));
+  const keyword=document.getElementById('device-keyword');
+  const status=document.getElementById('device-status-filter');
+  const title=document.querySelector('[data-device-list-title]');
+  const total=document.querySelector('[data-device-total]');
+  let levelLabels=['区域','产线'];
+  let selectedId='root';
+  let openMenuId='';
+  let idSeed=1;
+  const nodes=[
+    {id:'root',parentId:null,level:-1,name:'区域',expanded:true},
+    {id:'area-a',parentId:'root',level:0,name:'区域A',expanded:true},{id:'line-a1',parentId:'area-a',level:1,name:'产线A1',expanded:true},
+    {id:'area-b',parentId:'root',level:0,name:'区域B',expanded:true},{id:'line-b1',parentId:'area-b',level:1,name:'产线B1',expanded:true},
+    {id:'area-c',parentId:'root',level:0,name:'区域C',expanded:true},{id:'line-c1',parentId:'area-c',level:1,name:'产线C1',expanded:true},
+    {id:'area-d',parentId:'root',level:0,name:'区域D',expanded:true},{id:'line-d1',parentId:'area-d',level:1,name:'产线D1',expanded:true}
+  ];
+  const byId=id=>nodes.find(node=>node.id===id);
+  const children=id=>nodes.filter(node=>node.parentId===id);
+  const descendants=id=>{const result=[];children(id).forEach(child=>{result.push(child,...descendants(child.id));});return result;};
+  const leafIds=id=>{const node=byId(id);if(!node)return[];const childNodes=children(id);return childNodes.length?childNodes.flatMap(child=>leafIds(child.id)):[id];};
+  const deviceCount=id=>{const leaves=new Set(leafIds(id));return rows.filter(row=>leaves.has(row.dataset.orgLeaf)).length;};
+  const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  window.getSPCDeviceOrganizationLeaves=()=>nodes.filter(node=>node.level===levelLabels.length-1&&!children(node.id).length).map(node=>({id:node.id,name:node.name,parentName:byId(node.parentId)?.name||''}));
+
+  function renderTree(){
+    rows.forEach(row=>{
+      const leaf=byId(row.dataset.orgLeaf);const parent=leaf?byId(leaf.parentId):null;
+      const dataCells=Array.from(row.cells).filter(cell=>!cell.classList.contains('sequence-cell'));
+      if(parent&&dataCells[3])dataCells[3].textContent=parent.name;
+    });
+    const renderNode=(node,depth)=>{
+      const childNodes=children(node.id);
+      const isLeaf=!childNodes.length;
+      const menu=node.id==='root'
+        ? '<button type="button" data-node-action="add">新增'+escapeHtml(levelLabels[0])+'</button>'
+        : (node.level<levelLabels.length-1?'<button type="button" data-node-action="add">新增'+escapeHtml(levelLabels[node.level+1])+'</button>':'')+'<button type="button" data-node-action="rename">重命名</button><button class="danger" type="button" data-node-action="delete">删除</button>';
+      let html='<div class="org-tree-row'+(selectedId===node.id?' is-active':'')+'" style="--org-depth:'+depth+'" data-org-node="'+node.id+'"><button class="org-tree-toggle '+(isLeaf?'is-leaf':node.expanded?'':'is-collapsed')+'" type="button" data-node-toggle aria-label="'+(node.expanded?'收起':'展开')+'"></button><span class="org-tree-name">'+escapeHtml(node.id==='root'?levelLabels[0]:node.name)+'</span><span class="org-tree-count">'+deviceCount(node.id)+'</span><button class="org-tree-more" type="button" data-node-more aria-label="节点操作">节点操作</button>'+(openMenuId===node.id?'<div class="org-node-menu">'+menu+'</div>':'')+'</div>';
+      if(node.expanded)childNodes.forEach(child=>{html+=renderNode(child,depth+1);});
+      return html;
+    };
+    tree.innerHTML=renderNode(byId('root'),0);
+  }
+
+  function nodePath(id){
+    const parts=[];let current=byId(id);
+    while(current&&current.id!=='root'){parts.unshift(current.name);current=byId(current.parentId);}
+    return parts.length?parts.join(' / '):levelLabels[0];
+  }
+
+  function applyFilters(){
+    const allowed=new Set(leafIds(selectedId));
+    const query=keyword.value.trim().toLowerCase();
+    let visible=0;
+    rows.forEach(row=>{
+      const state=row.querySelector('[data-device-status]')?.dataset.deviceStatus||'';
+      const matchesTree=allowed.has(row.dataset.orgLeaf);
+      const matchesKeyword=!query||(row.dataset.deviceSn+' '+row.dataset.deviceName).toLowerCase().includes(query);
+      const selectedStatus=status.dataset.selected||status.querySelector('[data-filter-value]').textContent.trim();
+      const selectedState=selectedStatus==='启用'?'enabled':selectedStatus==='停用'?'disabled':'all';
+      const matchesStatus=selectedState==='all'||state===selectedState;
+      const isVisible=matchesTree&&matchesKeyword&&matchesStatus;
+      row.style.display=isVisible?'':'none';
+      if(isVisible)visible++;
+    });
+    title.textContent='设备列表 · '+nodePath(selectedId);
+    total.textContent='共 '+visible+' 条';
+  }
+
+  function showToast(message){
+    window.SPCPrototype.toast(message,'info');
+  }
+
+  function openOrgModal(titleText,bodyHtml,confirmLabel,onConfirm){
+    return window.SPCPrototype.openModal(titleText,bodyHtml,confirmLabel,onConfirm);
+  }
+
+  function closeDeviceMenus(exceptMenu){
+    document.querySelectorAll('.device-more-menu').forEach(menu=>{if(menu!==exceptMenu)menu.hidden=true;});
+  }
+
+  function syncConnectionAction(row){
+    const action=row&&row.querySelector('[data-device-connection-action]');
+    const statusButton=row&&row.querySelector('[data-device-status]');
+    const connection=row&&row.querySelector('[data-device-connection-status]');
+    if(!action||!statusButton||!connection)return;
+    const enabled=statusButton.dataset.deviceStatus==='enabled';
+    const connected=connection.classList.contains('is-connected');
+    action.disabled=!enabled;
+    action.title=enabled?'':'请先启用设备';
+    action.dataset.deviceConnectionAction=connected?'disconnect':'reconnect';
+    action.textContent=connected?'断开连接':'重新连接';
+  }
+
+  function setConnectionState(action,connected){
+    const row=action.closest('tr');
+    const connection=row&&row.querySelector('[data-device-connection-status]');
+    if(!row||!connection)return;
+    connection.textContent=connected?'已连接':'未连接';
+    connection.className='runtime-status'+(connected?' is-connected':'');
+    syncConnectionAction(row);
+    showToast((row.dataset.deviceName||'设备')+(connected?'已重新连接':'已断开连接'));
+  }
+
+  function promptNode(node,mode){
+    const isAdd=mode==='add';
+    const childLevel=node.id==='root'?0:node.level+1;
+    const label=isAdd?levelLabels[childLevel]:levelLabels[node.level];
+    const initial=isAdd?'':node.name;
+    openOrgModal((isAdd?'新增':'重命名')+label,'<div class="proto-field"><label>'+escapeHtml(label)+'名称</label><input data-org-name maxlength="30" value="'+escapeHtml(initial)+'" placeholder="请输入'+escapeHtml(label)+'名称"></div><p class="org-modal-note">同一上级节点下名称不可重复。</p>',isAdd?'新增':'保存',modal=>{
+      const name=modal.querySelector('[data-org-name]').value.trim();
+      if(!name){showToast('请输入'+label+'名称');return false;}
+      const parentId=isAdd?node.id:node.parentId;
+      if(nodes.some(item=>item.id!==node.id&&item.parentId===parentId&&item.name===name)){showToast('同一上级节点下已存在该名称');return false;}
+      if(isAdd){nodes.push({id:'org-node-'+Date.now()+'-'+idSeed++,parentId:node.id,level:childLevel,name,expanded:true});node.expanded=true;}
+      else node.name=name;
+      openMenuId='';renderTree();applyFilters();showToast((isAdd?'已新增':'已更新')+label+'“'+name+'”');
+    });
+  }
+
+  function deleteNode(node){
+    if(children(node.id).length){showToast('该节点下仍有子节点，不能删除');return;}
+    if(deviceCount(node.id)>0){showToast('该节点已关联设备，不能删除');return;}
+    openOrgModal('删除'+levelLabels[node.level],'<p style="margin:0;color:#475569;line-height:1.7">确认删除“'+escapeHtml(node.name)+'”吗？</p>','删除',()=>{
+      const index=nodes.findIndex(item=>item.id===node.id);if(index>=0)nodes.splice(index,1);
+      if(selectedId===node.id)selectedId=node.parentId||'root';
+      openMenuId='';renderTree();applyFilters();showToast('节点已删除');
+    });
+  }
+
+  function openMigrationPrompt(){
+    openOrgModal('调整层级结构','<p style="margin:0;color:#475569;line-height:1.8">当前已有 4 台设备。新增、删除或调整层级顺序前，需要先执行设备归属迁移；本原型仅展示迁移约束，不执行数据迁移。</p>','知道了');
+  }
+
+  function openLevelSettings(){
+    const body='<div class="org-level-list"><label class="org-level-item"><span>第 1 级</span><input data-level-index="0" value="'+escapeHtml(levelLabels[0])+'"></label><label class="org-level-item"><span>第 2 级</span><input data-level-index="1" value="'+escapeHtml(levelLabels[1])+'"></label></div><div class="org-structure-card"><div><div class="org-structure-path">'+escapeHtml(levelLabels.join(' → '))+'</div><p class="org-modal-note">结构变更需要先迁移已有设备归属。</p></div><button class="proto-secondary" type="button" data-adjust-levels>调整层级结构</button></div>';
+    const backdrop=openOrgModal('层级设置',body,'保存设置',modal=>{
+      const values=Array.from(modal.querySelectorAll('[data-level-index]')).map(input=>input.value.trim());
+      if(values.some(value=>!value)){showToast('层级名称不能为空');return false;}
+      if(new Set(values).size!==values.length){showToast('层级名称不能重复');return false;}
+      levelLabels=values;byId('root').name=values[0];renderTree();applyFilters();showToast('层级名称已更新');
+    });
+    backdrop.querySelector('[data-adjust-levels]').addEventListener('click',event=>{event.stopPropagation();openMigrationPrompt();});
+  }
+
+  workspace.addEventListener('click',event=>{
+    const moreButton=event.target.closest('[data-device-more]');
+    if(moreButton){event.preventDefault();event.stopPropagation();const menu=moreButton.parentElement.querySelector('.device-more-menu');const willOpen=menu.hidden;closeDeviceMenus(menu);menu.hidden=!willOpen;openMenuId='';renderTree();return;}
+    const connectionAction=event.target.closest('[data-device-connection-action]');
+    if(connectionAction){event.preventDefault();event.stopPropagation();closeDeviceMenus();if(connectionAction.dataset.deviceConnectionAction==='disconnect'){window.SPCPrototype.confirmAction('确认断开连接','断开后平台将暂时无法接收该设备上传的数据，是否继续？',()=>setConnectionState(connectionAction,false));}else setConnectionState(connectionAction,true);return;}
+    if(event.target.closest('.device-more-menu [data-proto-action]'))closeDeviceMenus();
+    const levelButton=event.target.closest('[data-org-level-settings]');
+    if(levelButton){event.preventDefault();event.stopPropagation();openLevelSettings();return;}
+    const row=event.target.closest('[data-org-node]');if(!row)return;
+    event.preventDefault();event.stopPropagation();const node=byId(row.dataset.orgNode);if(!node)return;
+    if(event.target.closest('[data-node-toggle]')){node.expanded=!node.expanded;openMenuId='';renderTree();return;}
+    if(event.target.closest('[data-node-more]')){openMenuId=openMenuId===node.id?'':node.id;renderTree();return;}
+    const action=event.target.closest('[data-node-action]')?.dataset.nodeAction;
+    if(action==='add'){promptNode(node,'add');return;}if(action==='rename'){promptNode(node,'rename');return;}if(action==='delete'){deleteNode(node);return;}
+    selectedId=node.id;openMenuId='';renderTree();applyFilters();
+  });
+  document.querySelector('.management-filters').addEventListener('click',event=>{
+    if(event.target.closest('[data-org-reset]')){event.preventDefault();event.stopPropagation();keyword.value='';delete status.dataset.selected;status.querySelector('[data-filter-value]').textContent='全部状态';selectedId='root';renderTree();applyFilters();return;}
+    if(event.target.closest('[data-org-query]')){event.preventDefault();event.stopPropagation();applyFilters();}
+  });
+  keyword.addEventListener('keydown',event=>{if(event.key==='Enter')applyFilters();});
+  document.addEventListener('click',event=>{if(!event.target.closest('.device-more-wrap'))closeDeviceMenus();if(openMenuId&&!event.target.closest('[data-org-node]')){openMenuId='';renderTree();}});
+  rows.forEach(syncConnectionAction);renderTree();applyFilters();
+  new MutationObserver(mutations=>{mutations.forEach(mutation=>syncConnectionAction(mutation.target.closest('tr')));}).observe(tbody,{attributes:true,subtree:true,attributeFilter:['data-device-status']});
+  new MutationObserver(()=>{rows=Array.from(tbody.querySelectorAll('tr[data-org-leaf]'));renderTree();applyFilters();}).observe(tbody,{childList:true});
+})();
+</script></body></html>
