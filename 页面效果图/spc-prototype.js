@@ -518,7 +518,7 @@
     const active = new Set(headers.filter(column => getComputedStyle(table.tHead.rows[0].cells[column.index]).display !== 'none').map(column => String(column.index)));
     const page = document.body.dataset.page;
     const lockedIndexes = new Set(headers.filter(column => {
-      if (page === 'board-query') return column.label === '板边条码' || column.label === '操作';
+      if (page === 'board-query') return column.label === '条码号' || column.label === '操作';
       if (page === 'defect-analysis') return column.label === '订单编号' || column.label === '板边条码';
       return false;
     }).map(column => column.index));
