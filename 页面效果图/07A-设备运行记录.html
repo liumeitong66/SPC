@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>设备运行记录</title>
+  <link rel="stylesheet" href="spc-common.css">
+  <style>
+    body[data-page="device-runtime-monitor"] .main{gap:12px;overflow:hidden}
+    .runtime-breadcrumb{height:30px;flex:0 0 30px;display:flex;align-items:center;gap:8px;color:#6c7b8f;font-size:12px}.runtime-breadcrumb a{color:var(--blue);text-decoration:none}.runtime-breadcrumb .detail-back{margin-left:auto;height:30px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#475569;font-weight:550}
+    .device-overview{height:116px;flex:0 0 116px;display:flex;flex-direction:column}.overview-head{height:42px;flex:0 0 42px;padding:0 14px;border-bottom:1px solid #e8edf2;display:flex;align-items:center;gap:10px}.overview-head b{font-size:16px;color:var(--ink)}.overview-head span{color:#7a8798;font-size:12px}.overview-grid{flex:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));padding:0 4px}.overview-item{position:relative;min-width:0;padding:12px 14px}.overview-item+.overview-item:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:1px;background:#e7ebf0}.overview-item label{display:block;margin-bottom:7px;color:#758397;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.overview-item strong{display:block;color:#263b56;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.runtime-state{display:inline-flex!important;align-items:center;gap:6px}.runtime-state:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#a9b3c1}.runtime-state.good{color:#167a4b}.runtime-state.good:before{background:#20a464}.runtime-state.warn{color:#a7650a}.runtime-state.warn:before{background:#e6a23c}.runtime-state.bad{color:#c43d3d}.runtime-state.bad:before{background:#df4a4a}.runtime-state.muted{color:#8995a5}.runtime-state.muted:before{background:#b7c0cb}
+    .record-filters{height:76px!important;flex:0 0 76px!important}.record-filters .field.time{width:270px!important}.record-filters .field.record-type,.record-filters .field.record-result{width:170px}.record-filters .field.record-result{display:block;color:inherit;font-weight:400}.record-filters .field.record-result:before{display:none}.record-list{flex:1;min-height:0;display:flex;flex-direction:column}.table-wrap{flex:1;min-height:0;overflow:auto}.record-table{width:100%;min-width:1320px;border-collapse:collapse;table-layout:fixed}.record-table th{position:sticky;top:0;z-index:2;height:38px;padding:0 12px;background:#f7f9fc;color:#536277;font-size:12px;text-align:left;white-space:nowrap}.record-table td{height:46px;padding:0 12px;border-bottom:1px solid #edf0f4;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.record-table tbody tr:hover{background:#f8fbff}.record-type{font-weight:650;color:#29415f}.state-change{color:#64748b}.record-result{display:inline-flex;align-items:center;gap:6px;font-weight:600}.record-result:before{content:"";width:7px;height:7px;border-radius:50%;background:#a9b3c1}.record-result.success{color:#167a4b}.record-result.success:before{background:#20a464}.record-result.failed{color:#c43d3d}.record-result.failed:before{background:#df4a4a}.record-result.processing,.record-result.pending,.record-result.partial{color:#a7650a}.record-result.processing:before,.record-result.pending:before,.record-result.partial:before{background:#e6a23c}.record-result.neutral{color:#64748b}.pager{height:40px;flex:0 0 40px;border-top:1px solid #edf0f4;padding:0 14px;display:flex;align-items:center;justify-content:space-between;color:#738196;font-size:12px}
+    @media(max-width:1180px){.overview-grid{grid-template-columns:repeat(4,minmax(0,1fr));overflow:auto}.device-overview{height:164px;flex-basis:164px}.overview-item:nth-child(5):before{display:none}.record-filters{overflow-x:auto}}
+    @media(max-width:900px){body[data-page="device-runtime-monitor"] .main{overflow:auto}.device-overview{min-height:220px;height:auto}.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.record-filters{height:auto!important;min-height:150px;flex-basis:auto!important;flex-wrap:wrap}.record-filters .actions{margin-left:0}.record-list{min-height:440px}}
+  </style>
+</head>
+<body data-page="device-runtime-monitor">
+  <aside class="sidebar"><div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div><div class="group nav-label">质量分析</div><nav class="nav">
+    <a class="item nav-item" href="01-项目统计首页.html"><span class="ico nav-icon">◉</span>项目统计</a><a class="item nav-item" href="09-设备质量分析.html"><span class="ico nav-icon">◇</span>设备分析</a><a class="item nav-item" href="03-缺陷分析.html"><span class="ico nav-icon">▥</span>缺陷分析</a><a class="item nav-item" href="04-误报分析.html"><span class="ico nav-icon">⌁</span>误报分析</a><a class="item nav-item" href="04A-不良导出.html"><span class="ico nav-icon">⇩</span>不良分析</a><a class="item nav-item" href="13-品质预警.html"><span class="ico nav-icon">⚑</span>告警分析</a><div class="group nav-label">数据管理</div><a class="item nav-item" href="02-单板查询与结果追溯.html"><span class="ico nav-icon">▤</span>单板查询</a><a class="item nav-item active" href="07-数据上传监控.html"><span class="ico nav-icon">▧</span>设备运行监控</a><a class="item nav-item" href="08-设备与区域管理.html"><span class="ico nav-icon">▦</span>设备管理</a><a class="item nav-item" href="14-告警管理.html"><span class="ico nav-icon">⚙</span>告警管理</a><div class="group nav-label">系统管理</div><a class="item nav-item" href="10-用户管理.html"><span class="ico nav-icon">♟</span>用户管理</a><a class="item nav-item" href="11-角色管理.html"><span class="ico nav-icon">♧</span>角色管理</a><a class="item nav-item" href="12-个人中心.html"><span class="ico nav-icon">☻</span>个人中心</a>
+  </nav></aside>
+  <div class="app"><header class="top"><div class="title"><h1>设备运行记录</h1></div><div class="top-actions"><button class="iconbtn proto-language-btn" title="切换语言">◎</button><button class="iconbtn proto-theme-btn" title="切换外观">☼</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <main class="main">
+      <div class="runtime-breadcrumb"><a href="07-数据上传监控.html">设备运行监控</a><span>›</span><span>设备运行记录</span><a class="detail-back" href="07-数据上传监控.html">返回</a></div>
+      <section class="panel device-overview" aria-label="设备运行概况"><div class="overview-head"><b data-device-title>AOI-01</b><span>综合运行记录</span></div><div class="overview-grid"><div class="overview-item"><label>设备SN</label><strong data-profile="sn">SI1020E1112</strong></div><div class="overview-item"><label>所在位置</label><strong data-profile="location">区域A / 产线A1</strong></div><div class="overview-item"><label>启用状态</label><strong data-profile="enabled">启用</strong></div><div class="overview-item"><label>连接状态</label><strong class="runtime-state good" data-profile="connection">已连接</strong></div><div class="overview-item"><label>传输状态</label><strong class="runtime-state good" data-profile="transmission">正常</strong></div><div class="overview-item"><label>最后心跳时间</label><strong data-profile="heartbeat">2026-08-04 14:33:02</strong></div><div class="overview-item"><label>最后接收数据时间</label><strong data-profile="received">2026-08-04 14:32:56</strong></div><div class="overview-item"><label>待补传数量</label><strong data-profile="pending">0</strong></div></div></section>
+      <section class="filters record-filters" aria-label="设备运行记录筛选"><div class="field time"><label>时间范围</label><div class="control" tabindex="0"><span>2026-08-04 00:00</span><span>至</span><span>2026-08-04 14:33</span><span class="chev">⌄</span></div></div><div class="field record-type"><label>记录类型</label><div class="control" tabindex="0"><span data-filter-value>全部类型</span><span class="chev">⌄</span></div></div><div class="field record-result"><label>处理结果</label><div class="control" tabindex="0"><span data-filter-value>全部结果</span><span class="chev">⌄</span></div></div><div class="actions"><button class="btn" type="button">重置</button><button class="btn primary" type="button">查询</button></div></section>
+      <section class="panel record-list records"><div class="phead"><div class="phead-title"><b>综合运行记录</b></div><div class="tools"><button class="btn" type="button">导出记录</button></div></div><div class="table-wrap"><table class="table record-table"><colgroup><col style="width:170px"><col style="width:120px"><col style="width:160px"><col style="width:180px"><col style="width:350px"><col style="width:120px"><col style="width:160px"></colgroup><thead><tr><th>发生时间</th><th>记录类型</th><th>批次号</th><th>状态变化</th><th>记录详情</th><th>处理结果</th><th>来源/操作人</th></tr></thead><tbody data-record-rows></tbody></table></div><div class="pager"><span data-record-count>共 0 条</span><span>‹　1　›　　10 条/页</span></div></section>
+    </main>
+  </div>
+  <script src="spc-prototype.js"></script>
+  <script>
+    (function(){
+      const profiles={
+        'AOI-01':{sn:'SI1020E1112',location:'区域A / 产线A1',enabled:'启用',connection:'已连接',connectionClass:'good',transmission:'正常',transmissionClass:'good',heartbeat:'2026-08-04 14:33:02',received:'2026-08-04 14:32:56',pending:'0'},
+        'AOI-02':{sn:'SI1020E1148',location:'区域B / 产线B1',enabled:'启用',connection:'已连接',connectionClass:'good',transmission:'正常',transmissionClass:'good',heartbeat:'2026-08-04 14:32:59',received:'2026-08-04 14:32:52',pending:'18'},
+        'AOI-03':{sn:'SI1020E1186',location:'区域C / 产线C1',enabled:'停用',connection:'未监控',connectionClass:'muted',transmission:'未监控',transmissionClass:'muted',heartbeat:'—',received:'2026-08-03 22:16:08',pending:'—'},
+        'AOI-04':{sn:'SI1020E1206',location:'区域D / 产线D1',enabled:'启用',connection:'未连接',connectionClass:'bad',transmission:'中断',transmissionClass:'bad',heartbeat:'2026-08-04 12:58:20',received:'2026-08-04 12:58:16',pending:'—'},
+        'AOI-05':{sn:'SI1020E1238',location:'区域E / 产线E1',enabled:'启用',connection:'已连接',connectionClass:'good',transmission:'延迟',transmissionClass:'warn',heartbeat:'2026-08-04 14:32:48',received:'2026-08-04 14:10:12',pending:'246'}
+      };
+      const records={
+        'AOI-01':[
+          ['2026-08-04 14:32:56','传输异常','B20260804-001','延迟 → 正常','接收检测数据 1,286 条，数据序号连续','无需处理','设备主动上报'],
+          ['2026-08-04 13:55:20','人工操作','—','—','执行设备诊断，连接链路正常','成功','admin'],
+          ['2026-08-04 12:10:08','连接变化','—','未连接 → 已连接','恢复心跳，连接重新建立','成功','设备心跳']
+        ],
+        'AOI-02':[
+          ['2026-08-04 14:32:52','传输异常','B20260804-002','延迟 → 正常','当前数据传输已恢复正常','无需处理','设备主动上报'],
+          ['2026-08-04 14:28:41','补传任务','B20260804-002','待处理 18 → 剩余 3','成功补传 15 条，3 条校验失败','部分成功','系统自动任务'],
+          ['2026-08-04 14:14:08','数据缺失','B20260804-002','连续 → 缺失 18 条','检测到序列 7,815–7,832 缺失，共 18 条','待处理','平台序列校验']
+        ],
+        'AOI-03':[
+          ['2026-08-03 22:16:08','人工操作','—','启用 → 停用','设备停用，停止连接和数据传输监控','成功','admin']
+        ],
+        'AOI-04':[
+          ['2026-08-04 12:58:20','连接变化','—','已连接 → 未连接','连续 3 个心跳周期未响应','失败','系统监控'],
+          ['2026-08-04 12:58:20','传输异常','B20260804-004','正常 → 中断','设备连接中断，本地待上传数量暂无法确认','失败','系统监控']
+        ],
+        'AOI-05':[
+          ['2026-08-04 14:30:12','补传任务','B20260804-005','待处理 246 → 补传中','正在补传缺失数据，任务尚未结束','处理中','系统自动任务'],
+          ['2026-08-04 14:10:12','传输异常','B20260804-005','正常 → 延迟','最后接收数据时间落后 22 分钟','失败','系统监控']
+        ]
+      };
+      const resultClass={'待处理':'pending','处理中':'processing','成功':'success','部分成功':'partial','失败':'failed','无需处理':'neutral'};
+      const requested=new URLSearchParams(window.location.search).get('device')||'AOI-01';
+      const name=profiles[requested]?requested:'AOI-01';
+      const profile=profiles[name];
+      document.querySelector('[data-device-title]').textContent=name;
+      Object.entries(profile).forEach(([key,value])=>{if(key.endsWith('Class'))return;const target=document.querySelector('[data-profile="'+key+'"]');if(target)target.textContent=value;});
+      const connection=document.querySelector('[data-profile="connection"]'),transmission=document.querySelector('[data-profile="transmission"]');
+      connection.className='runtime-state '+profile.connectionClass;
+      transmission.className='runtime-state '+profile.transmissionClass;
+      const deviceRecords=records[name]||[];
+      document.querySelector('[data-record-rows]').innerHTML=deviceRecords.map(item=>'<tr><td>'+item[0]+'</td><td><span class="record-type">'+item[1]+'</span></td><td>'+item[2]+'</td><td class="state-change">'+item[3]+'</td><td title="'+name+' · '+item[4]+'">'+name+' · '+item[4]+'</td><td><span class="record-result '+resultClass[item[5]]+'">'+item[5]+'</span></td><td>'+item[6]+'</td></tr>').join('');
+      document.querySelector('[data-record-count]').textContent='共 '+deviceRecords.length+' 条';
+    })();
+  </script>
+</body>
+</html>

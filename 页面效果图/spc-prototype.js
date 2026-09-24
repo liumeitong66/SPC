@@ -2,7 +2,7 @@
   'use strict';
 
   const pageMap = {
-    '订单统计': '01-项目统计首页.html',
+    '项目统计': '01-项目统计首页.html',
     '设备分析': '09-设备质量分析.html',
     '单板查询': '02-单板查询与结果追溯.html',
     '缺陷分析': '03-缺陷分析.html',
@@ -12,6 +12,7 @@
     '告警分析': '13-品质预警.html',
     '告警管理': '14-告警管理.html',
     '告警规则详情': '13A-告警规则详情.html',
+    '设备运行监控': '07-数据上传监控.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
     '角色管理': '11-角色管理.html',
@@ -26,7 +27,7 @@
     '设备名称': ['全部设备（4）', 'AOI-01', 'AOI-02', 'AOI-03', 'AOI-04'],
     '设备SN': ['全部设备SN', 'SI1020E1112', 'SI1020E1148', 'SI1020E1186', 'SI1020E1206', 'SI1020E1238', 'SI1020E1262', 'SI1020E1284', 'SI1020E1308', 'SI1020E1326', 'SI1020E1342', 'SI1020E1365', 'SI1020E1388'],
     '检测结果': ['全部', '良好', '不良', '直通', '误报', '漏报'],
-    '订单编号': ['全部订单', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
+    '模板名称': ['全部模板', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
     '项目 / 程序': ['3267504J2G_A面', '1-A', '329134S_P129'],
     '分析维度': ['不良类型', '封装类型', '料号', '位号'],
     '位号': ['R118', 'D2', 'C56', '全部位号'],
@@ -43,7 +44,7 @@
   };
 
   const menuPermissionTree = [
-    { id: 'project-statistics', name: '订单统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看订单明细'] },
+    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看模板明细'] },
     { id: 'device-quality', name: '设备分析', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看设备明细', '查看本机 SPC'] },
     { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '导出所选'] },
     { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出所选'] },
@@ -127,7 +128,7 @@
   let currentTheme = 'light';
   const projectColumns = [
     { key: 'index', label: '序号', group: '基础信息' },
-    { key: 'projectName', label: '订单编号', group: '基础信息' },
+    { key: 'projectName', label: '模板名称', group: '基础信息' },
     { key: 'deviceCount', label: '覆盖设备数', group: '基础信息' },
     { key: 'deviceNames', label: '检测设备SN', group: '基础信息' },
     { key: 'boardTotal', label: '板卡总数', group: '板卡指标' },
@@ -160,7 +161,7 @@
     { key: 'index', label: '序号', group: '基础信息' },
     { key: 'deviceName', label: '设备名称', group: '基础信息' },
     { key: 'deviceSn', label: '设备SN', group: '基础信息' },
-    { key: 'projectCount', label: '检测订单数', group: '基础信息' },
+    { key: 'projectCount', label: '检测模板数', group: '基础信息' },
     ...projectColumns.filter(column => column.group !== '基础信息'),
     { key: 'lastDataTime', label: '最后数据时间', group: '基础信息' }
   ];
@@ -296,7 +297,7 @@
   const pct = value => `${Number(value).toFixed(2)}%`;
 
   function mouthLabel(mouth) {
-    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '二次复判' : '一次复判';
+    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '最终复判' : '一次复判';
   }
 
   function mouthData(sample, mouth) {
@@ -346,7 +347,7 @@
     const heads = columns.map(column => `<th data-column-key="${column.key}" class="${column.group === '基础信息' ? '' : 'num'}">${column.label}</th>`).join('');
     const body = rows.map(row => `<tr data-device-row="${row.deviceSn || row.index}">${selectable ? `<td class="device-select-cell"><input class="device-row-check" type="checkbox" aria-label="选择设备 ${row.deviceName}"></td>` : ''}${columns.map(column => {
       const numeric = column.group === '基础信息' ? '' : 'num';
-      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部订单编号')}</td>`;
+      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部模板名称')}</td>`;
       if (column.key === 'projectName') return `<td data-column-key="projectName"><a href="#" class="project-link" data-project-uuid="${row.projectUuid}">${row.projectName}</a></td>`;
       if (column.key === 'deviceName') return `<td data-column-key="deviceName"><a href="#" class="device-link" data-device-name="${row.deviceName}" title="点击后提示跳转至本机 SPC">${row.deviceName}</a></td>`;
       return `<td data-column-key="${column.key}" class="${numeric}${column.key === 'projectUuid' ? ' uuid' : ''}">${row[column.key] ?? '—'}</td>`;
@@ -519,7 +520,7 @@
     const page = document.body.dataset.page;
     const lockedIndexes = new Set(headers.filter(column => {
       if (page === 'board-query') return column.label === 'PCB ID' || column.label === '操作';
-      if (page === 'defect-analysis') return column.label === '订单编号' || column.label === '板边条码';
+      if (page === 'defect-analysis') return column.label === '模板名称' || column.label === '板边条码';
       return false;
     }).map(column => column.index));
     const options = headers.map(column => `<label class="proto-column-option"><input type="checkbox" value="${column.index}" ${(active.has(String(column.index)) || lockedIndexes.has(column.index)) ? 'checked' : ''} ${lockedIndexes.has(column.index) ? 'disabled' : ''}><span title="${column.label}">${column.label}${lockedIndexes.has(column.index) ? '（必选）' : ''}</span></label>`).join('');
@@ -599,9 +600,9 @@
         const centerY = margin.top + rowHeight * index + rowHeight / 2;
         const endX = x(item.value);
         const barWidth = Math.max(2, endX - x(minimum));
-        return `<g><title>订单 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
+        return `<g><title>模板 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
       }).join('');
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="订单良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="模板良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
     }
     const width = showAll ? 900 : 560;
     const height = showAll ? 330 : 220;
@@ -624,8 +625,8 @@
       const labelMarkup = `<text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text>`;
       return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
-    const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '订单' : '设备';
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
+    const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '模板' : '设备';
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
   }
 
   function renderProjectComparison(type = currentComparisonType) {
@@ -649,7 +650,7 @@
     const backdrop = openModal('全部良率对比', body, '关闭');
     backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
     backdrop.querySelector('[data-close]').remove();
-    let modalType = currentComparisonType;
+    let modalType = currentComparisonType === 'project' ? 'device' : currentComparisonType;
     const draw = () => {
       backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
         const active = button.dataset.modalComparisonType === modalType;
@@ -840,7 +841,7 @@
       if (target) target.textContent = selectedDevice;
     }
     const legend = document.querySelector('.legend');
-    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '二次复判', '#9fb5a6']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}${key === mouth ? '（当前）' : '参照'}</span>`).join('');
+    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '最终复判', '#36a878']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}</span>`).join('');
     document.querySelectorAll('.line-original').forEach(line => { line.style.stroke = mouth === 'original' ? '#3478f6' : '#8ba3c7'; line.style.strokeWidth = mouth === 'original' ? '2.5' : '2'; });
     document.querySelectorAll('.line-review').forEach(line => { line.style.stroke = mouth === 'review' ? '#3478f6' : '#9bb0ce'; line.style.strokeWidth = mouth === 'review' ? '2.5' : '2'; });
     document.querySelectorAll('.line-second').forEach(line => { line.style.stroke = mouth === 'second' ? '#3478f6' : '#9fb5a6'; line.style.strokeWidth = mouth === 'second' ? '2.5' : '2'; });
@@ -1041,7 +1042,7 @@
     content.innerHTML = `${deviceQualityMouthToolbar()}
       <section class="quality-metrics">
         ${metricBlock('参与统计设备', '4<small>台</small>', '覆盖 4 个区域')}
-        ${metricBlock('检测订单数', '8<small>个</small>', '按订单编号去重')}
+        ${metricBlock('检测模板数', '8<small>个</small>', '按模板名称去重')}
         ${metricBlock('板卡总数', '124,450<small>块</small>', '当前筛选范围')}
         ${metricBlock(`${label}板卡不良率`, `${avgNgRate.toFixed(2)}<small>%</small>`, '', 'boardYield')}
         ${metricBlock(`${label}器件 DPPM`, currentMouth === 'original' ? '2,368' : currentMouth === 'second' ? '884' : '1,042', currentMouth === 'original' ? '一次复判后下降 1,326' : currentMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
@@ -1091,7 +1092,7 @@
       return;
     }
     if (/菜单权限/.test(action)) {
-      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>订单统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
+      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>项目统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
       return;
     }
     if (/数据权限/.test(action)) {
@@ -1456,11 +1457,12 @@
       control.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openMulti(); } });
       return;
     }
-    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '订单编号' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
+    if (document.body.dataset.page === 'board-query' && field.classList.contains('barcode-number')) return;
+    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '模板名称' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
     if (searchable) {
       const openHistory = input => {
         const historyMap = {
-          '订单编号': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
+          '模板名称': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
           '设备名称': ['AOI-01', 'AOI-02', 'AOI-03', 'AOI-04', 'AOI-05'],
           '条码号': ['SY-A01-DEMO-02', 'SY-B02-SMT-1669', 'SY-C03-143873', 'SY-D04-155042F-01', 'SY-A03-SMT-4698'],
           '一次复判员': ['J20678 · 张三', 'J20542 · 王芳', 'J20911 · 陈杰', 'J20816 · 李明', 'J20436 · 刘敏']
@@ -1486,7 +1488,7 @@
             control.dataset.selected = value;
             closePopover();
             input.focus();
-            if (label === '订单编号') toast(`已按订单编号 ${value} 查询`, 'info');
+            if (label === '模板名称') toast(`已按模板名称 ${value} 查询`, 'info');
             if (label === '设备名称') toast(`已选择历史设备 ${value}`, 'info');
           };
           pop.appendChild(option);
@@ -1494,8 +1496,8 @@
         document.body.appendChild(pop);
         currentPopover = pop;
       };
-      if (label === '订单编号') {
-        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="订单编号" placeholder="输入订单编号">';
+      if (label === '模板名称' && document.body.dataset.page !== 'board-query') {
+        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="模板名称" placeholder="输入模板名称">';
       }
       const bindHistoryInput = input => {
         if (!input || input.dataset.historyBound) return;
@@ -1508,7 +1510,7 @@
         event.stopPropagation();
         const existingInput = control.querySelector('input');
         if (existingInput) { bindHistoryInput(existingInput); openHistory(existingInput); return; }
-        const placeholderMap = { '订单编号': '输入订单编号', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
+        const placeholderMap = { '模板名称': '输入模板名称', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
         const placeholder = placeholderMap[label] || (label.includes('设备') ? '输入设备名称或设备SN' : '输入完整或部分PCB标识');
         control.innerHTML = `<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="${label}" placeholder="${placeholder}">`;
         const input = control.querySelector('input');
@@ -1670,7 +1672,7 @@
     const nav = document.querySelector('.nav');
     const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
     if (!nav || navItems.some(item => getText(item).includes('设备分析'))) return;
-    const projectItem = navItems.find(item => getText(item).includes('订单统计'));
+    const projectItem = navItems.find(item => getText(item).includes('项目统计'));
     if (!projectItem) return;
     const item = document.createElement('div');
     const isCompactItem = projectItem.classList.contains('item');
@@ -1682,7 +1684,7 @@
 
   function normalizeOrderStatisticsNavigation() {
     document.querySelectorAll('.nav .nav-item,.nav .item').forEach(item => {
-      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '订单统计');
+      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '项目统计');
     });
   }
 
@@ -1698,8 +1700,32 @@
     Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
       const text = getText(item);
       if (text.includes('不良导出')) item.innerHTML = item.innerHTML.replace('不良导出', '不良分析');
-      if (text.includes('数据上传监控') || text.includes('二次复判统计')) item.remove();
+      if (text.includes('数据上传监控')) item.innerHTML = item.innerHTML.replace('数据上传监控', '设备运行监控');
+      if (text.includes('二次复判统计')) item.remove();
     });
+  }
+
+  function ensureRuntimeMonitorNavigation() {
+    const nav = document.querySelector('.nav');
+    const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
+    if (!nav) return;
+    const existing = navItems.find(item => getText(item).includes('设备运行监控'));
+    if (existing) {
+      existing.classList.toggle('active', document.body.dataset.page === 'device-runtime-monitor');
+      return;
+    }
+    const deviceItem = navItems.find(item => getText(item).includes('设备管理'));
+    if (!deviceItem) return;
+    const item = document.createElement('a');
+    item.className = deviceItem.className;
+    item.classList.remove('active');
+    if (document.body.dataset.page === 'device-runtime-monitor') item.classList.add('active');
+    item.href = '07-数据上传监控.html';
+    item.style.textDecoration = 'none';
+    const deviceIcon = deviceItem.querySelector('.ico,.nav-icon');
+    const iconClass = deviceIcon ? deviceIcon.className : 'ico nav-icon';
+    item.innerHTML = `<span class="${iconClass}">▧</span>设备运行监控`;
+    deviceItem.insertAdjacentElement('beforebegin', item);
   }
 
   function ensureDefectAnalysisNavigation() {
@@ -1716,6 +1742,33 @@
     if (document.body.dataset.page === 'defect-analysis-machine') falseAlarmItem.classList.remove('active');
   }
 
+  function normalizeRequestedNavigation() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
+    const labels = ['项目统计','设备分析','缺陷分析','误报分析','告警分析','单板查询','设备运行监控','设备管理','告警管理','用户管理','角色管理'];
+    const routes = {'项目统计':'01-项目统计首页.html','设备分析':'09-设备质量分析.html','缺陷分析':'03-缺陷分析.html','误报分析':'04-误报分析.html','告警分析':'13-品质预警.html','单板查询':'02-单板查询与结果追溯.html','设备运行监控':'07-数据上传监控.html','设备管理':'08-设备与区域管理.html','告警管理':'14-告警管理.html','用户管理':'10-用户管理.html','角色管理':'11-角色管理.html'};
+    const items = Array.from(nav.children).filter(item => item.matches('.nav-item,.item'));
+    const groups = Array.from(nav.children).filter(item => item.classList.contains('group'));
+    const find = label => items.find(item => label === '项目统计' ? /项目统计|项目统计|项目统计/.test(getText(item)) : getText(item).includes(label));
+    const makeGroup = (name, fallback) => groups.find(item => getText(item).includes(name)) || Object.assign(document.createElement('div'), {className:'group nav-label', textContent:fallback});
+    const dataGroup = makeGroup('数据管理', '数据管理');
+    const systemGroup = makeGroup('系统管理', '系统管理');
+    const ordered = labels.map(label => {
+      let item = find(label);
+      if (!item) {
+        item = document.createElement('a');
+        item.className = items.find(candidate => candidate.matches('a'))?.className || 'item nav-item';
+        item.classList.remove('active');
+        const iconClass = nav.querySelector('.ico,.nav-icon')?.className || 'ico nav-icon';
+        item.innerHTML = `<span class="${iconClass}">${label === '设备运行监控' ? '▧' : '◉'}</span>${label}`;
+      }
+      if (label === '项目统计') item.innerHTML = item.innerHTML.replace(/项目统计|项目统计/, '项目统计');
+      if (label === '设备运行监控') item.classList.toggle('active', document.body.dataset.page === 'device-runtime-monitor');
+      item.href = routes[label];
+      return item;
+    });
+    nav.replaceChildren(...ordered.slice(0,5), dataGroup, ...ordered.slice(5,9), systemGroup, ...ordered.slice(9));
+  }
   function openTopMenu(button, items) {
     closePopover();
     const rect = button.getBoundingClientRect();
@@ -1785,18 +1838,83 @@
     ]);
   }
 
+  function initializeAccountMenu() {
+    document.querySelectorAll('.nav-item[href="12-个人中心.html"],.nav .item[href="12-个人中心.html"]').forEach(item => item.remove());
+
+    const entry = document.querySelector('.account-entry');
+    const sidebar = document.querySelector('.sidebar');
+    if (!entry || !sidebar || entry.closest('.sidebar-account')) return;
+
+    const accountName = getText(entry.querySelector('.account-copy b')) || 'admin';
+    const roleName = getText(entry.querySelector('.account-copy small')) || '平台管理员';
+    const wrap = document.createElement('div');
+    wrap.className = 'account-menu-wrap';
+    entry.parentNode.insertBefore(wrap, entry);
+    wrap.appendChild(entry);
+    const sidebarAccount = document.createElement('div');
+    sidebarAccount.className = 'sidebar-account';
+    sidebarAccount.setAttribute('aria-label', '当前账号');
+    sidebarAccount.appendChild(wrap);
+    sidebar.appendChild(sidebarAccount);
+
+    entry.setAttribute('role', 'button');
+    entry.setAttribute('aria-haspopup', 'menu');
+    entry.setAttribute('aria-expanded', 'false');
+    entry.setAttribute('title', '账号菜单');
+
+    const menu = document.createElement('div');
+    menu.className = 'account-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', '账号菜单');
+    menu.hidden = true;
+    menu.innerHTML = `<div class="account-menu-summary"><div class="account-menu-summary-row"><span>账号名称</span><b>${accountName}</b></div><div class="account-menu-summary-row"><span>角色名称</span><b>${roleName}</b></div></div><div class="account-menu-actions"><a class="account-menu-action" href="12-个人中心.html" role="menuitem">个人中心</a><button class="account-menu-action danger" type="button" role="menuitem" data-account-logout>退出登录</button></div>`;
+    wrap.appendChild(menu);
+
+    const setOpen = open => {
+      menu.hidden = !open;
+      wrap.classList.toggle('open', open);
+      entry.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    entry.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(menu.hidden);
+    });
+    entry.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      setOpen(menu.hidden);
+    });
+    menu.querySelector('[data-account-logout]').addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      openModal('退出登录', '<p style="margin:0;color:#475569;line-height:1.7">确认退出当前账号吗？</p>', '退出登录', () => toast('已退出登录', 'info'));
+    });
+    document.addEventListener('click', event => {
+      if (!wrap.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+  }
+
   function initializePage() {
     removeVisibleProjectUuidColumns();
     enhanceBoardQueryTable();
     normalizeOrderStatisticsNavigation();
     normalizeDeviceAnalysisNavigation();
     normalizeSharedNavigation();
+    ensureRuntimeMonitorNavigation();
     ensureQualityNavigation();
     ensureDefectAnalysisNavigation();
+    normalizeRequestedNavigation();
     initializeDeviceQualityPage();
     if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectTrend(); initializeProjectComparison(); }
     removeTitleExplanations();
     normalizeTopActions();
+    initializeAccountMenu();
     ensureGlobalDataTimestamp();
     normalizeTimeFields();
     normalizeDropdownIcons();
@@ -1878,7 +1996,7 @@
       }
       if (target.matches('.proto-language-btn')) { event.preventDefault(); openLanguageMenu(target); return; }
       if (target.matches('.proto-theme-btn')) { event.preventDefault(); openThemeMenu(target); return; }
-      if (/^查询$|^分析$/.test(text)) { event.preventDefault(); runQuery(target); return; }
+      if (/^查询$|^分析$/.test(text)) { if (document.body.dataset.page === 'board-query' && target.matches('[data-board-query]')) return; event.preventDefault(); runQuery(target); return; }
       if (/^重置$/.test(text)) { event.preventDefault(); window.location.reload(); return; }
       if (/^(数据导出|导出报表|导出图|导出明细|导出设备明细|导出监控记录|导出该页报表|导出所选)/.test(text)) { event.preventDefault(); exportTable(target); return; }
       if (/刷新状态/.test(text)) { event.preventDefault(); toast('设备上传状态已刷新'); document.querySelectorAll('tbody tr').forEach(row => row.classList.add('proto-row-flash')); return; }
@@ -2022,3 +2140,5 @@
   initializeListSequences();
   initializePage();
 })();
+
+
