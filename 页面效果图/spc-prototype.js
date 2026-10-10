@@ -2,7 +2,7 @@
   'use strict';
 
   const pageMap = {
-    '订单统计': '01-项目统计首页.html',
+    '项目统计': '01-项目统计首页.html',
     '设备分析': '09-设备质量分析.html',
     '单板查询': '02-单板查询与结果追溯.html',
     '缺陷分析': '03-缺陷分析.html',
@@ -12,6 +12,7 @@
     '告警分析': '13-品质预警.html',
     '告警管理': '14-告警管理.html',
     '告警规则详情': '13A-告警规则详情.html',
+    '设备运行监控': '07-数据上传监控.html',
     '设备管理': '08-设备与区域管理.html',
     '用户管理': '10-用户管理.html',
     '角色管理': '11-角色管理.html',
@@ -26,7 +27,7 @@
     '设备名称': ['全部设备（4）', 'AOI-01', 'AOI-02', 'AOI-03', 'AOI-04'],
     '设备SN': ['全部设备SN', 'SI1020E1112', 'SI1020E1148', 'SI1020E1186', 'SI1020E1206', 'SI1020E1238', 'SI1020E1262', 'SI1020E1284', 'SI1020E1308', 'SI1020E1326', 'SI1020E1342', 'SI1020E1365', 'SI1020E1388'],
     '检测结果': ['全部', '良好', '不良', '直通', '误报', '漏报'],
-    '订单编号': ['全部订单', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
+    '模板名称': ['全部模板', '3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9'],
     '项目 / 程序': ['3267504J2G_A面', '1-A', '329134S_P129'],
     '分析维度': ['不良类型', '封装类型', '料号', '位号'],
     '位号': ['R118', 'D2', 'C56', '全部位号'],
@@ -43,7 +44,7 @@
   };
 
   const menuPermissionTree = [
-    { id: 'project-statistics', name: '订单统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看订单明细'] },
+    { id: 'project-statistics', name: '项目统计', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看模板明细'] },
     { id: 'device-quality', name: '设备分析', selected: true, features: ['查看与查询', '显示列', '导出所选', '查看设备明细', '查看本机 SPC'] },
     { id: 'board-query', name: '单板查询', selected: true, features: ['查看与查询', '导出所选'] },
     { id: 'defect-analysis', name: '缺陷分析', selected: true, features: ['查看与查询', '自定义列', '导出所选'] },
@@ -73,7 +74,7 @@
     .proto-modal-head{height:54px;padding:0 18px;border-bottom:1px solid #e6ebf1;display:flex;align-items:center;justify-content:space-between}.proto-modal-head h3{margin:0;color:#102a4c;font-size:17px}.proto-close{width:32px;height:32px;border:0;background:#fff;border-radius:4px;color:#64748b;cursor:pointer;font-size:18px}
     .proto-modal-body{padding:18px}.proto-modal-foot{height:62px;padding:0 18px;border-top:1px solid #e6ebf1;display:flex;align-items:center;justify-content:flex-end;gap:8px}.proto-field{margin-bottom:14px}.proto-field label{display:block;font-size:12px;color:#59687b;font-weight:600;margin-bottom:6px}.proto-field input,.proto-field select{width:100%;height:38px;border:1px solid #cfd8e4;border-radius:4px;padding:0 10px;background:#fff;color:#334155}.proto-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.proto-check{height:38px;border:1px solid #e0e6ed;border-radius:5px;display:flex;align-items:center;gap:8px;padding:0 10px}.proto-primary,.proto-secondary{height:36px;padding:0 15px;border-radius:4px;font-weight:600;cursor:pointer}.proto-primary{border:1px solid #3478f6;background:#3478f6;color:#fff}.proto-secondary{border:1px solid #cfd8e4;background:#fff;color:#475569}.proto-column-modal{width:min(860px,calc(100vw - 40px))}.proto-column-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.proto-column-note{font-size:12px;color:#64748b}.proto-column-actions{display:flex;gap:6px}.proto-column-actions button{height:30px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#475569;cursor:pointer}.proto-column-actions button:hover{border-color:#3478f6;color:#2468e8}.proto-column-groups{display:flex;flex-direction:column;gap:16px}.proto-column-group h4{margin:0 0 8px;color:#334155;font-size:13px}.proto-column-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.proto-column-option{height:36px;border:1px solid #e0e6ed;border-radius:5px;display:flex;align-items:center;gap:8px;padding:0 10px;color:#475569;min-width:0}.proto-column-option span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.proto-column-option:has(input:checked){background:#f2f7ff;border-color:#a9c7fb;color:#245fbf}.proto-region-modal{width:min(680px,calc(100vw - 40px))}.proto-region-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}.proto-region-metric{padding:11px 14px;border-radius:7px;background:#f4f7fb;color:#64748b;font-size:12px}.proto-region-metric b{display:block;margin-top:3px;color:#17365f;font-size:20px}.proto-region-table{border:1px solid #e1e7ef;border-radius:7px;overflow:hidden}.proto-region-head,.proto-region-row{display:grid;grid-template-columns:minmax(220px,1fr) 140px 96px;align-items:center;gap:14px}.proto-region-head{height:38px;padding:0 14px;background:#f5f7fa;color:#718096;font-size:12px}.proto-region-row{min-height:52px;padding:6px 14px;border-top:1px solid #edf1f5}.proto-region-row input{width:100%;height:36px;border:1px solid #cfd8e4;border-radius:4px;padding:0 10px;background:#fff;color:#334155}.proto-region-row input:focus{outline:3px solid rgba(52,120,246,.16);border-color:#6ea0ff}.proto-region-count{color:#475569}.proto-region-count b{color:#2468e8}.proto-region-operation{text-align:right}.proto-region-delete{border:0;background:transparent;color:#df4a4a;font-weight:600;cursor:pointer}.proto-region-delete:disabled{color:#b7c0cb;cursor:not-allowed}.proto-region-add{width:100%;margin-top:14px;border-style:dashed}.proto-region-hint{margin:10px 0 0;color:#8491a3;font-size:12px}.proto-permission-modal{width:min(760px,calc(100vw - 40px));overflow:hidden}.proto-permission-modal .proto-modal-body{padding:0;overflow:hidden}.proto-permission-toolbar{height:54px;padding:0 18px;border-bottom:1px solid #e7ecf2;display:flex;align-items:center;justify-content:space-between;gap:12px}.proto-permission-summary{color:#64748b;font-size:12px}.proto-permission-summary b{color:#2468e8;font-size:16px}.proto-permission-tools{display:flex;gap:6px}.proto-permission-tools button{height:30px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#475569;cursor:pointer}.proto-permission-tools button:hover{border-color:#3478f6;color:#2468e8}.proto-permission-tree{max-height:min(560px,calc(100vh - 220px));overflow:auto;padding:12px 18px 18px}.proto-permission-group{border:1px solid #e0e6ed;border-radius:7px;overflow:hidden}.proto-permission-group+.proto-permission-group{margin-top:8px}.proto-permission-root{height:46px;padding:0 12px;display:flex;align-items:center;gap:10px;background:#f7f9fc}.proto-permission-root input,.proto-permission-leaf input{width:15px;height:15px;accent-color:#3478f6;flex:0 0 15px}.proto-permission-root-name{font-weight:650;color:#334155}.proto-permission-count{margin-left:auto;color:#7a8798;font-size:12px}.proto-permission-toggle{width:28px;height:28px;border:0;background:transparent;color:#718095;cursor:pointer;position:relative;font-size:0}.proto-permission-toggle:before{content:"";position:absolute;width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);top:7px;left:9px;transition:transform 160ms var(--proto-ease)}.proto-permission-group.is-collapsed .proto-permission-toggle:before{transform:rotate(-45deg);top:9px;left:7px}.proto-permission-children{padding:8px 12px 10px 48px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;border-top:1px solid #e7ecf2}.proto-permission-group.is-collapsed .proto-permission-children{display:none}.proto-permission-leaf{min-height:34px;padding:0 9px;border-radius:5px;display:flex;align-items:center;gap:8px;color:#526176}.proto-permission-leaf:hover{background:#f2f7ff}.proto-dark .proto-permission-root,.proto-dark .proto-permission-toolbar{background:#1c2a3d!important}.proto-dark .proto-permission-group,.proto-dark .proto-permission-children,.proto-dark .proto-permission-toolbar{border-color:#2c3b50!important}@media(max-width:900px){.proto-column-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.proto-region-head,.proto-region-row{grid-template-columns:minmax(130px,1fr) 82px 64px;gap:8px}.proto-region-head,.proto-region-row{padding-left:10px;padding-right:10px}.proto-region-summary{gap:8px}.proto-permission-toolbar{height:auto;min-height:54px;padding-top:10px;padding-bottom:10px;align-items:flex-start;flex-direction:column}.proto-permission-children{grid-template-columns:1fr;padding-left:40px}.proto-permission-tree{max-height:calc(100vh - 250px)}}
     .proto-device-modal{width:min(600px,calc(100vw - 40px))}.proto-device-identify-row{display:flex;align-items:center;gap:8px}.proto-device-identify-row input{flex:1;min-width:0}.proto-device-identify-button{height:38px;flex:0 0 auto;padding:0 14px;border:1px solid #3478f6;border-radius:4px;background:#fff;color:#2468e8;font-weight:600;cursor:pointer}.proto-device-identify-button:hover{background:#f2f7ff}.proto-device-identify-button:disabled{border-color:#d7dee8;background:#f5f7fa;color:#9aa6b5;cursor:not-allowed}.proto-device-identify-button .proto-spinner{width:14px;height:14px;margin-right:6px;border-color:#bed1f5;border-top-color:#3478f6;vertical-align:-2px}.proto-device-status{min-height:18px;margin:6px 0 0;font-size:12px;color:#7a8798}.proto-device-status.is-loading{color:#526176}.proto-device-status.is-success{color:#26845b}.proto-device-status.is-error{color:#c23d3d}.proto-field input[readonly]{background:#f5f7fa;color:#59687b;cursor:default}.proto-field select:disabled,.proto-primary:disabled{background:#edf1f5;border-color:#d7dee8;color:#a2adba;cursor:not-allowed}.proto-device-divider{height:1px;margin:2px 0 14px;background:#edf1f5}@media(max-width:520px){.proto-device-identify-row{align-items:stretch;flex-direction:column}.proto-device-identify-button{width:100%}}
-    .proto-toast-stack{position:fixed;z-index:110;right:22px;top:78px;display:flex;flex-direction:column;gap:8px}.proto-toast{min-width:280px;max-width:420px;background:#fff;border:1px solid #dbe3ed;border-radius:7px;box-shadow:0 8px 18px rgba(16,42,76,.14);padding:11px 14px;display:flex;align-items:center;gap:9px;color:#334155;animation:proto-slide 220ms var(--proto-ease)}.proto-toast:before{content:'✓';width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#eaf8f1;color:#168150;font-weight:700}.proto-toast.info:before{content:'i';background:#edf4ff;color:#2468e8}.proto-toast.error:before{content:'!';background:#fff0f0;color:#c43d3d}.mouth-context{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:4px;background:#edf4ff;color:#245fbf;font-weight:650}.quality-tabs{height:46px;display:flex;align-items:flex-end;gap:24px;border-bottom:1px solid #dce3ec;background:#fff;padding:0 18px;border-radius:8px 8px 0 0}.quality-tab{height:46px;border:0;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-weight:600;padding:0 2px;cursor:pointer}.quality-tab.on{color:#2468e8;border-bottom-color:#3478f6}.quality-content{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}.quality-metrics{height:94px;background:#fff;border:1px solid #dce3ec;border-radius:8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}.quality-metric{padding:14px 16px;min-width:0}.quality-metric+.quality-metric{border-left:1px solid #e7ebf0}.quality-metric .metric-value{font-size:23px}.quality-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:14px;height:250px}.quality-chart{min-width:0;background:#fff;border:1px solid #dce3ec;border-radius:8px;overflow:hidden}.quality-chart-body{height:calc(100% - 50px);min-width:0;padding:12px 16px;overflow:hidden}.quality-chart-body svg{display:block;width:100%;height:100%;max-width:100%;overflow:hidden}.quality-bars{display:flex;flex-direction:column;gap:13px;padding-top:3px}.quality-bar{display:grid;grid-template-columns:88px minmax(0,1fr) 54px;align-items:center;gap:10px;font-size:11px;color:#526176}.quality-bar-track{height:12px;border-radius:3px;background:#edf1f5;overflow:hidden}.quality-bar-fill{height:100%;background:#3478f6;border-radius:3px}.quality-guide{flex:1;display:grid;place-items:center;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-align:center;color:#64748b;padding:32px}.quality-guide h3{margin:0 0 8px;color:#102a4c}.project-picks{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}.project-pick{height:34px;padding:0 12px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#245fbf;cursor:pointer}.comparison-summary{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #dce3ec;border-radius:8px;padding:12px 16px}.comparison-summary b{color:#102a4c}.device-link,.project-link{color:#245fbf;font-weight:650;cursor:pointer;text-decoration:none}.device-link:after{content:'↗';margin-left:5px;font-size:10px;font-weight:500}.device-link:hover{text-decoration:underline}.filters{flex-wrap:wrap!important;row-gap:12px!important}.filters>.field{flex:0 0 auto}.pager{gap:12px;overflow:hidden}.pager>:first-child{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.proto-pagination{display:flex;align-items:center;gap:4px;margin-left:auto;min-width:0;max-width:100%;flex:0 1 auto;color:#334155;white-space:nowrap}.proto-page-nav{width:30px;min-width:30px}.proto-page-number{width:auto;min-width:30px;padding:0 7px;font-variant-numeric:tabular-nums}.proto-page-nav,.proto-page-number{height:32px;border:1px solid transparent;border-radius:5px;background:#fff;color:#334155;display:grid;place-items:center;cursor:pointer}.proto-page-number.on{border-color:#3478f6;color:#2468e8;background:#edf4ff}.proto-page-nav:disabled{color:#a8b2c0;cursor:not-allowed}.proto-page-size{height:34px;min-width:96px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155;padding:0 28px 0 10px}.proto-page-jump{display:flex;align-items:center;gap:6px;white-space:nowrap}.proto-page-jump input{width:48px;height:34px;border:1px solid #cfd8e4;border-radius:5px;text-align:center;color:#334155}.proto-page-jump input:focus{outline:3px solid rgba(52,120,246,.2);border-color:#3478f6}body[data-page="device-quality"] .field.time{width:310px;flex:0 0 310px}body[data-page="device-quality"] .field.time .control{overflow:hidden;font-variant-numeric:tabular-nums}body[data-page="device-quality"] .field.time .control span{flex:0 0 auto}@media(max-width:1400px){.quality-metrics{grid-template-columns:repeat(3,1fr);height:154px}.quality-grid{height:220px}.filters:not(.board-filters){height:150px!important;flex-basis:150px!important;align-content:center!important}body[data-page="device-quality"] .field.time{width:285px;flex-basis:285px}body[data-page="device-quality"] .field.time .control{font-size:12px;padding:0 8px;gap:4px}body[data-page="device-quality"] .field.device{width:170px}body[data-page="device-quality"] .field.project{width:160px}}
+    .proto-toast-stack{position:fixed;z-index:110;right:22px;top:78px;display:flex;flex-direction:column;gap:8px}.proto-toast{min-width:280px;max-width:420px;background:#fff;border:1px solid #dbe3ed;border-radius:7px;box-shadow:0 8px 18px rgba(16,42,76,.14);padding:11px 14px;display:flex;align-items:center;gap:9px;color:#334155;animation:proto-slide 220ms var(--proto-ease)}.proto-toast:before{content:'✓';width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#eaf8f1;color:#168150;font-weight:700}.proto-toast.info:before{content:'i';background:#edf4ff;color:#2468e8}.proto-toast.error:before{content:'!';background:#fff0f0;color:#c43d3d}.mouth-context{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:4px;background:#edf4ff;color:#245fbf;font-weight:650}.quality-tabs{height:46px;display:flex;align-items:flex-end;gap:24px;border-bottom:1px solid #dce3ec;background:#fff;padding:0 18px;border-radius:8px 8px 0 0}.quality-tab{height:46px;border:0;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-weight:600;padding:0 2px;cursor:pointer}.quality-tab.on{color:#2468e8;border-bottom-color:#3478f6}.quality-content{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}.quality-metrics{height:94px;background:#fff;border:1px solid #dce3ec;border-radius:8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}.quality-metric{padding:14px 16px;min-width:0}.quality-metric+.quality-metric{border-left:1px solid #e7ebf0}.quality-metric .metric-value{font-size:23px}.quality-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:14px;height:250px}.quality-chart{min-width:0;background:#fff;border:1px solid #dce3ec;border-radius:8px;overflow:hidden}.quality-chart-body{height:calc(100% - 50px);min-width:0;padding:12px 16px;overflow:hidden}.quality-chart-body svg{display:block;width:100%;height:100%;max-width:100%;overflow:hidden}.quality-bars{display:flex;flex-direction:column;gap:13px;padding-top:3px}.quality-bar{display:grid;grid-template-columns:88px minmax(0,1fr) 54px;align-items:center;gap:10px;font-size:11px;color:#526176}.quality-bar-track{height:12px;border-radius:3px;background:#edf1f5;overflow:hidden}.quality-bar-fill{height:100%;background:#3478f6;border-radius:3px}.quality-guide{flex:1;display:grid;place-items:center;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-align:center;color:#64748b;padding:32px}.quality-guide h3{margin:0 0 8px;color:#102a4c}.project-picks{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}.project-pick{height:34px;padding:0 12px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#245fbf;cursor:pointer}.comparison-summary{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #dce3ec;border-radius:8px;padding:12px 16px}.comparison-summary b{color:#102a4c}.device-link,.project-link{color:#245fbf;font-weight:650;cursor:pointer;text-decoration:none}body[data-page="device-quality"] .device-link:after{content:none}.device-link:after{content:'↗';margin-left:5px;font-size:10px;font-weight:500}.device-link:hover{text-decoration:underline}.filters{flex-wrap:wrap!important;row-gap:12px!important}.filters>.field{flex:0 0 auto}.pager{gap:12px;overflow:hidden}.pager>:first-child{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.proto-pagination{display:flex;align-items:center;gap:4px;margin-left:auto;min-width:0;max-width:100%;flex:0 1 auto;color:#334155;white-space:nowrap}.proto-page-nav{width:30px;min-width:30px}.proto-page-number{width:auto;min-width:30px;padding:0 7px;font-variant-numeric:tabular-nums}.proto-page-nav,.proto-page-number{height:32px;border:1px solid transparent;border-radius:5px;background:#fff;color:#334155;display:grid;place-items:center;cursor:pointer}.proto-page-number.on{border-color:#3478f6;color:#2468e8;background:#edf4ff}.proto-page-nav:disabled{color:#a8b2c0;cursor:not-allowed}.proto-page-size{height:34px;min-width:96px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155;padding:0 28px 0 10px}.proto-page-jump{display:flex;align-items:center;gap:6px;white-space:nowrap}.proto-page-jump input{width:48px;height:34px;border:1px solid #cfd8e4;border-radius:5px;text-align:center;color:#334155}.proto-page-jump input:focus{outline:3px solid rgba(52,120,246,.2);border-color:#3478f6}body[data-page="device-quality"] .field.time{width:310px;flex:0 0 310px}body[data-page="device-quality"] .field.time .control{overflow:hidden;font-variant-numeric:tabular-nums}body[data-page="device-quality"] .field.time .control span{flex:0 0 auto}@media(max-width:1400px){.quality-metrics{grid-template-columns:repeat(3,1fr);height:154px}.quality-grid{height:220px}.filters:not(.board-filters){height:150px!important;flex-basis:150px!important;align-content:center!important}body[data-page="device-quality"] .field.time{width:285px;flex-basis:285px}body[data-page="device-quality"] .field.time .control{font-size:12px;padding:0 8px;gap:4px}body[data-page="device-quality"] .field.device{width:170px}body[data-page="device-quality"] .field.project{width:160px}}
     .proto-empty td{height:220px!important;text-align:center!important;color:#738196!important}.proto-empty td:before{content:'⌕';display:block;font-size:26px;color:#a0adbc;margin-bottom:8px}.proto-loading{opacity:.58;pointer-events:none}.proto-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:proto-spin .7s linear infinite;margin-right:7px;vertical-align:-2px}.proto-tab-empty{height:100%;display:grid;place-items:center;color:#718095;text-align:center;padding:40px}.proto-tab-empty b{display:block;color:#334155;margin-bottom:7px}.proto-row-flash{animation:proto-flash 900ms var(--proto-ease)}
     .top-title h1,.title h1{margin:0!important;font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif!important;font-size:22px!important;font-weight:700!important;line-height:1.3!important;color:#102a4c!important}.control{height:36px!important;padding:0 8px!important;font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif!important;font-size:12px!important;font-weight:400!important;color:#334155!important;border-radius:4px!important}.btn{height:36px!important;padding:0 15px!important;font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif!important;font-size:14px!important;font-weight:550!important;line-height:normal!important;border-radius:4px!important}.panel-title,.phead-title>b,.phead>b{font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:1.4!important;color:#102a4c!important}.data-table th,.table th,.dtable th{height:40px!important;padding:0 12px!important;font-size:12px!important;font-weight:650!important;color:#526176!important;border-bottom:1px solid #dce3ec!important;background:#f7f9fc!important}.data-table td,.table td,.dtable td{height:44px!important;padding:0 12px!important;font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif!important;font-size:14px!important;line-height:normal!important;background-color:#fff}.data-table td:not(.project-name):not(.device-name),.table td:not(.pcb-id):not(.device-name),.dtable td{color:#334155}.pager{height:40px!important;min-height:40px!important;flex-basis:40px!important;padding:0 14px!important;font-size:12px!important}
     .charts>.panel{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}.charts>.panel>.panel-head{flex:0 0 auto}.charts>.panel>.chart-body{height:auto!important;flex:1;min-height:0;overflow:hidden}.charts>.panel>.chart-body>svg{display:block;width:100%;height:100%;max-width:100%;max-height:100%;overflow:hidden}
@@ -127,9 +128,9 @@
   let currentTheme = 'light';
   const projectColumns = [
     { key: 'index', label: '序号', group: '基础信息' },
-    { key: 'projectName', label: '订单编号', group: '基础信息' },
+    { key: 'projectName', label: '模板名称', group: '基础信息' },
     { key: 'deviceCount', label: '覆盖设备数', group: '基础信息' },
-    { key: 'deviceNames', label: '检测设备SN', group: '基础信息' },
+    { key: 'deviceNames', label: '设备SN', group: '基础信息' },
     { key: 'boardTotal', label: '板卡总数', group: '板卡指标' },
     { key: 'boardGood', label: '板卡良品总数', group: '板卡指标' },
     { key: 'boardDppm', label: '板卡DPPM', group: '板卡指标' },
@@ -155,12 +156,13 @@
     { key: 'componentMiss', label: '器件漏报数', group: '器件指标' },
     { key: 'componentSpecialMiss', label: '器件漏报数（特殊缺陷）', group: '器件指标' }
   ];
-  let activeProjectColumns = new Set(projectColumns.map(column => column.key));
+  const defaultProjectColumnKeys = ['index', 'projectName', 'deviceCount', 'deviceNames', 'boardTotal', 'boardGood', 'boardYield', 'componentTotal', 'componentOkRate'];
+  let activeProjectColumns = new Set(defaultProjectColumnKeys);
   const deviceColumns = [
     { key: 'index', label: '序号', group: '基础信息' },
     { key: 'deviceName', label: '设备名称', group: '基础信息' },
     { key: 'deviceSn', label: '设备SN', group: '基础信息' },
-    { key: 'projectCount', label: '检测订单数', group: '基础信息' },
+    { key: 'projectCount', label: '检测模板数', group: '基础信息' },
     ...projectColumns.filter(column => column.group !== '基础信息'),
     { key: 'lastDataTime', label: '最后数据时间', group: '基础信息' }
   ];
@@ -296,7 +298,7 @@
   const pct = value => `${Number(value).toFixed(2)}%`;
 
   function mouthLabel(mouth) {
-    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '二次复判' : '一次复判';
+    return mouth === 'original' ? '机器判定' : mouth === 'second' ? '最终复判' : '一次复判';
   }
 
   function mouthData(sample, mouth) {
@@ -329,7 +331,7 @@
   }
 
   function columnWidth(key) {
-    const widths = { index: 60, projectName: 170, projectUuid: 240, projectNames: 210, projectUuids: 290, deviceCount: 110, deviceNames: 240, deviceName: 140, deviceSn: 150, projectCount: 110, lastDataTime: 170, componentSpecialNg: 190, componentSpecialFalse: 210, componentSpecialMiss: 210 };
+    const widths = { index: 60, projectName: 170, projectUuid: 240, projectNames: 210, projectUuids: 290, deviceCount: 110, deviceNames: 330, deviceName: 140, deviceSn: 150, projectCount: 110, lastDataTime: 170, componentSpecialNg: 190, componentSpecialFalse: 210, componentSpecialMiss: 210 };
     return widths[key] || (key.includes('Rate') ? 140 : 130);
   }
 
@@ -346,9 +348,10 @@
     const heads = columns.map(column => `<th data-column-key="${column.key}" class="${column.group === '基础信息' ? '' : 'num'}">${column.label}</th>`).join('');
     const body = rows.map(row => `<tr data-device-row="${row.deviceSn || row.index}">${selectable ? `<td class="device-select-cell"><input class="device-row-check" type="checkbox" aria-label="选择设备 ${row.deviceName}"></td>` : ''}${columns.map(column => {
       const numeric = column.group === '基础信息' ? '' : 'num';
-      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部订单编号')}</td>`;
+      if (selectable && column.key === 'projectNames') return `<td data-column-key="projectNames">${deviceProjectValueMarkup(row.projectNames, '全部模板名称')}</td>`;
       if (column.key === 'projectName') return `<td data-column-key="projectName"><a href="#" class="project-link" data-project-uuid="${row.projectUuid}">${row.projectName}</a></td>`;
-      if (column.key === 'deviceName') return `<td data-column-key="deviceName"><a href="#" class="device-link" data-device-name="${row.deviceName}" title="点击后提示跳转至本机 SPC">${row.deviceName}</a></td>`;
+      if (column.key === 'deviceNames') return `<td data-column-key="deviceNames" class="device-sn-list" title="${row.deviceNames || ''}">${row.deviceNames || '—'}</td>`;
+       if (column.key === 'deviceName') return `<td data-column-key="deviceName"><a href="#" class="device-link" data-device-name="${row.deviceName}" title="点击后提示跳转至本机 SPC">${row.deviceName}</a></td>`;
       return `<td data-column-key="${column.key}" class="${numeric}${column.key === 'projectUuid' ? ' uuid' : ''}">${row[column.key] ?? '—'}</td>`;
     }).join('')}</tr>`).join('');
     return `<colgroup>${selectable ? '<col style="width:44px">' : ''}${cols}</colgroup><thead><tr>${selectable ? '<th class="device-select-cell"><input class="device-select-all" type="checkbox" aria-label="全选设备"></th>' : ''}${heads}</tr></thead><tbody>${body}</tbody>`;
@@ -458,7 +461,7 @@
       return sum + (parseInt(col && col.style.width, 10) || 120);
     }, 0);
     const containerWidth = table.closest('.table-scroll')?.clientWidth || 0;
-    table.style.width = totalWidth > containerWidth ? `${Math.max(totalWidth, 520)}px` : '100%';
+    table.style.width = table.matches('[data-project-table]') ? `${Math.max(totalWidth, 520)}px` : totalWidth > containerWidth ? `${Math.max(totalWidth, 520)}px` : '100%';
     let stickyLeft = selectionWidth;
     columns.slice(0, stickyCount).forEach(column => {
       if (!visible.has(column.key)) return;
@@ -485,7 +488,7 @@
     const isDevice = !!document.querySelector('[data-device-table]');
     const columns = isDevice ? deviceColumns : projectColumns;
     const activeColumns = isDevice ? activeDeviceColumns : activeProjectColumns;
-    const defaultColumns = isDevice ? new Set(defaultDeviceColumnKeys) : new Set(projectColumns.map(column => column.key));
+    const defaultColumns = new Set(isDevice ? defaultDeviceColumnKeys : defaultProjectColumnKeys);
     const lockedKeys = isDevice ? new Set(['deviceName']) : new Set(['projectName']);
     const groups = ['基础信息', '板卡指标', '器件指标'];
     const groupHtml = groups.map(group => `<section class="proto-column-group"><h4>${group}</h4><div class="proto-column-grid">${columns.filter(column => column.group === group).map(column => `<label class="proto-column-option" ${lockedKeys.has(column.key) ? `title="${column.label}为必选字段"` : ''}><input type="checkbox" value="${column.key}" ${activeColumns.has(column.key) || lockedKeys.has(column.key) ? 'checked' : ''} ${lockedKeys.has(column.key) ? 'disabled data-column-locked="true"' : ''}><span title="${column.label}">${column.label}${lockedKeys.has(column.key) ? '（必选）' : ''}</span></label>`).join('')}</div></section>`).join('');
@@ -519,7 +522,7 @@
     const page = document.body.dataset.page;
     const lockedIndexes = new Set(headers.filter(column => {
       if (page === 'board-query') return column.label === 'PCB ID' || column.label === '操作';
-      if (page === 'defect-analysis') return column.label === '订单编号' || column.label === '板边条码';
+      if (page === 'defect-analysis') return column.label === '模板名称' || column.label === '条码号';
       return false;
     }).map(column => column.index));
     const options = headers.map(column => `<label class="proto-column-option"><input type="checkbox" value="${column.index}" ${(active.has(String(column.index)) || lockedIndexes.has(column.index)) ? 'checked' : ''} ${lockedIndexes.has(column.index) ? 'disabled' : ''}><span title="${column.label}">${column.label}${lockedIndexes.has(column.index) ? '（必选）' : ''}</span></label>`).join('');
@@ -599,9 +602,9 @@
         const centerY = margin.top + rowHeight * index + rowHeight / 2;
         const endX = x(item.value);
         const barWidth = Math.max(2, endX - x(minimum));
-        return `<g><title>订单 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
+        return `<g><title>模板 ${item.name}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${item.name}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value" x="${Math.min(width - 20, endX + 23).toFixed(1)}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
       }).join('');
-      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="订单良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="模板良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}${bars}</svg>`;
     }
     const width = showAll ? 900 : 560;
     const height = showAll ? 330 : 220;
@@ -624,8 +627,8 @@
       const labelMarkup = `<text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text>`;
       return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
-    const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '订单' : '设备';
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '二次复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
+    const dimensionLabel = type === 'area' ? '区域' : type === 'project' ? '模板' : '设备';
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimensionLabel}良率排名前10名，按${currentMouth === 'original' ? '机器判定' : currentMouth === 'second' ? '最终复判' : '一次复判'}口径降序展示">${grid}<line class="comparison-grid" x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}"/>${bars}</svg>`;
   }
 
   function renderProjectComparison(type = currentComparisonType) {
@@ -649,7 +652,7 @@
     const backdrop = openModal('全部良率对比', body, '关闭');
     backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
     backdrop.querySelector('[data-close]').remove();
-    let modalType = currentComparisonType;
+    let modalType = currentComparisonType === 'project' ? 'device' : currentComparisonType;
     const draw = () => {
       backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
         const active = button.dataset.modalComparisonType === modalType;
@@ -816,6 +819,7 @@
     const deviceSn = name => deviceSamples.find(device => device.name === name)?.sn || prototypeDeviceSn[name] || name;
     const rows = sourceProjects.map((project, index) => ({ index: index + 1, projectName: project.name, projectUuid: project.uuid, deviceCount: `${selectedDevice ? 1 : project.devices.length} 台`, deviceNames: selectedDevice ? deviceSn(selectedDevice) : project.devices.map(deviceSn).join('、'), ...statsFor(project, mouth) }));
     table.innerHTML = tableMarkup(projectColumns, rows, 'data-project-table');
+    [...table.tBodies[0].rows].forEach((row, index) => { row.dataset.deviceNames = sourceProjects[index].devices.join(' '); });
     delete table.dataset.selectExportEnhanced;
     const exportButton = table.closest('.table-panel')?.querySelector('.table-tools .btn');
     if (exportButton) enhanceSelectableTable(table, exportButton);
@@ -840,7 +844,7 @@
       if (target) target.textContent = selectedDevice;
     }
     const legend = document.querySelector('.legend');
-    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '二次复判', '#9fb5a6']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}${key === mouth ? '（当前）' : '参照'}</span>`).join('');
+    if (legend) legend.innerHTML = [['original', '机器判定', '#8ba3c7'], ['review', '一次复判', '#9bb0ce'], ['second', '最终复判', '#36a878']].map(([key, label, color]) => `<span><i style="background:${key === mouth ? '#3478f6' : color}"></i>${label}</span>`).join('');
     document.querySelectorAll('.line-original').forEach(line => { line.style.stroke = mouth === 'original' ? '#3478f6' : '#8ba3c7'; line.style.strokeWidth = mouth === 'original' ? '2.5' : '2'; });
     document.querySelectorAll('.line-review').forEach(line => { line.style.stroke = mouth === 'review' ? '#3478f6' : '#9bb0ce'; line.style.strokeWidth = mouth === 'review' ? '2.5' : '2'; });
     document.querySelectorAll('.line-second').forEach(line => { line.style.stroke = mouth === 'second' ? '#3478f6' : '#9fb5a6'; line.style.strokeWidth = mouth === 'second' ? '2.5' : '2'; });
@@ -856,7 +860,7 @@
   }
 
   function deviceQualityFilters() {
-    return `<section class="filters quality-filter"><div class="field time"><label>时间范围</label><div class="control"><span>▣</span><span>2026-08-01 00:00</span><span class="muted">至</span><span>2026-08-04 14:32</span></div></div><div class="field device device-search"><label>设备名称</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" aria-label="设备名称" placeholder="输入设备名称"></div></div><div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>`;
+    return `<section class="filters quality-filter"><div class="field device device-search"><label>设备名称</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" aria-label="设备名称" placeholder="输入设备名称"></div></div><div class="filter-actions"><button class="btn">重置</button><button class="btn primary">查询</button></div></section>`;
   }
 
   function chartPeriodPicker(context, selected) {
@@ -947,7 +951,8 @@
     selectAll.checked = visibleChecks.length > 0 && selected === visibleChecks.length;
     selectAll.indeterminate = selected > 0 && selected < visibleChecks.length;
     exportButton.disabled = selected === 0;
-    exportButton.textContent = selected ? `导出所选（${selected}）` : '导出所选';
+    const label = ['defect-analysis-machine','false-analysis'].includes(document.body.dataset.page) ? '导出所选器件' : '导出所选';
+    exportButton.textContent = selected ? `${label}（${selected}）` : label;
   }
 
   function prepareSelectableRows(table) {
@@ -968,8 +973,12 @@
     table.classList.add('select-export-table');
     exportButton.classList.add('select-export');
     exportButton.dataset.selectExport = 'true';
+    if (['defect-analysis-machine','false-analysis'].includes(document.body.dataset.page)) {
+      const leafButton = exportButton.closest('.export-actions')?.querySelector('[data-export-leaf]');
+      if (leafButton) leafButton.after(exportButton);
+    }
     exportButton.disabled = true;
-    exportButton.textContent = '导出所选';
+    exportButton.textContent = ['defect-analysis-machine','false-analysis'].includes(document.body.dataset.page) ? '导出所选器件' : '导出所选';
     table._selectExportButton = exportButton;
 
     const boardTable = table.classList.contains('board-query-table');
@@ -1027,7 +1036,7 @@
     const deviceTable = root.querySelector('[data-device-table]');
     if (deviceTable) {
       const button = deviceTable.closest('.table-panel')?.querySelector('.device-export');
-      if (button) { button.disabled = true; button.textContent = '导出所选'; }
+      if (button) { button.disabled = true; button.textContent = ['defect-analysis-machine','false-analysis'].includes(document.body.dataset.page) ? '导出所选器件' : '导出所选'; }
     }
   }
 
@@ -1041,7 +1050,7 @@
     content.innerHTML = `${deviceQualityMouthToolbar()}
       <section class="quality-metrics">
         ${metricBlock('参与统计设备', '4<small>台</small>', '覆盖 4 个区域')}
-        ${metricBlock('检测订单数', '8<small>个</small>', '按订单编号去重')}
+        ${metricBlock('检测模板数', '8<small>个</small>', '按模板名称去重')}
         ${metricBlock('板卡总数', '124,450<small>块</small>', '当前筛选范围')}
         ${metricBlock(`${label}板卡不良率`, `${avgNgRate.toFixed(2)}<small>%</small>`, '', 'boardYield')}
         ${metricBlock(`${label}器件 DPPM`, currentMouth === 'original' ? '2,368' : currentMouth === 'second' ? '884' : '1,042', currentMouth === 'original' ? '一次复判后下降 1,326' : currentMouth === 'second' ? '较一次复判下降 158' : '较机器判定下降 1,326')}
@@ -1091,7 +1100,7 @@
       return;
     }
     if (/菜单权限/.test(action)) {
-      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>订单统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
+      openModal('菜单权限', `<div class="proto-checks"><label class="proto-check"><input type="checkbox" checked>项目统计</label><label class="proto-check"><input type="checkbox" checked>设备分析</label><label class="proto-check"><input type="checkbox" checked>单板查询</label><label class="proto-check"><input type="checkbox" checked>缺陷分析</label><label class="proto-check"><input type="checkbox" checked>误报分析</label><label class="proto-check"><input type="checkbox">平台管理</label></div>`, '保存权限', () => toast('菜单权限已更新'));
       return;
     }
     if (/数据权限/.test(action)) {
@@ -1375,6 +1384,11 @@
   function makeControlInteractive(control) {
     const field = control.closest('.field');
     const label = getText(field && field.querySelector('label'));
+    if (label === '检测结果' && field.classList.contains('multi-select') && !control.dataset.selectedValues) {
+      control.dataset.selectedValues = JSON.stringify(choices['检测结果'].slice(1));
+      const hint = valueSpan(control);
+      if (hint) hint.textContent = '请选择检测结果';
+    }
     if (control.dataset.customHistory === 'true') return;
     control.setAttribute('role', 'button');
     control.tabIndex = 0;
@@ -1422,6 +1436,14 @@
         let selected = [];
         try { selected = JSON.parse(control.dataset.selectedValues || '[]'); } catch (_) { selected = []; }
         const selectedSet = new Set(selected);
+        const commitSelection = () => {
+          const values = Array.from(selectedSet);
+          control.dataset.selectedValues = JSON.stringify(values);
+          control.dataset.selected = values.join(',');
+          const target = valueSpan(control);
+          if (target) target.textContent = label === '检测结果' && !values.length ? '请选择检测结果' : values.length ? (values.length === 1 ? values[0] : `已选 ${values.length} 项`) : choices[label][0];
+          return values;
+        };
         choices[label].slice(1).forEach(value => {
           const option = document.createElement('button');
           option.className = 'proto-option proto-multi-option';
@@ -1431,20 +1453,22 @@
             event.stopPropagation();
             if (selectedSet.has(value)) selectedSet.delete(value); else selectedSet.add(value);
             option.setAttribute('aria-selected', selectedSet.has(value) ? 'true' : 'false');
+            if (label === '检测结果') commitSelection();
           };
           pop.appendChild(option);
         });
+        if (label === '检测结果') {
+          document.body.appendChild(pop);
+          currentPopover = pop;
+          return;
+        }
         const foot = document.createElement('div');
         foot.className = 'proto-popover-foot';
         foot.innerHTML = '<button type="button" data-multi-clear>清空</button><button type="button" class="primary" data-multi-apply>确定</button>';
         foot.querySelector('[data-multi-clear]').onclick = event => { event.stopPropagation(); selectedSet.clear(); pop.querySelectorAll('.proto-multi-option').forEach(option => option.setAttribute('aria-selected', 'false')); };
         foot.querySelector('[data-multi-apply]').onclick = event => {
           event.stopPropagation();
-          const values = Array.from(selectedSet);
-          control.dataset.selectedValues = JSON.stringify(values);
-          control.dataset.selected = values.join(',');
-          const target = valueSpan(control);
-          if (target) target.textContent = values.length ? (values.length === 1 ? values[0] : `已选 ${values.length} 项`) : choices[label][0];
+          const values = commitSelection();
           closePopover();
           toast(`${label}已选择 ${values.length || '全部'} 项`, 'info');
         };
@@ -1456,11 +1480,12 @@
       control.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openMulti(); } });
       return;
     }
-    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '订单编号' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
+    if (document.body.dataset.page === 'board-query' && field.classList.contains('barcode-number')) return;
+    const searchable = /PCB SN|条码|复判员|用户名|姓名|角色名称|角色编码/.test(label) || label === '模板名称' || (label === '设备名称' && (!field.classList.contains('device') || field.classList.contains('device-search')));
     if (searchable) {
       const openHistory = input => {
         const historyMap = {
-          '订单编号': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
+          '模板名称': ['3267504J2G_A面', '1-A', '329134S_P129', '155042F_P9', 'A14-POWER'],
           '设备名称': ['AOI-01', 'AOI-02', 'AOI-03', 'AOI-04', 'AOI-05'],
           '条码号': ['SY-A01-DEMO-02', 'SY-B02-SMT-1669', 'SY-C03-143873', 'SY-D04-155042F-01', 'SY-A03-SMT-4698'],
           '一次复判员': ['J20678 · 张三', 'J20542 · 王芳', 'J20911 · 陈杰', 'J20816 · 李明', 'J20436 · 刘敏']
@@ -1486,7 +1511,7 @@
             control.dataset.selected = value;
             closePopover();
             input.focus();
-            if (label === '订单编号') toast(`已按订单编号 ${value} 查询`, 'info');
+            if (label === '模板名称') toast(`已按模板名称 ${value} 查询`, 'info');
             if (label === '设备名称') toast(`已选择历史设备 ${value}`, 'info');
           };
           pop.appendChild(option);
@@ -1494,8 +1519,8 @@
         document.body.appendChild(pop);
         currentPopover = pop;
       };
-      if (label === '订单编号') {
-        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="订单编号" placeholder="输入订单编号">';
+      if (label === '模板名称' && document.body.dataset.page !== 'board-query') {
+        control.innerHTML = '<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="模板名称" placeholder="请输入模板名称">';
       }
       const bindHistoryInput = input => {
         if (!input || input.dataset.historyBound) return;
@@ -1508,7 +1533,7 @@
         event.stopPropagation();
         const existingInput = control.querySelector('input');
         if (existingInput) { bindHistoryInput(existingInput); openHistory(existingInput); return; }
-        const placeholderMap = { '订单编号': '输入订单编号', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
+        const placeholderMap = { '模板名称': '请输入模板名称', '设备名称': '输入设备名称', '条码号': '输入条码号', '复判员': '输入工号或姓名', '一次复判员': '输入工号或姓名', '用户名': '输入用户名', '姓名': '输入姓名', '角色名称': '输入角色名称', '角色编码': '输入角色编码' };
         const placeholder = placeholderMap[label] || (label.includes('设备') ? '输入设备名称或设备SN' : '输入完整或部分PCB标识');
         control.innerHTML = `<span aria-hidden="true">⌕</span><input class="proto-search" aria-label="${label}" placeholder="${placeholder}">`;
         const input = control.querySelector('input');
@@ -1570,10 +1595,11 @@
         let values = [];
         try { values = JSON.parse(control.dataset.selectedValues); } catch (_) { values = []; }
         if (values.length) filters.push(values.map(normalize));
+        else if (label === '检测结果') filters.push(['__no_detection_result_selected__']);
         return;
       }
       const value = input ? input.value.trim() : (control && (control.dataset.selected || getText(valueSpan(control))));
-      if (!value || /全部|输入/.test(value)) return;
+      if (!value || /全部|输入|^请选择/.test(value)) return;
       if (label === '设备名称' && field.classList.contains('device-search')) {
         deviceNameFilter = normalize(value);
         return;
@@ -1670,7 +1696,7 @@
     const nav = document.querySelector('.nav');
     const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
     if (!nav || navItems.some(item => getText(item).includes('设备分析'))) return;
-    const projectItem = navItems.find(item => getText(item).includes('订单统计'));
+    const projectItem = navItems.find(item => getText(item).includes('项目统计'));
     if (!projectItem) return;
     const item = document.createElement('div');
     const isCompactItem = projectItem.classList.contains('item');
@@ -1682,7 +1708,7 @@
 
   function normalizeOrderStatisticsNavigation() {
     document.querySelectorAll('.nav .nav-item,.nav .item').forEach(item => {
-      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '订单统计');
+      if (getText(item).includes('项目统计')) item.innerHTML = item.innerHTML.replace('项目统计', '项目统计');
     });
   }
 
@@ -1698,8 +1724,32 @@
     Array.from(nav.querySelectorAll('.nav-item,.item')).forEach(item => {
       const text = getText(item);
       if (text.includes('不良导出')) item.innerHTML = item.innerHTML.replace('不良导出', '不良分析');
-      if (text.includes('数据上传监控') || text.includes('二次复判统计')) item.remove();
+      if (text.includes('数据上传监控')) item.innerHTML = item.innerHTML.replace('数据上传监控', '设备运行监控');
+      if (text.includes('二次复判统计')) item.remove();
     });
+  }
+
+  function ensureRuntimeMonitorNavigation() {
+    const nav = document.querySelector('.nav');
+    const navItems = nav ? Array.from(nav.querySelectorAll('.nav-item,.item')) : [];
+    if (!nav) return;
+    const existing = navItems.find(item => getText(item).includes('设备运行监控'));
+    if (existing) {
+      existing.classList.toggle('active', document.body.dataset.page === 'device-runtime-monitor');
+      return;
+    }
+    const deviceItem = navItems.find(item => getText(item).includes('设备管理'));
+    if (!deviceItem) return;
+    const item = document.createElement('a');
+    item.className = deviceItem.className;
+    item.classList.remove('active');
+    if (document.body.dataset.page === 'device-runtime-monitor') item.classList.add('active');
+    item.href = '07-数据上传监控.html';
+    item.style.textDecoration = 'none';
+    const deviceIcon = deviceItem.querySelector('.ico,.nav-icon');
+    const iconClass = deviceIcon ? deviceIcon.className : 'ico nav-icon';
+    item.innerHTML = `<span class="${iconClass}">▧</span>设备运行监控`;
+    deviceItem.insertAdjacentElement('beforebegin', item);
   }
 
   function ensureDefectAnalysisNavigation() {
@@ -1716,6 +1766,33 @@
     if (document.body.dataset.page === 'defect-analysis-machine') falseAlarmItem.classList.remove('active');
   }
 
+  function normalizeRequestedNavigation() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
+    const labels = ['项目统计','设备分析','缺陷分析','误报分析','不良分析','告警分析','单板查询','设备运行监控','设备管理','告警管理','用户管理','角色管理'];
+    const routes = {'项目统计':'01-项目统计首页.html','设备分析':'09-设备质量分析.html','缺陷分析':'03-缺陷分析.html','误报分析':'04-误报分析.html','不良分析':'04A-不良导出.html','告警分析':'13-品质预警.html','单板查询':'02-单板查询与结果追溯.html','设备运行监控':'07-数据上传监控.html','设备管理':'08-设备与区域管理.html','告警管理':'14-告警管理.html','用户管理':'10-用户管理.html','角色管理':'11-角色管理.html'};
+    const items = Array.from(nav.children).filter(item => item.matches('.nav-item,.item'));
+    const groups = Array.from(nav.children).filter(item => item.classList.contains('group'));
+    const find = label => items.find(item => label === '项目统计' ? /项目统计|项目统计|项目统计/.test(getText(item)) : getText(item).includes(label));
+    const makeGroup = (name, fallback) => groups.find(item => getText(item).includes(name)) || Object.assign(document.createElement('div'), {className:'group nav-label', textContent:fallback});
+    const dataGroup = makeGroup('数据管理', '数据管理');
+    const systemGroup = makeGroup('系统管理', '系统管理');
+    const ordered = labels.map(label => {
+      let item = find(label);
+      if (!item) {
+        item = document.createElement('a');
+        item.className = items.find(candidate => candidate.matches('a'))?.className || 'item nav-item';
+        item.classList.remove('active');
+        const iconClass = nav.querySelector('.ico,.nav-icon')?.className || 'ico nav-icon';
+        item.innerHTML = `<span class="${iconClass}">${label === '设备运行监控' ? '▧' : '◉'}</span>${label}`;
+      }
+      if (label === '项目统计') item.innerHTML = item.innerHTML.replace(/项目统计|项目统计/, '项目统计');
+      if (label === '设备运行监控') item.classList.toggle('active', document.body.dataset.page === 'device-runtime-monitor');
+      item.href = routes[label];
+      return item;
+    });
+    nav.replaceChildren(...ordered.slice(0,6), dataGroup, ...ordered.slice(6,10), systemGroup, ...ordered.slice(10));
+  }
   function openTopMenu(button, items) {
     closePopover();
     const rect = button.getBoundingClientRect();
@@ -1785,18 +1862,83 @@
     ]);
   }
 
+  function initializeAccountMenu() {
+    document.querySelectorAll('.nav-item[href="12-个人中心.html"],.nav .item[href="12-个人中心.html"]').forEach(item => item.remove());
+
+    const entry = document.querySelector('.account-entry');
+    const sidebar = document.querySelector('.sidebar');
+    if (!entry || !sidebar || entry.closest('.sidebar-account')) return;
+
+    const accountName = getText(entry.querySelector('.account-copy b')) || 'admin';
+    const roleName = getText(entry.querySelector('.account-copy small')) || '平台管理员';
+    const wrap = document.createElement('div');
+    wrap.className = 'account-menu-wrap';
+    entry.parentNode.insertBefore(wrap, entry);
+    wrap.appendChild(entry);
+    const sidebarAccount = document.createElement('div');
+    sidebarAccount.className = 'sidebar-account';
+    sidebarAccount.setAttribute('aria-label', '当前账号');
+    sidebarAccount.appendChild(wrap);
+    sidebar.appendChild(sidebarAccount);
+
+    entry.setAttribute('role', 'button');
+    entry.setAttribute('aria-haspopup', 'menu');
+    entry.setAttribute('aria-expanded', 'false');
+    entry.setAttribute('title', '账号菜单');
+
+    const menu = document.createElement('div');
+    menu.className = 'account-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', '账号菜单');
+    menu.hidden = true;
+    menu.innerHTML = `<div class="account-menu-summary"><div class="account-menu-summary-row"><span>账号名称</span><b>${accountName}</b></div><div class="account-menu-summary-row"><span>角色名称</span><b>${roleName}</b></div></div><div class="account-menu-actions"><a class="account-menu-action" href="12-个人中心.html" role="menuitem">个人中心</a><button class="account-menu-action danger" type="button" role="menuitem" data-account-logout>退出登录</button></div>`;
+    wrap.appendChild(menu);
+
+    const setOpen = open => {
+      menu.hidden = !open;
+      wrap.classList.toggle('open', open);
+      entry.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    entry.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(menu.hidden);
+    });
+    entry.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      setOpen(menu.hidden);
+    });
+    menu.querySelector('[data-account-logout]').addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      openModal('退出登录', '<p style="margin:0;color:#475569;line-height:1.7">确认退出当前账号吗？</p>', '退出登录', () => toast('已退出登录', 'info'));
+    });
+    document.addEventListener('click', event => {
+      if (!wrap.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+  }
+
   function initializePage() {
     removeVisibleProjectUuidColumns();
     enhanceBoardQueryTable();
     normalizeOrderStatisticsNavigation();
     normalizeDeviceAnalysisNavigation();
     normalizeSharedNavigation();
+    ensureRuntimeMonitorNavigation();
     ensureQualityNavigation();
     ensureDefectAnalysisNavigation();
+    normalizeRequestedNavigation();
     initializeDeviceQualityPage();
     if (document.body.dataset.mouthPage === 'project') { currentMouth = 'original'; renderProjectSummary(currentMouth); initializeProjectTrend(); initializeProjectComparison(); }
     removeTitleExplanations();
     normalizeTopActions();
+    initializeAccountMenu();
     ensureGlobalDataTimestamp();
     normalizeTimeFields();
     normalizeDropdownIcons();
@@ -1878,7 +2020,7 @@
       }
       if (target.matches('.proto-language-btn')) { event.preventDefault(); openLanguageMenu(target); return; }
       if (target.matches('.proto-theme-btn')) { event.preventDefault(); openThemeMenu(target); return; }
-      if (/^查询$|^分析$/.test(text)) { event.preventDefault(); runQuery(target); return; }
+      if (/^查询$|^分析$/.test(text)) { if (document.body.dataset.page === 'board-query' && target.matches('[data-board-query]')) return; event.preventDefault(); runQuery(target); return; }
       if (/^重置$/.test(text)) { event.preventDefault(); window.location.reload(); return; }
       if (/^(数据导出|导出报表|导出图|导出明细|导出设备明细|导出监控记录|导出该页报表|导出所选)/.test(text)) { event.preventDefault(); exportTable(target); return; }
       if (/刷新状态/.test(text)) { event.preventDefault(); toast('设备上传状态已刷新'); document.querySelectorAll('tbody tr').forEach(row => row.classList.add('proto-row-flash')); return; }
@@ -1951,8 +2093,8 @@
           toast(enabled ? '规则已停用' : '规则已启用', 'info');
           return;
         }
-        if (row.dataset.ruleStatus === 'enabled') {
-          toast('请先停用规则，再执行编辑或删除操作', 'info');
+        if (action === 'delete' && row.dataset.ruleStatus === 'enabled') {
+          toast('请先停用规则，再执行删除操作', 'info');
           return;
         }
         const ruleName = getText(row.querySelector('.rule-name'));
@@ -2019,6 +2161,7 @@
     });
   }
 
+  window.SPCPrototype = Object.assign(window.SPCPrototype || {}, { openModal, toast });
   initializeListSequences();
   initializePage();
 })();

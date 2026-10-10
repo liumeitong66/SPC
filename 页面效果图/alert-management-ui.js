@@ -1,0 +1,45 @@
+(() => {
+  const panel=document.querySelector('.management-filters');
+  const name=document.getElementById('rule-name-filter');
+  const tbody=document.querySelector('.alert-rule-row')?.parentElement;
+  if(!panel||!name||!tbody)return;
+  panel.insertAdjacentHTML('afterbegin','<div class="field time time-filter"><label>时间范围</label><div class="control" role="button" tabindex="0" data-start="2026-02-04T14:32" data-end="2026-08-04T14:32"><span aria-hidden="true">▣</span><span>2026-02-04 14:32</span><span class="placeholder">至</span><span>2026-08-04 14:32</span></div></div>');
+  name.closest('.rule-filter').insertAdjacentHTML('afterend','<div class="field level-filter"><label>告警级别</label><div class="control" role="button" tabindex="0" aria-label="告警级别" aria-expanded="false"><span aria-hidden="true">▦</span><span>请选择告警级别</span><span class="chev" aria-hidden="true">⌄</span></div><div class="alert-level-menu" hidden><label><input type="checkbox" value="紧急" checked>紧急</label><label><input type="checkbox" value="一般" checked>一般</label></div></div>');
+  const level=panel.querySelector('.level-filter'),trigger=level.querySelector('.control'),menu=level.querySelector('.alert-level-menu');
+  const selected=()=>[...menu.querySelectorAll('input:checked')].map(input=>input.value);
+  const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+  const toggle=()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))};
+  trigger.addEventListener('click',event=>{event.stopPropagation();toggle()});
+  trigger.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle()}if(event.key==='Escape')close()});
+  document.addEventListener('click',event=>{if(!level.contains(event.target))close()});
+  const created=['2026-07-28 09:20:14','2026-07-29 10:08:35','2026-07-30 14:45:21','2026-08-01 16:12:39','2026-08-02 09:32:11','2026-08-03 11:28:06','2026-08-04 08:55:42'];
+  const updated=['2026-08-04 14:20:34','2026-08-04 14:18:09','2026-08-03 22:16:10','2026-08-04 14:10:52','2026-08-04 13:45:12','2026-08-04 12:06:18','2026-08-04 14:25:01'];
+  const head=tbody.closest('table').querySelector('thead tr');
+  const actionHead=head.lastElementChild;
+  ['创建时间','更新时间','操作人'].forEach(label=>{const th=document.createElement('th');th.textContent=label;head.insertBefore(th,actionHead)});
+  [230,210,120,190,100,100,170,170,100,140].forEach((width,index)=>{head.cells[index].style.width=width+'px'});
+  const rows=[...tbody.querySelectorAll('.alert-rule-row')];
+  rows.forEach((row,index)=>{
+    row.dataset.createdAt=created[index];
+    row.dataset.updatedAt=updated[index];
+    const operation=row.lastElementChild;
+    for(const value of [created[index],updated[index],'admin']){const td=document.createElement('td');td.textContent=value;operation.before(td)}
+    const detail=operation.querySelector('a[href*="13A-"]'),logs=operation.querySelector('a[href*="15-"]'),edit=operation.querySelector('[data-alert-action="edit"]'),remove=operation.querySelector('[data-alert-action="delete"]');
+    operation.replaceChildren(edit);
+    const wrap=document.createElement('span');wrap.className='rule-more-wrap';
+    const more=document.createElement('button');more.type='button';more.className='op rule-more-trigger';more.textContent='更多';more.setAttribute('aria-expanded','false');
+    const dropdown=document.createElement('span');dropdown.className='rule-more-menu';dropdown.hidden=true;
+    dropdown.append(detail,logs,remove);wrap.append(more,dropdown);operation.append(wrap);
+    const sync=()=>{remove.disabled=row.dataset.ruleStatus==='enabled'};
+    sync();new MutationObserver(sync).observe(row,{attributes:true,attributeFilter:['data-rule-status']});
+    more.addEventListener('click',event=>{event.stopPropagation();document.querySelectorAll('.rule-more-menu').forEach(other=>{if(other!==dropdown)other.hidden=true});dropdown.hidden=!dropdown.hidden;more.setAttribute('aria-expanded',String(!dropdown.hidden))});
+  });
+  document.addEventListener('click',event=>{if(event.target.closest('.rule-more-wrap'))return;document.querySelectorAll('.rule-more-menu').forEach(dropdown=>dropdown.hidden=true)});
+  const pager=document.querySelector('.table-panel .pager');
+  const updateCount=count=>{const summary=pager.querySelector(':scope > span:first-child');if(summary){summary.textContent='共 '+count+' 条';return}const first=[...pager.childNodes].find(node=>node.nodeType===3&&node.nodeValue.includes('共'));if(first)first.nodeValue='共 '+count+' 条';else pager.prepend(document.createTextNode('共 '+count+' 条'))};
+  const query=()=>{const keyword=name.value.trim().toLowerCase(),levels=selected(),control=panel.querySelector('.time-filter .control'),start=control.dataset.start||'',end=control.dataset.end||'';let count=0;for(const row of tbody.querySelectorAll('.alert-rule-row')){const matchesName=!keyword||row.querySelector('.rule-name').textContent.toLowerCase().includes(keyword);const matchesLevel=levels.includes(row.querySelector('.lvl').textContent.trim());const created=row.dataset.createdAt.replace(' ','T');const matchesDate=(!start||created>=start)&&(!end||created<=end);const visible=matchesName&&matchesLevel&&matchesDate;row.hidden=!visible;row.style.display=visible?'':'none';if(visible)count++}updateCount(count)};
+  document.getElementById('query-rule-filter').addEventListener('click',event=>{event.stopPropagation();query()});
+  document.getElementById('reset-rule-filter').addEventListener('click',event=>{event.stopPropagation();name.value='';menu.querySelectorAll('input').forEach(input=>input.checked=true);const control=panel.querySelector('.time-filter .control');control.dataset.start='2026-02-04T14:32';control.dataset.end='2026-08-04T14:32';control.innerHTML='<span aria-hidden="true">▣</span><span>2026-02-04 14:32</span><span class="placeholder">至</span><span>2026-08-04 14:32</span>';close();query()});
+  name.addEventListener('keydown',event=>{if(event.key==='Enter')query()});
+  new MutationObserver(query).observe(tbody,{childList:true});
+})();

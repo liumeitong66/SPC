@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>角色管理</title><link rel="stylesheet" href="management-common.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>角色管理</title><link rel="stylesheet" href="management-common.css"><link rel="stylesheet" href="sidebar-collapse.css"><link rel="stylesheet" href="filter-compact.css"></head>
 <body class="management-page" data-page="role-management">
 <aside class="sidebar"><div class="brand"><div class="mark"><i></i><i></i></div><div><strong>AOI SPC</strong><small>集中管理平台</small></div></div><div class="group nav-label">质量分析</div>
 <nav class="nav">
-<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>订单分析</a>
+<a class="item nav-item" href="01-项目统计首页.html" style="text-decoration:none"><span class="ico nav-icon">◉</span>项目统计</a>
 <a class="item nav-item" href="09-设备质量分析.html" style="text-decoration:none"><span class="ico nav-icon">◇</span>设备分析</a>
 <a class="item nav-item" href="03-缺陷分析.html" style="text-decoration:none"><span class="ico nav-icon">▥</span>缺陷分析</a>
 <a class="item nav-item" href="04-误报分析.html" style="text-decoration:none"><span class="ico nav-icon">⌁</span>误报分析</a>
@@ -25,4 +25,4 @@
 <tr><td title="质量工程师">质量工程师</td><td title="查询分析质量数据并导出报表">查询分析质量数据并导出报表</td><td><button class="status-button" data-proto-action="toggle-role" data-role-status="enabled">启用</button></td><td><button class="action-btn" data-proto-action="edit-role">编辑</button><button class="action-btn" data-proto-action="menu-permissions">菜单权限</button><button class="action-btn danger" data-proto-action="delete-role" disabled>删除</button></td></tr>
 <tr><td title="设备管理员">设备管理员</td><td title="管理接入设备及区域信息">管理接入设备及区域信息</td><td><button class="status-button off" data-proto-action="toggle-role" data-role-status="disabled">停用</button></td><td><button class="action-btn" data-proto-action="edit-role">编辑</button><button class="action-btn" data-proto-action="menu-permissions">菜单权限</button><button class="action-btn danger" data-proto-action="delete-role">删除</button></td></tr>
 </tbody></table></div><div class="pager"><span>共 3 条</span><div class="pages"><span class="page on">1</span></div></div></section>
-</main></div><script src="spc-prototype.js"></script></body></html>
+</main></div><script src="spc-prototype.js"></script><script src="sidebar-collapse.js"></script></body></html>

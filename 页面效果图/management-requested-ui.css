@@ -1,0 +1,18 @@
+.management-page[data-page="device-management"] .status-button,.management-page[data-page="user-management"] .status-button{position:relative;display:inline-block;width:36px;height:20px;border-radius:10px;background:#3478f6;color:transparent!important;font-size:0;vertical-align:middle;transition:background .16s}
+.management-page[data-page="device-management"] .management-filters{height:60px!important;min-height:60px!important;flex:0 0 60px!important;align-content:center!important}
+@media(max-width:1400px){.management-page[data-page="device-management"] .management-filters{height:150px!important;min-height:150px!important;flex:0 0 150px!important}}
+.management-page[data-page="device-management"] .status-button.off,.management-page[data-page="user-management"] .status-button.off{background:#c5ced9}
+.management-page[data-page="device-management"] .status-button:after,.management-page[data-page="user-management"] .status-button:after{content:"";position:absolute;top:3px;left:19px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #62708655;transition:left .16s}
+.management-page[data-page="device-management"] .status-button.off:after,.management-page[data-page="user-management"] .status-button.off:after{left:3px}
+.management-page[data-page="user-management"] .table,.management-page[data-page="role-management"] .table{min-width:1350px}
+.management-page[data-page="role-management"] .role-operation{display:flex;align-items:center;gap:14px;overflow:visible}
+.management-page[data-page="role-management"] .role-more-wrap{position:relative;display:inline-flex}
+.management-page[data-page="role-management"] .role-more-trigger:after{content:"";display:inline-block;width:6px;height:6px;margin:0 2px 3px 7px;border-right:1px solid #77879d;border-bottom:1px solid #77879d;transform:rotate(45deg)}
+.management-page[data-page="role-management"] .role-more-menu{position:absolute;right:0;top:25px;z-index:20;width:132px;padding:4px;border:1px solid #dce4ee;border-radius:6px;background:#fff;box-shadow:0 8px 20px #20375429;display:flex;flex-direction:column;gap:2px}
+.management-page[data-page="role-management"] .role-more-menu[hidden]{display:none}
+.management-page[data-page="role-management"] .role-more-menu .action-btn{display:block;width:100%;height:32px;margin:0!important;padding:0 10px;border-radius:4px;text-align:left;color:#475569}
+.management-page[data-page="role-management"] .role-more-menu .action-btn:hover{background:#f2f7ff;color:#2468e8}
+.management-page[data-page="role-management"] .role-more-menu .action-btn.danger{color:#df4a4a}
+.management-page[data-page="role-management"] .role-more-menu .action-btn:disabled{color:#b7c0cb}
+.management-page[data-page="role-management"] .role-action-cell{overflow:visible!important;position:relative}
+.management-page[data-page="role-management"] .role-action-cell:hover:after{display:none}
