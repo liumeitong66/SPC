@@ -1,0 +1,19 @@
+.quality-filter-link{border:0;background:transparent;padding:0;color:#2468e8;font:inherit;font-size:12px;cursor:pointer}
+.quality-filter-link:hover{text-decoration:underline}
+.quality-conditions-popover{position:fixed;z-index:110;width:min(690px,calc(100vw - 24px));max-height:min(640px,calc(100vh - 24px));overflow:auto;padding:18px 20px 20px;border:1px solid #d9e1eb;border-radius:9px;background:#fff;box-shadow:0 14px 35px rgba(22,42,70,.2);color:#334155;font-size:13px}
+.quality-conditions-popover[hidden]{display:none}
+.quality-conditions-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.quality-conditions-head strong{font-size:15px;font-weight:600;color:#334155}
+.quality-conditions-mode{display:flex;align-items:center;gap:6px;white-space:nowrap;color:#64748b}
+.quality-conditions-popover select,.quality-conditions-popover input{height:36px;min-width:0;padding:0 10px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155;font:inherit}
+.quality-conditions-mode select{width:70px;color:#2468e8;border-color:#3478f6}
+.quality-conditions-row{display:grid;grid-template-columns:minmax(130px,1.35fr) minmax(110px,.85fr) minmax(150px,1.7fr) 28px;align-items:center;gap:9px;margin:9px 0}
+.quality-conditions-row>select,.quality-conditions-value>select,.quality-conditions-value>input{width:100%}
+.quality-conditions-value{min-width:0;display:flex;align-items:center;gap:7px}
+.quality-conditions-value[hidden]{display:none}
+.quality-conditions-remove,.quality-conditions-add{border:0;background:transparent;color:#65748a;cursor:pointer;font:inherit}
+.quality-conditions-remove{height:30px;font-size:21px;line-height:1}
+.quality-conditions-remove:hover,.quality-conditions-add:hover{color:#2468e8}
+.quality-conditions-add{margin-top:9px;padding:4px 0;font-size:13px}
+.quality-conditions-empty{color:#91a0b1}
+@media(max-width:580px){.quality-conditions-head{align-items:flex-start;flex-direction:column}.quality-conditions-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 28px}.quality-conditions-value{grid-column:1/3}.quality-conditions-remove{grid-column:3;grid-row:1/3}}
