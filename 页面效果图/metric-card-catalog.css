@@ -1,0 +1,22 @@
+.metric-card-edit-button{height:30px;margin-left:auto;padding:0 11px;border:1px solid #b8cdf2;border-radius:4px;background:#fff;color:#2468e8;font-size:12px;cursor:pointer}
+.metric-card-editing .metric{cursor:pointer}
+.metric-card-editing .metric:hover{box-shadow:inset 0 0 0 2px #b8cdf2}
+.metric-card-editing .metric.metric-card-selected{box-shadow:inset 0 0 0 2px #3478f6;background:#f5f9ff}
+.metric-card-editor{position:fixed;z-index:85;right:0;top:0;width:min(440px,100vw);height:100vh;display:flex;flex-direction:column;border-left:1px solid #d9e2ed;background:#fff;box-shadow:-10px 0 28px rgba(16,42,76,.12);color:#334155;font-size:13px}
+.metric-card-editor[hidden],.metric-card-editor [hidden]{display:none}
+.metric-card-editor-head{height:64px;flex:none;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e6ebf1}
+.metric-card-editor-head h3{margin:0;color:#102a4c;font-size:17px}
+.metric-card-editor-head button{width:32px;height:32px;border:0;background:#fff;color:#64748b;font-size:20px;cursor:pointer}
+.metric-card-editor-body{flex:1;overflow:auto;padding:16px 18px}
+.metric-card-tabs{height:48px;margin:-16px -18px 18px;padding:0 18px;display:flex;gap:28px;border-bottom:1px solid #e4e9f0}
+.metric-card-tabs button{height:48px;padding:0;border:0;border-bottom:3px solid transparent;background:#fff;color:#334155;font-size:14px;cursor:pointer}
+.metric-card-tabs button.active{color:#2468e8;border-bottom-color:#3478f6}
+.metric-card-field{display:block;margin-bottom:14px;color:#64748b;font-size:12px}
+.metric-card-field input,.metric-card-field select{box-sizing:border-box;display:block;width:100%;height:38px;margin-top:6px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155;font-family:inherit;font-size:13px}
+.metric-card-time-inputs{display:flex;align-items:center;gap:8px;min-width:0}
+.metric-card-time-inputs input{flex:1;min-width:0;width:0;padding:0 5px;font-size:11px}
+.metric-card-time-inputs span{flex:none;color:#64748b}
+.metric-card-rule-value{box-sizing:border-box;min-height:38px;display:flex;align-items:center;margin-top:6px;padding:8px 10px;border:1px solid #e0e6ee;border-radius:4px;background:#f7f9fc;color:#334155;font-size:13px;line-height:20px;overflow-wrap:anywhere}
+.metric-card-editor-foot{height:64px;flex:none;padding:0 18px;display:flex;align-items:center;justify-content:flex-end;border-top:1px solid #e6ebf1}
+.metric-card-editor-foot button{height:36px;padding:0 14px;border:1px solid #3478f6;border-radius:4px;background:#3478f6;color:#fff;cursor:pointer}
+@media(max-width:1180px){.metric-card-editor{width:min(380px,100vw)}}

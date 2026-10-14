@@ -38,6 +38,8 @@
       : [];
     return [...new Set([...fromTable,...(fallbackNames[key] || [])])];
   };
+  const isMultiName = condition => field(condition.field)?.type === 'name' && ['contains','notContains'].includes(condition.operator);
+  const selectedNames = condition => Array.isArray(condition.value) ? condition.value : (condition.value ? [condition.value] : []);
   let metric = null;
   let draft = { join:'all', conditions:[] };
   const popover = document.createElement('section');
@@ -50,7 +52,13 @@
     if (condition.operator === 'empty' || condition.operator === 'notEmpty') return '<div class="quality-conditions-value quality-conditions-empty">无需填写</div>';
     if (type === 'time') return `<div class="quality-conditions-value"><select data-condition-value>${options([['','请选择时间'],...periods],condition.value)}</select>${condition.value === 'specific' ? `<input type="date" data-condition-date aria-label="具体日期" value="${escape(condition.date || '')}">` : ''}</div>`;
     if (type === 'number') return `<div class="quality-conditions-value"><input type="number" step="any" data-condition-value aria-label="数值" placeholder="请输入数值" value="${escape(condition.value || '')}"></div>`;
-    if (type === 'name') return `<div class="quality-conditions-value"><select data-condition-value>${options([['','请选择名称'],...nameOptions(condition.field).map(value => [value,value])],condition.value)}</select></div>`;
+    if (type === 'name') {
+      if (isMultiName(condition)) {
+        const selected = selectedNames(condition);
+        return `<div class="quality-conditions-value"><details class="quality-conditions-multi"><summary>${selected.length ? escape(selected.join('、')) : '请选择名称'}</summary><div class="quality-conditions-multi-options">${nameOptions(condition.field).map(value => `<label><input type="checkbox" data-condition-name value="${escape(value)}"${selected.includes(value) ? ' checked' : ''}><span>${escape(value)}</span></label>`).join('')}</div></details></div>`;
+      }
+      return `<div class="quality-conditions-value"><select data-condition-value>${options([['','请选择名称'],...nameOptions(condition.field).map(value => [value,value])],condition.value)}</select></div>`;
+    }
     return '<div class="quality-conditions-value quality-conditions-empty">请选择字段</div>';
   }
   function render() {
@@ -79,10 +87,10 @@
   }
   function save() {
     if (!metric || document.querySelector('[data-custom-metric].is-editor-selected') !== metric) return;
-    const valid = draft.conditions.filter(item => item.field && item.operator && (['empty','notEmpty'].includes(item.operator) || (item.value && (item.value !== 'specific' || item.date))));
+    const valid = draft.conditions.filter(item => item.field && item.operator && (['empty','notEmpty'].includes(item.operator) || (isMultiName(item) ? selectedNames(item).length > 0 : item.value && (item.value !== 'specific' || item.date))));
     metric.dataset.metricConditions = JSON.stringify({join:draft.join,conditions:valid});
     const summary = document.querySelector('.quality-filter-control > span');
-    if (summary) summary.textContent = valid.length ? `已设置 ${valid.length} 个筛选条件` : '未设置筛选条件';
+    if (summary) summary.textContent = valid.length ? `已设置 ${valid.length} 个筛选条件` : '请选择';
     close();
     metric._qualityFilterDraft = null;
   }
@@ -103,7 +111,12 @@
     const row = event.target.closest('[data-condition-index]');
     if (!row) return;
     const item = draft.conditions[Number(row.dataset.conditionIndex)];
-    if (event.target.matches('[data-condition-field]')) { Object.assign(item,{field:event.target.value,operator:'',value:'',date:''}); render(); }
+    if (event.target.matches('[data-condition-name]')) {
+      const selected = selectedNames(item);
+      item.value = event.target.checked ? [...selected,event.target.value] : selected.filter(value => value !== event.target.value);
+      event.target.closest('details').querySelector('summary').textContent = item.value.length ? item.value.join('、') : '请选择名称';
+    }
+    else if (event.target.matches('[data-condition-field]')) { Object.assign(item,{field:event.target.value,operator:'',value:'',date:''}); render(); }
     else if (event.target.matches('[data-condition-operator]')) { Object.assign(item,{operator:event.target.value,value:'',date:''}); render(); }
     else if (event.target.matches('[data-condition-value]')) { item.value = event.target.value; if (field(item.field)?.type === 'time') render(); }
     else if (event.target.matches('[data-condition-date]')) item.date = event.target.value;

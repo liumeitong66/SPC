@@ -1,0 +1,24 @@
+.metric-scope-field{min-width:0}
+.metric-scope-trigger{box-sizing:border-box;width:100%;height:38px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155;text-align:left;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.metric-scope-trigger:after{content:'⌄';color:#64748b}
+.metric-scope-dialog{position:fixed;z-index:115;right:12px;top:64px;width:min(620px,calc(100vw - 24px));max-height:calc(100vh - 80px);overflow:auto;box-sizing:border-box;padding:16px 18px;background:#fff;border:1px solid #dce3ec;border-radius:8px;box-shadow:0 12px 28px #102a4c33;color:#334155;font-size:13px}
+.metric-scope-dialog[hidden]{display:none}
+.metric-scope-head{min-height:34px;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.metric-scope-head strong{font-size:15px;font-weight:600;margin-right:auto}
+.metric-scope-match{display:flex;align-items:center;gap:8px;color:#64748b;white-space:nowrap}
+.metric-scope-match select{height:34px;padding:0 24px 0 10px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155}
+.metric-scope-close{width:30px;height:30px;border:0;background:transparent;color:#64748b;font-size:22px;cursor:pointer}
+.metric-scope-rules{display:grid;gap:10px}
+.metric-scope-rule{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(82px,.65fr) minmax(0,1.6fr) 28px;align-items:start;gap:8px;min-width:0}
+.metric-scope-rule select,.metric-scope-rule input{box-sizing:border-box;width:100%;height:38px;min-width:0;padding:0 9px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155;font-size:13px}
+.metric-scope-rule select:focus,.metric-scope-rule input:focus{outline:2px solid #3478f64d;border-color:#3478f6}
+.metric-scope-time{display:flex;gap:6px;min-width:0}.metric-scope-time select,.metric-scope-time input{flex:1;min-width:0}.metric-scope-empty{min-width:0}
+.metric-scope-remove{height:38px;border:0;background:transparent;color:#64748b;font-size:20px;cursor:pointer}
+.metric-scope-custom{grid-column:1/4;display:flex;align-items:center;gap:8px;color:#64748b}
+.metric-scope-custom input{flex:1}
+.metric-scope-add{margin:15px 0 12px;padding:0;border:0;background:transparent;color:#334155;font-size:13px;cursor:pointer}
+.metric-scope-add:hover{color:#2468e8}
+.metric-scope-foot{display:flex;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid #edf1f5}
+.metric-scope-foot button{height:34px;padding:0 14px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155;cursor:pointer}
+.metric-scope-foot button:last-child{border-color:#3478f6;background:#3478f6;color:#fff}
+@media(max-width:540px){.metric-scope-dialog{padding:14px}.metric-scope-head{flex-wrap:wrap}.metric-scope-rule{grid-template-columns:minmax(0,1fr) 86px 28px}.metric-scope-rule [data-rule-value]{grid-column:1/3}.metric-scope-rule .metric-scope-remove{grid-column:3;grid-row:1/3}.metric-scope-custom{grid-column:1/3}}

@@ -271,6 +271,7 @@
     { name: '区域C', original: { yield: 91.20 }, review: { yield: 98.01 } },
     { name: '区域D', original: { yield: 90.15 }, review: { yield: 97.09 } }
   ];
+  window.spcQualityChartSamples = { devices: deviceSamples, comparisonDevices, areas: comparisonAreas, projects: comparisonProjects, trend: () => deviceTrendDataset(currentTrendPeriod) };
 
   function closePopover() {
     if (currentPopover) currentPopover.remove();
@@ -1338,18 +1339,101 @@
 
   let qualityEditorSelectedChart = null;
   let qualityEditorSelectedMetric = null;
+  const qualityMetricOverrides = new Map();
+
+  const deviceIndicatorOptions = [
+    ['participatingDevices', '参与统计设备数'], ['templateCount', '检测模板数'], ['pcbTotal', '检测PCB数'],
+    ['boardGood', '板卡良品数'], ['boardYield', '板卡良率'], ['boardNg', '板卡不良数'], ['boardNgRate', '板卡不良率'],
+    ['boardFalse', '误报数'], ['boardFalseRate', '误报率'], ['boardPass', '直通数'], ['boardPassRate', '直通率'],
+    ['componentTotal', '器件检测数'], ['componentDppm', '器件DPPM'], ['componentFalseDppm', '器件误报DPPM'],
+    ['componentOk', '器件OK数'], ['componentOkRate', '器件OK率'], ['componentNg', '器件NG数'],
+    ['componentNgRate', '器件NG率'], ['componentSpecialNg', '特殊缺陷器件NG数'],
+    ['componentPass', '器件直通数'], ['componentPassRate', '器件直通率'], ['componentFalse', '器件误报数'],
+    ['componentSpecialFalse', '特殊缺陷器件误报数'], ['componentMiss', '器件漏报数'], ['componentSpecialMiss', '特殊缺陷器件漏报数']
+  ];
+  const deviceIndicatorRules = {
+    participatingDevices: '有历史检测记录的设备ID去重计数', templateCount: '检测模板ID去重计数',
+    pcbTotal: '检测记录总数', boardGood: '良品PCB数', boardYield: '良品PCB数 / 检测PCB数 × 100%',
+    boardNg: '不良PCB数', boardNgRate: '不良PCB数 / 检测PCB数 × 100%',
+    boardFalse: '误报PCB数', boardFalseRate: '误报PCB数 / 检测PCB数 × 100%',
+    boardPass: '直通PCB数', boardPassRate: '直通PCB数 / 检测PCB数 × 100%',
+    componentTotal: '器件检测数', componentDppm: '器件不良数 / 器件检测数 × 1,000,000',
+    componentFalseDppm: '器件误报数 / 器件检测数 × 1,000,000', componentOk: '器件OK数',
+    componentOkRate: '器件OK数 / 器件检测数 × 100%', componentNg: '器件NG数',
+    componentNgRate: '器件NG数 / 器件检测数 × 100%', componentSpecialNg: '特殊缺陷器件NG数',
+    componentPass: '器件直通数', componentPassRate: '器件直通数 / 器件检测数 × 100%',
+    componentFalse: '器件误报数', componentSpecialFalse: '特殊缺陷器件误报数',
+    componentMiss: '器件漏报数', componentSpecialMiss: '特殊缺陷器件漏报数'
+  };
+  const deviceIndicatorSource = key => key === 'participatingDevices' ? '设备管理数据' : '单板分析数据';
+  const deviceIndicatorDedupField = key => key === 'participatingDevices' ? { code: 'deviceId', label: '设备ID' } : key === 'templateCount' ? { code: 'templateId', label: '模板ID' } : null;
+  const deviceIndicatorNeedsMouth = key => !['participatingDevices','templateCount','pcbTotal','componentTotal'].includes(key);
+  window.spcMetricScopeOptions = () => ({
+    templates: [...new Set(deviceSamples.flatMap(device => device.projects.map(project => project.name)))],
+    devices: deviceSamples.map(device => device.name),
+    locations: ['区域A','区域B','区域C','区域D']
+  });
+  function deviceIndicatorValue(key, mouth = currentMouth, scope = {}) {
+    const rules = scope.rules || [];
+    if (rules.some(rule => rule.field === 'time') || scope.time && scope.time !== 'all') return '—';
+    if ((rules.some(rule => rule.field === 'templates') || scope.templates?.length) && !['templateCount','participatingDevices'].includes(key)) return '—';
+    const match = (actual, rule) => {
+      const values = Array.isArray(actual) ? actual.map(String) : [String(actual ?? '')];
+      const wanted = String(rule.value ?? '');
+      if (rule.operator === '为空') return values.every(value => !value);
+      if (rule.operator === '不为空') return values.some(Boolean);
+      if (['boardTotal','templateCount'].includes(rule.field)) {
+        const number = Number(values[0]), target = Number(wanted);
+        if (!Number.isFinite(number) || !Number.isFinite(target)) return false;
+        return ({'等于':number===target,'不等于':number!==target,'大于':number>target,'大于或等于':number>=target,'小于':number<target,'小于或等于':number<=target})[rule.operator] ?? false;
+      }
+      if (rule.operator === '不等于') return values.every(value => value !== wanted);
+      if (rule.operator === '包含') return values.some(value => value.includes(wanted));
+      if (rule.operator === '不包含') return values.every(value => !value.includes(wanted));
+      return values.some(value => value === wanted);
+    };
+    const devices = deviceSamples.filter(device => Number(device.boardTotal) > 0 && (rules.length ? rules.every(rule => {
+      const area = comparisonDevices.find(item => item.name === device.name)?.area;
+      const actual = ({templates:device.projects.map(project => project.name),devices:device.name,locations:area,boardTotal:device.boardTotal,templateCount:device.projects.length})[rule.field];
+      return match(actual, rule);
+    }) : (!scope.devices?.length || scope.devices.includes(device.name)) && (!scope.templates?.length || device.projects.some(project => scope.templates.includes(project.name))) && (!scope.locations?.length || scope.locations.includes(comparisonDevices.find(item => item.name === device.name)?.area))));
+    if (key === 'participatingDevices') return `${devices.length}<small>台</small>`;
+    if (key === 'templateCount') return `${new Set(devices.flatMap(device => device.projects.filter(project => !scope.templates?.length || scope.templates.includes(project.name)).map(project => project.uuid)).filter(Boolean)).size}<small>个</small>`;
+    const totals = Object.fromEntries(['boardTotal','boardGood','boardNg','boardFalse','boardPass','componentTotal','componentOk','componentNg','componentSpecialNg','componentPass','componentFalse','componentSpecialFalse','componentMiss','componentSpecialMiss'].map(item => [item,0]));
+    devices.forEach(device => {
+      const stats = statsFor(device, mouth);
+      Object.keys(totals).forEach(item => { totals[item] += Number(String(stats[item]).replaceAll(',','')) || 0; });
+    });
+    const ratio = (numerator, denominator, scale) => denominator ? numerator / denominator * scale : 0;
+    const ratios = {
+      boardYield: ratio(totals.boardGood,totals.boardTotal,100), boardNgRate: ratio(totals.boardNg,totals.boardTotal,100),
+      boardFalseRate: ratio(totals.boardFalse,totals.boardTotal,100), boardPassRate: ratio(totals.boardPass,totals.boardTotal,100),
+      componentOkRate: ratio(totals.componentOk,totals.componentTotal,100), componentNgRate: ratio(totals.componentNg,totals.componentTotal,100),
+      componentPassRate: ratio(totals.componentPass,totals.componentTotal,100),
+      componentDppm: ratio(totals.componentNg,totals.componentTotal,1000000),
+      componentFalseDppm: ratio(totals.componentFalse,totals.componentTotal,1000000)
+    };
+    if (Object.hasOwn(ratios,key)) return key.endsWith('Dppm') ? `${number(Math.round(ratios[key]))}` : `${ratios[key].toFixed(2)}<small>%</small>`;
+    if (!Object.hasOwn(totals,key)) return '—';
+    return `${number(totals[key])}<small>${key.startsWith('board') ? '块' : '个'}</small>`;
+  }
+  window.spcDeviceMetricScopeValue = (key, scope) => deviceIndicatorValue(key, currentMouth, scope);
 
   const metricCardConfigs = {
-    participatingDevices: { description: '参与统计设备', table: '设备管理底表', source: '设备数据管理', range: '存在历史检测数据的全部设备', aggregation: '设备ID去重计数', precision: '整数', format: '数字（千分位）' },
-    templateCount: { description: '检测模板数', table: 'PCB检测记录', source: '检测数据管理', range: '跟随页面筛选', aggregation: '模板ID去重计数', precision: '整数', format: '数字（千分位）' },
-    pcbTotal: { description: '检测 PCB 总数', table: 'PCB检测记录', source: '检测数据管理', range: '跟随页面筛选', aggregation: '检测记录总数', precision: '整数', format: '数字（千分位）' },
-    boardNgRate: { description: '板卡不良率', table: 'PCB检测记录', source: '检测数据管理', range: '跟随页面筛选', aggregation: '不良PCB数 / 检测PCB数', precision: '2位小数', format: '百分比' },
-    componentDppm: { description: '器件 DPPM', table: '器件检测明细', source: '检测数据管理', range: '跟随页面筛选', aggregation: '器件不良数 / 器件检测数 × 1,000,000', precision: '整数', format: '数字（千分位）' }
+    participatingDevices: { description: '参与统计设备', source: '设备管理数据', aggregation: '设备ID去重计数', precision: '整数', format: '数字（千分位）' },
+    templateCount: { description: '检测模板数', source: '单板分析数据', aggregation: '检测模板ID去重计数', precision: '整数', format: '数字（千分位）' },
+    pcbTotal: { description: '检测 PCB 总数', source: '单板分析数据', aggregation: '检测记录总数', precision: '整数', format: '数字（千分位）' },
+    boardNgRate: { description: '板卡不良率', source: '单板分析数据', aggregation: '不良PCB数 / 检测PCB数', precision: '2位小数', format: '百分比' },
+    componentDppm: { description: '器件 DPPM', source: '单板分析数据', aggregation: '器件不良数 / 器件检测数 × 1,000,000', precision: '整数', format: '数字（千分位）' }
   };
 
-  function metricCardConfigMarkup(config) {
+  function metricCardConfigMarkup(config, metric) {
+    const selectedIndicator = metric.dataset.metricIndicator || metric.dataset.customMetric;
+    const usedIndicators = new Set([...document.querySelectorAll('[data-custom-metric]')].filter(item => item !== metric).map(item => item.dataset.metricIndicator || item.dataset.customMetric));
+    const indicatorOptions = `${deviceIndicatorOptions.some(([key]) => key === selectedIndicator) ? '' : '<option value="" selected>请选择统计指标</option>'}${deviceIndicatorOptions.map(([key,label]) => `<option value="${key}"${key === selectedIndicator ? ' selected' : ''}${usedIndicators.has(key) ? ' disabled' : ''}>${label}</option>`).join('')}`;
     return `<div class="quality-metric-tabs" role="tablist"><button type="button" class="quality-metric-tab is-active" data-metric-tab="base">基础配置</button><button type="button" class="quality-metric-tab" data-metric-tab="custom">自定义配置</button></div>
-      <div class="quality-metric-panel" data-metric-panel="base"><div class="quality-config-grid"><div class="quality-config-field full"><label>标题</label><input data-metric-description value="${config.description}"></div><div class="quality-config-field full"><label>数据源</label><div class="quality-source-picker"><button type="button" class="quality-source-trigger" data-source-trigger>${config.source}</button><div class="quality-source-menu" data-source-menu hidden><label class="quality-source-option"><input type="checkbox" value="检测数据管理" ${config.source === '检测数据管理' ? 'checked' : ''}>检测数据管理</label><label class="quality-source-option"><input type="checkbox" value="设备数据管理" ${config.source === '设备数据管理' ? 'checked' : ''}>设备数据管理</label><label class="quality-source-option"><input type="checkbox" value="检测模板管理" ${config.source === '检测模板管理' ? 'checked' : ''}>检测模板管理</label></div></div></div><div class="quality-config-field full"><label>数据范围</label><div class="quality-config-field"><div class="quality-config-field"><div class="quality-filter-control" style="height:38px;padding:0 10px;border:1px solid #cfd8e4;border-radius:4px"><span>${config.range}</span><button type="button" class="quality-filter-link" aria-haspopup="dialog">筛选</button></div></div></div></div><div class="quality-config-field full"><label>统计方式</label><select><option>${config.aggregation}</option></select></div></div></div>
+      <div class="quality-metric-panel" data-metric-panel="base"><div class="quality-config-grid"><div class="quality-config-field full"><label>标题</label><input data-metric-description value="${config.description}"></div><div class="quality-config-field full"><label>统计指标</label><select data-metric-indicator>${indicatorOptions}</select></div></div></div>
+
       <div class="quality-metric-panel" data-metric-panel="custom" hidden><div class="quality-config-grid"><div class="quality-config-field full"><label>背景颜色</label><select><option>默认</option><option>浅蓝</option><option>白色</option></select></div><div class="quality-config-field full"><label>文字颜色</label><select><option>默认</option><option>深色</option><option>蓝色</option></select></div><div class="quality-config-field full"><label>字体字号</label><div class="quality-segment-control" data-font-mode><button type="button" class="is-active" data-font-mode-value="adaptive">自适应</button><button type="button" data-font-mode-value="custom">自定义</button></div></div><div class="quality-color-row quality-font-custom-fields" style="grid-column:1/-1" hidden><div class="quality-config-field"><label>数据说明字号</label><select><option>12</option><option>14</option><option>16</option></select></div><div class="quality-config-field"><label>数字字号</label><select><option>22</option><option>24</option><option>28</option><option>36</option></select></div></div><div class="quality-config-field full"><label>小数精度</label><select><option>${config.precision}</option><option>1位小数</option><option>2位小数</option></select></div><div class="quality-config-field full"><label>数字格式</label><select><option>${config.format}</option><option>普通数字</option><option>百分比</option></select></div></div></div>`;
   }
 
@@ -1363,12 +1447,9 @@
     if (!drawer) return;
     drawer.dataset.mode = 'metric';
     drawer.querySelector('.quality-config-drawer-head h3').textContent = '指标卡';
-    const config = metricCardConfigs[metric.dataset.customMetric] || metricCardConfigs.pcbTotal;
-    drawer.querySelector('.quality-config-drawer-body').innerHTML = metricCardConfigMarkup(config);
-    if (metric.dataset.metricConditions) {
-      const saved = JSON.parse(metric.dataset.metricConditions);
-      if (saved.conditions?.length) drawer.querySelector('.quality-filter-control > span').textContent = `已设置 ${saved.conditions.length} 个筛选条件`;
-    }
+    const indicatorKey = metric.dataset.metricIndicator || metric.dataset.customMetric;
+    const config = { ...(metricCardConfigs[indicatorKey] || metricCardConfigs.pcbTotal), description: metric.querySelector('.metric-label').textContent.replace('ⓘ','').trim() };
+    drawer.querySelector('.quality-config-drawer-body').innerHTML = metricCardConfigMarkup(config, metric);
     const restoreButton = drawer.querySelector('[data-quality-restore]');
     const previewButton = drawer.querySelector('[data-quality-preview]');
     if (restoreButton) restoreButton.hidden = true;
@@ -1377,8 +1458,17 @@
     save.textContent = '保存';
     save.onclick = () => {
       const description = drawer.querySelector('[data-metric-description]').value.trim();
+      const indicator = drawer.querySelector('[data-metric-indicator]').value;
+      if (!indicator) { toast('请选择统计指标'); return; }
+      metric.dataset.metricIndicator = indicator;
+      metric.querySelector('.metric-value').innerHTML = deviceIndicatorValue(indicator,currentMouth,JSON.parse(metric.dataset.metricScope||'{}'));
       if (description) metric.querySelector('.metric-label').textContent = description;
+      qualityMetricOverrides.set(metric.dataset.customMetric, { indicator, description: metric.querySelector('.metric-label').textContent, scope: metric.dataset.metricScope || '{}' });
       toast('指标卡配置已保存');
+    };
+    drawer.querySelector('[data-metric-indicator]').onchange = event => {
+      const indicator = event.target.value;
+      drawer.querySelector('[data-metric-description]').value = deviceIndicatorOptions.find(([key]) => key === indicator)?.[1] || '';
     };
     drawer.querySelectorAll('[data-metric-tab]').forEach(tab => tab.onclick = () => {
       drawer.querySelectorAll('[data-metric-tab]').forEach(item => item.classList.toggle('is-active', item === tab));
@@ -1391,44 +1481,14 @@
         if (customFields) customFields.hidden = button.dataset.fontModeValue !== 'custom';
       }
     });
-    const trendToggle = drawer.querySelector('[data-metric-trend]');
-    if (trendToggle) trendToggle.onchange = () => {
-      const fields = drawer.querySelector('[data-metric-trend-fields]');
-      if (fields) fields.hidden = !trendToggle.checked;
-    };
-    const timeRange = drawer.querySelector('[data-metric-time-range]');
-    if (timeRange) timeRange.onchange = () => {
-      const customRange = drawer.querySelector('[data-custom-time-range]');
-      if (customRange) customRange.hidden = timeRange.value !== 'custom';
-    };
-    const sourceTrigger = drawer.querySelector('[data-source-trigger]');
-    const sourceMenu = drawer.querySelector('[data-source-menu]');
-    if (sourceTrigger && sourceMenu) {
-      sourceTrigger.onclick = event => {
-        event.stopPropagation();
-        sourceMenu.hidden = !sourceMenu.hidden;
-      };
-      sourceMenu.onclick = event => event.stopPropagation();
-      sourceMenu.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.onchange = () => {
-        const selected = Array.from(sourceMenu.querySelectorAll('input:checked')).map(input => input.value);
-        if (!selected.length) {
-          checkbox.checked = true;
-          return;
-        }
-        sourceTrigger.textContent = selected.length === 1 ? selected[0] : `已选择 ${selected.length} 个数据源`;
-      });
-      drawer.onclick = event => {
-        if (!event.target.closest('.quality-source-picker')) sourceMenu.hidden = true;
-      };
-    }
   }
 
   function qualityEditorDrawerMarkup() {
     return `<aside class="quality-config-drawer" data-quality-config-drawer><header class="quality-config-drawer-head"><h3>柱状图</h3><button class="quality-config-drawer-close" type="button" data-quality-editor-exit aria-label="关闭">×</button></header><div class="quality-config-drawer-body"><div class="quality-metric-tabs" role="tablist"><button type="button" class="quality-metric-tab is-active" data-chart-tab="base">基础配置</button><button type="button" class="quality-metric-tab" data-chart-tab="custom">自定义配置</button></div>
-      <div class="quality-metric-panel" data-chart-panel="base"><section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full" data-quality-title-field><label>标题</label><input data-quality-config="name" value="设备检测负载分布"></div><div class="quality-config-field full"><label>图表类型</label><select data-quality-config="type"><option value="bar">柱状图</option><option value="horizontalBar">条形图</option><option value="line">折线图</option><option value="area">面积图</option><option value="pie">饼图</option><option value="donut">环形图</option><option value="combo">组合图</option><option value="radar">雷达图</option><option value="scatter">散点图</option><option value="funnel">漏斗图</option><option value="wordCloud">词云</option><option value="heatmap">热力图</option><option value="table">表格</option><option value="kanban">看板</option><option value="calendar">日历</option><option value="gantt">甘特图</option><option value="gallery">画册</option><option value="pivot">透视表</option><option value="text">文本</option><option value="button">按钮</option><option value="ranking">排行榜</option><option value="progress">进度图</option><option value="countdown">倒计时</option><option value="slicer">切片器</option><option value="layout">组合布局</option></select></div></div></section>
-      <section class="quality-config-section"><h4 data-quality-dimension-heading>横轴（类别）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="dimension"><option>设备</option><option>第二级位置</option><option>模板ID</option><option>检测日期</option><option>班次</option><option>判定结果</option></select></div><div class="quality-exclusive-checks"><label class="quality-config-check"><input type="checkbox" data-quality-multi-split>多选项拆分统计</label><label class="quality-config-check"><input type="checkbox" data-quality-summary-category checked>汇总相同的类别</label></div><div class="quality-chart-option-box" data-quality-axis-sort><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control quality-segment-three"><button type="button" class="is-active">横轴值</button><button type="button">纵轴值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
-      <section class="quality-config-section"><h4 data-quality-measure-heading>纵轴（字段）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="measure"><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option><option>平均检测耗时</option><option>误报率</option></select></div><label class="quality-config-check full" data-quality-group-toggle><input type="checkbox" data-quality-group checked>分组聚合</label><div class="quality-chart-option-box" data-quality-group-fields><div class="quality-config-field full"><label>分组依据</label><select><option>检测模板ID</option><option>判定结果</option><option>班次</option><option>第二级位置</option></select></div><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control"><button type="button" class="is-active">字段值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
-      <section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full" data-quality-chart-style><label>柱状图样式</label><select><option>普通柱状图</option><option>堆积柱状图</option><option>百分比堆积柱状图</option></select></div><div class="quality-config-field full"><label>主题色</label><div class="quality-source-trigger"><span class="quality-theme-preview"><i></i><i></i><i></i><i></i><i></i></span><span>默认</span></div></div><label class="quality-config-check full"><input type="checkbox">渐变填充</label><div class="quality-config-field full"><label>图表选项</label><div class="quality-chart-check-grid"><label class="quality-config-check"><input type="checkbox" data-quality-config="legend" checked>图例</label><label class="quality-config-check"><input type="checkbox" data-quality-config="label" checked>数据标签</label><label class="quality-config-check"><input type="checkbox" checked>坐标轴</label><label class="quality-config-check"><input type="checkbox" checked>网格线</label></div></div><div class="quality-chart-switch-row"><span>切换行/列</span><label class="quality-switch"><input type="checkbox"><span></span></label></div><div class="quality-config-field full"><label>空单元格显示为</label><select><option>空</option><option>零</option></select></div></div></section></div>
+      <div class="quality-metric-panel" data-chart-panel="base"><section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full" data-quality-title-field><label>标题</label><input data-quality-config="name" value="设备检测负载分布"></div><div class="quality-config-field full"><label>图表类型</label><select data-quality-config="type" hidden><option value="bar">基础柱状图</option><option value="barStacked">堆积柱状图</option><option value="barPercent">百分比堆积柱状图</option><option value="line">基础折线图</option><option value="lineSmooth">平滑折线图</option><option value="pie">饼状图</option><option value="donut">环状图</option><option value="horizontalBar">基础条形图</option><option value="horizontalBarStacked">堆积条形图</option><option value="horizontalBarPercent">百分比堆积条形图</option><option value="area">基础面积图</option><option value="areaStacked">堆积面积图</option><option value="areaPercent">百分比堆积面积图</option><option value="scatter">基础散点图</option><option value="radar">基础雷达图</option><option value="radarFilled">填充雷达图</option><option value="heatmap">热力图</option></select><div class="quality-chart-type-picker" data-chart-type-picker></div><div class="quality-config-field full"><label>主题色</label><div class="quality-source-trigger"><span class="quality-theme-preview"><i></i><i></i><i></i><i></i><i></i></span><span>默认</span></div></div><label class="quality-config-check full"><input type="checkbox">渐变填充</label><div class="quality-config-field full"><label>图表选项</label><div class="quality-chart-check-grid"><label class="quality-config-check"><input type="checkbox" data-quality-config="legend" checked>图例</label><label class="quality-config-check"><input type="checkbox" data-quality-config="label" checked>数据标签</label><label class="quality-config-check"><input type="checkbox" checked>坐标轴</label><label class="quality-config-check"><input type="checkbox" checked>网格线</label></div></div><div class="quality-chart-switch-row"><span>切换行/列</span><label class="quality-switch"><input type="checkbox"><span></span></label></div></div></div></section>
+      <section class="quality-config-section"><h4 data-quality-dimension-heading>横轴（类别）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="dimension"><option>检测日期</option><option>设备名称</option><option>设备SN</option><option>设备所在位置</option><option>模板名称</option><option>模板ID</option><option>机器判定结果</option><option>一次复判结果</option><option>最终复判结果</option><option>运行状态</option><option>启用状态</option></select></div><div class="quality-exclusive-checks"><label class="quality-config-check"><input type="checkbox" data-quality-summary-category checked>汇总相同的类别</label></div><div class="quality-chart-option-box" data-quality-axis-sort><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control quality-segment-three"><button type="button" class="is-active">横轴值</button><button type="button" data-quality-vertical-sort hidden>纵轴值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
+      <section class="quality-config-section"><h4 data-quality-measure-heading>纵轴（字段）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="measure"><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option><option>平均检测耗时</option><option>误报率</option></select></div><label class="quality-config-check full" data-quality-group-toggle><input type="checkbox" data-quality-group checked>分组聚合</label><div class="quality-chart-option-box" data-quality-group-fields><div class="quality-config-field full"><label>分组依据</label><select><option>模板ID</option><option>机器判定结果</option><option>设备所在位置</option></select></div><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control"><button type="button" class="is-active">字段值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
+      <section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full"><label>空单元格显示为</label><select><option>空</option><option>零</option></select></div></div></section></div>
       <div class="quality-metric-panel" data-chart-panel="custom" hidden>${qualityChartCustomMarkup()}</div>
     </div><footer class="quality-config-drawer-foot"><button type="button" class="primary" data-quality-chart-save>保存</button></footer></aside>`;
   }
@@ -1439,20 +1499,44 @@
 
   function qualityChartCustomMarkup() {
     return `<div class="quality-chart-accordions">
-      <details class="quality-chart-accordion"><summary>背景与标题</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>背景颜色</label><select><option>默认</option><option>白色</option><option>透明</option></select></div><div class="quality-config-field"><label>标题样式</label><select><option>默认</option><option>突出</option><option>隐藏</option></select></div></div></details>
-      <details class="quality-chart-accordion"><summary>尺寸</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>宽度</label><div class="quality-segment-control"><button type="button" class="is-active">默认宽度</button><button type="button">填充容器</button></div></div><div class="quality-config-field"><label>高度</label><div class="quality-segment-control"><button type="button" class="is-active">默认高度</button><button type="button">填充容器</button></div></div></div></details>
-      <details class="quality-chart-accordion"><summary>组件字体样式</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>字体颜色</label><select><option>默认</option><option>深色</option><option>浅色</option></select></div><div class="quality-config-field"><label>字号</label><select><option>10</option><option selected>12</option><option>14</option><option>16</option></select></div></div></details>
+      <details class="quality-chart-accordion"><summary>背景颜色</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>背景颜色</label><select><option>默认</option><option>白色</option><option>透明</option></select></div></div></details>
+
+      <details class="quality-chart-accordion"><summary>组件字体样式</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>字体颜色</label><select><option>默认</option><option>深色</option><option>浅色</option></select></div><div class="quality-config-field"><label>字号</label><select>${Array.from({length:27},(_,i)=>`<option${i===2?' selected':''}>${i+10}</option>`).join('')}</select></div></div></details>
       <details class="quality-chart-accordion"><summary>轴标题</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>选择轴</label><select><option>横轴</option><option>纵轴</option></select></div><div class="quality-config-field"><label>标题内容</label><input placeholder="请输入标题"></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div></details>
-      <details class="quality-chart-accordion"><summary>系列</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>选择系列</label><select data-quality-series-select><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option></select></div><label class="quality-config-check"><input type="checkbox" data-quality-custom-series-name>自定义显示名称</label><div class="quality-config-field" data-quality-series-name hidden><input value="检测PCB数" placeholder="请输入显示名称"></div><div class="quality-chart-subtitle"><span>系列样式</span></div><div class="quality-chart-option-box"><div class="quality-config-grid"><div class="quality-config-field"><label>填充色</label><select><option>默认</option></select></div><div class="quality-config-field"><label>填充色不透明度</label><select><option>100%</option><option>80%</option><option>60%</option></select></div><div class="quality-config-field"><label>边框色</label><select><option>默认</option></select></div><div class="quality-config-field"><label>边框不透明度</label><select><option>100%</option><option>80%</option></select></div><div class="quality-config-field"><label>边框线</label><select><option>实线</option><option>虚线</option></select></div><div class="quality-config-field"><label>边框粗细</label><select><option>默认</option><option>1</option><option>2</option></select></div><div class="quality-config-field full"><label>绘制轴</label><select><option>左轴</option><option>右轴</option></select></div></div></div><div class="quality-chart-subtitle"><span>数据点格式</span><button type="button">＋ 添加数据点</button></div><label class="quality-config-check"><input type="checkbox" data-quality-data-label checked>显示数据标签</label><div class="quality-chart-option-box" data-quality-data-label-fields><div class="quality-config-field"><label>标签位置</label><select><option>默认</option><option>顶部</option><option>内部</option></select></div><div class="quality-config-field"><label>标签内容</label><select><option>值</option><option>系列名</option><option>占比</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div></div></details>
-      <details class="quality-chart-accordion"><summary>图例</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>图例位置</label><select><option>顶部</option><option>底部</option><option>左侧</option><option>右侧</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div></details>
-      <details class="quality-chart-accordion"><summary>横轴</summary><div class="quality-chart-accordion-body"><label class="quality-config-check"><input type="checkbox" checked>显示标签</label><div class="quality-chart-option-box"><div class="quality-config-field"><label>标签角度</label><select><option>默认</option><option>横排</option><option>45°</option><option>竖排</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div><label class="quality-config-check"><input type="checkbox">显示轴线</label></div></details>
-      <details class="quality-chart-accordion"><summary>纵轴</summary><div class="quality-chart-accordion-body"><label class="quality-config-check"><input type="checkbox" checked>显示标签</label><div class="quality-chart-option-box"><div class="quality-config-field"><label>标签角度</label><select><option>横排</option><option>默认</option><option>45°</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div><label class="quality-config-check"><input type="checkbox">显示轴线</label><div class="quality-config-field"><label>轴范围</label><div class="quality-config-grid"><input placeholder="最小值：默认"><input placeholder="最大值：默认"></div></div></div></details>
-      <details class="quality-chart-accordion"><summary>网格线与刻度标记</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>设置对象</label><select><option>横轴</option><option>纵轴</option></select></div><label class="quality-config-check"><input type="checkbox">主网格</label></div></details>
+      <details class="quality-chart-accordion"><summary>系列</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>选择系列</label><select data-quality-series-select><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option></select></div><label class="quality-config-check"><input type="checkbox" data-quality-custom-series-name>自定义显示名称</label><div class="quality-config-field" data-quality-series-name hidden><input value="检测PCB数" placeholder="请输入显示名称"></div><div class="quality-chart-subtitle"><span>系列样式</span></div><div class="quality-chart-option-box"><div class="quality-config-grid"><div class="quality-config-field"><label>填充色</label><select><option>默认</option></select></div><div class="quality-config-field"><label>填充色不透明度</label><select><option>100%</option><option>80%</option><option>60%</option></select></div><div class="quality-config-field"><label>边框色</label><select><option>默认</option></select></div><div class="quality-config-field"><label>边框不透明度</label><select><option>100%</option><option>80%</option></select></div><div class="quality-config-field"><label>边框线</label><select><option>实线</option><option>虚线</option></select></div><div class="quality-config-field"><label>边框粗细</label><select><option>默认</option><option>1</option><option>2</option></select></div><div class="quality-config-field full"><label>绘制轴</label><select><option>左轴</option><option>右轴</option></select></div></div></div><label class="quality-config-check"><input type="checkbox" data-quality-data-label checked>显示数据标签</label><div class="quality-chart-option-box" data-quality-data-label-fields><div class="quality-config-field"><label>标签位置</label><select><option>默认</option><option>顶部</option><option>内部</option></select></div><div class="quality-config-field"><label>标签内容</label><select><option>值</option><option>系列名</option><option>占比</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div></div></details>
+      <details class="quality-chart-accordion"><summary>图例</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>图例位置</label><select><option>顶部</option><option>左侧</option><option>右侧</option><option>底部</option><option>隐藏</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div></details>
+      <details class="quality-chart-accordion"><summary>横轴</summary><div class="quality-chart-accordion-body"><label class="quality-config-check"><input type="checkbox" checked>显示标签</label><div class="quality-chart-option-box"><div class="quality-config-field"><label>标签角度</label><select><option>默认</option><option>垂直向上</option><option>左起斜上</option><option>横排</option><option>左起斜下</option><option>垂直向下</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div><label class="quality-config-check"><input type="checkbox">显示轴线</label></div></details>
+      <details class="quality-chart-accordion"><summary>纵轴</summary><div class="quality-chart-accordion-body"><label class="quality-config-check"><input type="checkbox" checked>显示标签</label><div class="quality-chart-option-box"><div class="quality-config-field"><label>标签角度</label><select><option>默认</option><option>垂直向上</option><option>左起斜上</option><option>横排</option><option>左起斜下</option><option>垂直向下</option></select></div><div class="quality-config-field"><label>文本格式</label>${qualityTextFormatMarkup()}</div></div><label class="quality-config-check"><input type="checkbox">显示轴线</label><div class="quality-config-field"><label>轴范围</label><div class="quality-config-grid"><input type="number" placeholder="最小值：默认"><input type="number" placeholder="最大值：默认"></div></div></div></details>
+      <details class="quality-chart-accordion"><summary>网格线与刻度标记</summary><div class="quality-chart-accordion-body"><div class="quality-config-field"><label>设置对象</label><select><option>横轴</option><option>纵轴</option></select></div><label class="quality-config-check"><input type="checkbox" data-quality-main-grid>主网格</label><div class="quality-chart-option-box" data-quality-grid-fields hidden><div class="quality-config-field"><label>网格颜色</label><select><option>默认</option></select></div><div class="quality-config-field"><label>网格粗细</label><select><option>0.5px</option><option selected>1px</option><option>2px</option><option>3px</option></select></div></div></div></details>
     </div>`;
   }
 
   function isHorizontalBarKind(kind) {
     return ['horizontalBar', 'horizontalBarStacked', 'horizontalBarPercent'].includes(kind);
+  }
+
+  const qualityChartTypes = [
+    ['柱状图',[['bar','基础柱状图'],['barStacked','堆积柱状图'],['barPercent','百分比堆积柱状图']]],
+    ['折线图',[['line','基础折线图'],['lineSmooth','平滑折线图']]],
+    ['饼图',[['pie','饼状图'],['donut','环状图']]],
+    ['条形图',[['horizontalBar','基础条形图'],['horizontalBarStacked','堆积条形图'],['horizontalBarPercent','百分比堆积条形图']]],
+    ['面积图',[['area','基础面积图'],['areaStacked','堆积面积图'],['areaPercent','百分比堆积面积图']]],
+    ['散点图',[['scatter','基础散点图']]],
+    ['雷达图',[['radar','基础雷达图'],['radarFilled','填充雷达图']]],
+    ['热力图',[['heatmap','基础热力图']]]
+  ];
+  function renderQualityChartTypePicker(drawer,kind) {
+    if (window.spcQualityConfigTemplate?.renderTypePicker) { window.spcQualityConfigTemplate.renderTypePicker(drawer, kind); return; }
+    const picker=drawer.querySelector('[data-chart-type-picker]');
+    if (!picker) return;
+    const selectedGroup=qualityChartTypes.find(([,variants])=>variants.some(([value])=>value===kind));
+    const group=selectedGroup || qualityChartTypes[0];
+    const icon=(value)=>{const family=value.replace(/Stacked|Percent|Smooth|Filled/g,'');if(family==='pie'||family==='donut')return `<svg viewBox="0 0 56 48"><circle cx="28" cy="24" r="17" fill="#e8efff" stroke="#cbd6eb"/><path d="M28 24V7A17 17 0 0 1 45 24Z" fill="#4d80fa"/>${family==='donut'?'<circle cx="28" cy="24" r="9" fill="white"/>':''}</svg>`;if(family==='line'||family==='area')return `<svg viewBox="0 0 56 48"><path d="M5 35 17 26 27 31 37 12 51 20" fill="none" stroke="#4d80fa" stroke-width="3"/>${family==='area'?'<path d="M5 35 17 26 27 31 37 12 51 20V40H5Z" fill="#c6d8ff" opacity=".7"/>':''}</svg>`;if(family==='radar')return `<svg viewBox="0 0 56 48"><path d="M28 4 51 19 42 43H14L5 19Z" fill="none" stroke="#d5dff1"/><path d="M28 10 44 21 38 36 16 37 11 20Z" fill="${value==='radarFilled'?'#b9ceff':'none'}" stroke="#4d80fa" stroke-width="2"/></svg>`;if(family==='scatter')return `<svg viewBox="0 0 56 48"><g fill="#4d80fa"><circle cx="9" cy="35" r="3"/><circle cx="19" cy="23" r="3"/><circle cx="31" cy="29" r="3"/><circle cx="39" cy="13" r="3"/><circle cx="48" cy="21" r="3"/></g></svg>`;if(family==='horizontalBar')return `<svg viewBox="0 0 56 48"><path d="M7 8h29v7H7zm0 13h43v7H7zm0 13h35v7H7z" fill="#4d80fa"/></svg>`;return `<svg viewBox="0 0 56 48"><path d="M8 17h9v26H8zm15-10h9v36h-9zm15 15h9v21h-9z" fill="#4d80fa"/></svg>`};
+    const label=selectedGroup?.[1].find(([value])=>value===kind)?.[1]||'选择图表类型';
+    picker.innerHTML=`<button type="button" class="quality-chart-type-trigger" aria-expanded="false">${label}<span>⌄</span></button><div class="quality-chart-type-menu" hidden>${qualityChartTypes.map(([name,variants])=>`<div class="quality-chart-type-group"><div class="quality-chart-type-group-title">${name}</div><div class="quality-chart-type-tiles">${variants.map(([value,title])=>`<button type="button" class="quality-chart-type-tile${value===kind?' is-active':''}" data-chart-type-variant="${value}" title="${title}" aria-label="${title}">${icon(value)}<span>${title}</span></button>`).join('')}</div></div>`).join('')}</div>`;
+    const trigger=picker.querySelector('.quality-chart-type-trigger'),menu=picker.querySelector('.quality-chart-type-menu');
+    trigger.onclick=()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))};
+    picker.querySelectorAll('[data-chart-type-variant]').forEach(button=>button.onclick=()=>{const select=drawer.querySelector('[data-quality-config="type"]');select.value=button.dataset.chartTypeVariant;select.dispatchEvent(new Event('change',{bubbles:true}));});
   }
 
   const heatmapDimensions = ['时间','设备名称','所在位置（一级）','所在位置（二级）','模板名称','缺陷类型','判定结果'];
@@ -1464,7 +1548,7 @@
       section = document.createElement('section');
       section.className = 'quality-config-section';
       section.dataset.heatmapFields = '';
-      section.innerHTML = `<div class="quality-config-grid"><div class="quality-config-field full"><label for="heatmap-x">横轴维度</label><select id="heatmap-x" data-heatmap="x">${options}</select></div><div class="quality-config-field full"><label for="heatmap-y">纵轴维度</label><select id="heatmap-y" data-heatmap="y">${options}</select></div><div class="quality-config-field full" data-heatmap-time><label for="heatmap-grain">时间粒度</label><select id="heatmap-grain" data-heatmap="grain"><option>小时</option><option>日期</option><option>周</option><option>月</option></select></div><div class="quality-config-field full"><label for="heatmap-color">颜色指标</label><select id="heatmap-color" data-heatmap="color"></select></div><div class="quality-config-field full"><label>空单元格显示为</label><select disabled><option>无数据（与 0 区分）</option></select></div></div>`;
+      section.innerHTML = `<div class="quality-config-grid"><div class="quality-config-field full"><label for="heatmap-x">横轴维度</label><select id="heatmap-x" data-heatmap="x">${options}</select></div><div class="quality-config-field full"><label for="heatmap-y">纵轴维度</label><select id="heatmap-y" data-heatmap="y">${options}</select></div><div class="quality-config-field full" data-heatmap-time><label for="heatmap-grain">时间粒度</label><select id="heatmap-grain" data-heatmap="grain"><option>天</option><option>周</option><option>月</option></select></div><div class="quality-config-field full"><label for="heatmap-color">颜色指标</label><select id="heatmap-color" data-heatmap="color"></select></div><div class="quality-config-field full"><label>空单元格显示为</label><select disabled><option>无数据（与 0 区分）</option></select></div></div>`;
       drawer.querySelector('[data-quality-dimension-heading]').closest('section').before(section);
       section.querySelectorAll('[data-heatmap]').forEach(select => select.onchange = () => {
         const target = qualityEditorSelectedChart;
@@ -1488,7 +1572,8 @@
     if (!heatmap || !chart) return;
     if (chart.hasAttribute('data-device-trend') && !chart._heatmapDefaultBody) chart._heatmapDefaultBody = chart.querySelector('.quality-chart-body')?.innerHTML || '';
     const data = chart.dataset;
-    data.heatmapX ||= '时间'; data.heatmapY ||= '设备名称'; data.heatmapGrain ||= '日期'; data.heatmapColor ||= '检测PCB数';
+    data.heatmapX ||= '时间'; data.heatmapY ||= '设备名称'; data.heatmapGrain ||= '天'; data.heatmapColor ||= '检测PCB数';
+    if (data.heatmapGrain === '日期' || data.heatmapGrain === '小时') data.heatmapGrain = '天';
     if (data.heatmapX === data.heatmapY) data.heatmapY = heatmapDimensions.find(value => value !== data.heatmapX);
     for (const axis of ['x','y']) {
       const select = section.querySelector(`[data-heatmap="${axis}"]`);
@@ -1496,7 +1581,7 @@
       [...select.options].forEach(option => option.disabled = option.value === data[axis === 'x' ? 'heatmapY' : 'heatmapX']);
     }
     const time = section.querySelector('[data-heatmap-time]');
-    time.hidden = ![data.heatmapX,data.heatmapY].includes('时间');time.style.display = time.hidden ? 'none' : '';
+    time.hidden = data.heatmapX !== '时间';time.style.display = time.hidden ? 'none' : '';
     section.querySelector('[data-heatmap="grain"]').value = data.heatmapGrain;
     const dimensions = [data.heatmapX,data.heatmapY];
     const measures = dimensions.includes('缺陷类型') ? ['缺陷数量','缺陷发生率'] : dimensions.includes('判定结果') ? ['PCB数量','结果占比'] : ['检测PCB数','PCB良率','PCB不良率','误报率','器件DPPM','平均检测耗时'];
@@ -1509,38 +1594,34 @@
     if (!drawer) return;
     const typeSelect = drawer.querySelector('[data-quality-config="type"]');
     if (!typeSelect) return;
-    drawer._fullChartTypeOptions ||= typeSelect.innerHTML;
     const horizontal = isHorizontalBarKind(kind);
-    typeSelect.innerHTML = horizontal
-      ? '<option value="horizontalBar">基础条形图</option><option value="horizontalBarStacked">堆积条形图</option><option value="horizontalBarPercent">百分比堆积条形图</option>'
-      : drawer._fullChartTypeOptions;
     typeSelect.value = kind;
+    renderQualityChartTypePicker(drawer,kind);
     configureHeatmapFields(drawer, kind, chart);
     const dimensionHeading = drawer.querySelector('[data-quality-dimension-heading]');
     const measureHeading = drawer.querySelector('[data-quality-measure-heading]');
-    if (dimensionHeading) dimensionHeading.textContent = horizontal ? '纵轴（类别）' : '横轴（类别）';
-    if (measureHeading) measureHeading.textContent = horizontal ? '横轴（字段）' : '纵轴（字段）';
-    const axisSortButtons = drawer.querySelectorAll('[data-quality-axis-sort] .quality-segment-three button');
-    if (axisSortButtons[0]) axisSortButtons[0].textContent = horizontal ? '纵轴值' : '横轴值';
-    if (axisSortButtons[1]) axisSortButtons[1].textContent = horizontal ? '横轴值' : '纵轴值';
-    const styleField = drawer.querySelector('[data-quality-chart-style]');
-    if (styleField) { styleField.hidden = horizontal || kind === 'heatmap'; styleField.style.display = styleField.hidden ? 'none' : ''; }
+    const pie = kind === 'pie' || kind === 'donut';
+    if (dimensionHeading) dimensionHeading.textContent = pie ? '扇区分组（类别）' : horizontal ? '纵轴（类别）' : '横轴（类别）';
+    if (measureHeading) measureHeading.textContent = pie ? '扇区数值' : horizontal ? '横轴（字段）' : '纵轴（字段）';
+    const switchRow = drawer.querySelector('.quality-chart-switch-row');
+    if (switchRow) { switchRow.hidden = pie; switchRow.style.display = pie ? 'none' : ''; }
+    const groupToggle = drawer.querySelector('[data-quality-group-toggle]');
+    const groupFields = drawer.querySelector('[data-quality-group-fields]');
+    const summarized = drawer.querySelector('[data-quality-summary-category]')?.checked;
+    if (groupToggle) { groupToggle.hidden = pie || !summarized; groupToggle.style.display = pie ? 'none' : ''; }
+    if (groupFields) { groupFields.hidden = pie || !summarized || !drawer.querySelector('[data-quality-group]')?.checked; groupFields.style.display = pie ? 'none' : ''; }
+    const checkGrid = drawer.querySelector('.quality-chart-check-grid');
+    if (checkGrid) {
+      [...checkGrid.querySelectorAll('label')].forEach(label => { if (/坐标轴|网格线/.test(label.textContent)) { label.hidden = pie; label.style.display = pie ? 'none' : ''; } });
+      let total = checkGrid.querySelector('[data-quality-total]');
+      if (!total) { checkGrid.insertAdjacentHTML('beforeend','<label class="quality-config-check" data-quality-total><input type="checkbox" data-quality-show-total checked>总数</label>'); total = checkGrid.querySelector('[data-quality-total]'); }
+      total.hidden = kind !== 'donut';total.style.display = total.hidden ? 'none' : '';
+      total.querySelector('input').checked = chart?.dataset.showTotal !== 'false';
+      total.querySelector('input').onchange = event => { if (chart) chart.dataset.showTotal = String(event.target.checked); };
+    }
+    window.spcRenderChartMeasureControls?.(drawer, chart);
     const emptyField = [...drawer.querySelectorAll('[data-chart-panel="base"] .quality-config-field')].find(field => !field.closest('[data-heatmap-fields]') && field.querySelector('label')?.textContent === '空单元格显示为');
     if (emptyField) { emptyField.hidden = kind === 'heatmap'; emptyField.style.display = emptyField.hidden ? 'none' : ''; }
-    const titleField = drawer.querySelector('[data-quality-title-field]');
-    let titleToggle = drawer.querySelector('[data-quality-show-title]');
-    if (horizontal && titleField && !titleToggle) {
-      titleField.insertAdjacentHTML('beforeend', '<label class="quality-config-check quality-title-toggle"><input type="checkbox" data-quality-show-title checked>显示标题</label>');
-      titleToggle = drawer.querySelector('[data-quality-show-title]');
-    }
-    if (!horizontal && titleToggle) {
-      titleToggle.closest('.quality-title-toggle')?.remove();
-      titleToggle = null;
-    }
-    if (titleToggle) {
-      titleToggle.checked = chart?.dataset.showTitle !== 'false';
-      titleToggle.onchange = previewQualityEditorChart;
-    }
     const drawerTitle = drawer.querySelector('.quality-config-drawer-head h3');
     if (drawerTitle && horizontal) drawerTitle.textContent = '条形图';
   }
@@ -1565,16 +1646,19 @@
     }
     const chartKind = chart.dataset.chartKind || 'bar';
     configureQualityChartDrawer(drawer, chartKind, chart);
-    const typeLabels = { bar: '柱状图', horizontalBar: '条形图', horizontalBarStacked: '条形图', horizontalBarPercent: '条形图', line: '折线图', area: '面积图', pie: '饼图', donut: '环形图', combo: '组合图', radar: '雷达图', scatter: '散点图', funnel: '漏斗图', wordCloud: '词云', heatmap: '热力图', table: '表格', kanban: '看板', calendar: '日历', gantt: '甘特图', gallery: '画册', pivot: '透视表', text: '文本', button: '按钮', ranking: '排行榜', progress: '进度图', countdown: '倒计时', slicer: '切片器', layout: '组合布局' };
+    const typeLabels = { bar: '基础柱状图', barStacked: '堆积柱状图', barPercent: '百分比堆积柱状图', lineSmooth: '平滑折线图', areaStacked: '堆积面积图', areaPercent: '百分比堆积面积图', radarFilled: '填充雷达图', horizontalBar: '条形图', horizontalBarStacked: '条形图', horizontalBarPercent: '条形图', line: '折线图', area: '面积图', pie: '饼图', donut: '环形图', combo: '组合图', radar: '雷达图', scatter: '散点图', funnel: '漏斗图', wordCloud: '词云', heatmap: '热力图', table: '表格', kanban: '看板', calendar: '日历', gantt: '甘特图', gallery: '画册', pivot: '透视表', text: '文本', button: '按钮', ranking: '排行榜', progress: '进度图', countdown: '倒计时', slicer: '切片器', layout: '组合布局' };
     drawer.querySelector('.quality-config-drawer-head h3').textContent = typeLabels[chartKind] || '柱状图';
     drawer.querySelector('[data-quality-config="name"]').value = getText(chart.querySelector('.phead-title b')) || '未命名图表';
     drawer.querySelector('[data-quality-config="type"]').value = chartKind;
-    chart.dataset.dimension ||= chart.hasAttribute('data-comparison-panel') ? '设备' : '检测日期';
+    chart.dataset.dimension ||= chart.hasAttribute('data-comparison-panel') ? '设备名称' : '检测日期';
+    if (chart.dataset.dimension === '设备') chart.dataset.dimension = '设备名称';
+    if (chart.dataset.dimension === '第二级位置') chart.dataset.dimension = '设备所在位置';
     chart.dataset.measure ||= chart.hasAttribute('data-comparison-panel') ? 'PCB良率' : '检测PCB数';
     chart.dataset.originalDimension ||= chart.dataset.dimension;
     chart.dataset.originalMeasure ||= chart.dataset.measure;
     drawer.querySelector('[data-quality-config="dimension"]').value = chart.dataset.dimension;
     drawer.querySelector('[data-quality-config="measure"]').value = chart.dataset.measure;
+    window.spcRenderChartMeasureControls?.(drawer, chart);
   }
 
   function previewQualityEditorChart() {
@@ -1598,16 +1682,17 @@
     chart.dataset.showTitle = String(showTitle);
     const drawerTitle = drawer.querySelector('.quality-config-drawer-head h3');
     const typeTitles = { bar: '柱状图', horizontalBar: '条形图', horizontalBarStacked: '条形图', horizontalBarPercent: '条形图', line: '折线图', area: '面积图', pie: '饼图', donut: '环形图', combo: '组合图', radar: '雷达图', scatter: '散点图', funnel: '漏斗图', wordCloud: '词云', heatmap: '热力图', table: '表格', kanban: '看板', calendar: '日历', gantt: '甘特图', gallery: '画册', pivot: '透视表', text: '文本', button: '按钮', ranking: '排行榜', progress: '进度图', countdown: '倒计时', slicer: '切片器', layout: '组合布局' };
-    if (drawerTitle) drawerTitle.textContent = typeTitles[type] || '柱状图';
+    if (drawerTitle) drawerTitle.textContent = qualityChartTypes.find(([,variants]) => variants.some(([value]) => value === type))?.[0] || typeTitles[type] || '柱状图';
+    if (window.spcRenderQualityChartPreview?.(chart, drawer)) return;
     if (type === 'heatmap') {
       const data = chart.dataset;
-      if (data.heatmapX !== '时间' || data.heatmapY !== '设备名称' || data.heatmapGrain !== '日期' || data.heatmapColor !== '检测PCB数' || chart.dataset.editorCreated === 'true') {
+      if (data.heatmapX !== '时间' || data.heatmapY !== '设备名称' || data.heatmapGrain !== '天' || data.heatmapColor !== '检测PCB数' || chart.dataset.editorCreated === 'true') {
         chart.querySelector('.quality-chart-body').innerHTML = `<div class="quality-custom-placeholder"><div><b>热力图</b>${data.heatmapX}${data.heatmapX === '时间' ? '（'+data.heatmapGrain+'）' : ''} × ${data.heatmapY}${data.heatmapY === '时间' ? '（'+data.heatmapGrain+'）' : ''}<small>颜色指标：${data.heatmapColor}</small><small>暂无该维度组合的统计数据</small></div></div>`;
       } else if (chart._heatmapDefaultBody) chart.querySelector('.quality-chart-body').innerHTML = chart._heatmapDefaultBody;
       return;
     }
     if (chart.dataset.editorCreated === 'true' || type !== chart.dataset.originalKind || dimension !== chart.dataset.originalDimension || measure !== chart.dataset.originalMeasure) {
-      const labels = { bar: '柱状图', line: '折线图', horizontalBar: '基础条形图', horizontalBarStacked: '堆积条形图', horizontalBarPercent: '百分比堆积条形图', area: '面积图', pie: '饼图', donut: '环形图', combo: '组合图', radar: '雷达图', scatter: '散点图', funnel: '漏斗图', wordCloud: '词云', heatmap: '热力图', table: '表格', kanban: '看板', calendar: '日历', gantt: '甘特图', gallery: '画册', pivot: '透视表', text: '文本', button: '按钮', ranking: '排行榜', progress: '进度图', countdown: '倒计时', slicer: '切片器', layout: '组合布局' };
+      const labels = { bar: '基础柱状图', barStacked: '堆积柱状图', barPercent: '百分比堆积柱状图', line: '基础折线图', lineSmooth: '平滑折线图', areaStacked: '堆积面积图', areaPercent: '百分比堆积面积图', radarFilled: '填充雷达图', horizontalBar: '基础条形图', horizontalBarStacked: '堆积条形图', horizontalBarPercent: '百分比堆积条形图', area: '面积图', pie: '饼图', donut: '环形图', combo: '组合图', radar: '雷达图', scatter: '散点图', funnel: '漏斗图', wordCloud: '词云', heatmap: '热力图', table: '表格', kanban: '看板', calendar: '日历', gantt: '甘特图', gallery: '画册', pivot: '透视表', text: '文本', button: '按钮', ranking: '排行榜', progress: '进度图', countdown: '倒计时', slicer: '切片器', layout: '组合布局' };
       chart.querySelector('.quality-chart-body').innerHTML = `<div class="quality-custom-placeholder"><div><b>${labels[type]}</b>${dimension} × ${measure}<small>预览已按当前配置同步更新</small></div></div>`;
     }
   }
@@ -1633,6 +1718,16 @@
       const fields = drawer.querySelector('[data-quality-group-fields]');
       if (groupToggleWrap && summaryCategory) groupToggleWrap.hidden = !summaryCategory.checked;
       if (fields && groupToggle && summaryCategory) fields.hidden = !summaryCategory.checked || !groupToggle.checked;
+      const axisSort = drawer.querySelector('[data-quality-axis-sort] .quality-segment-three');
+      const verticalSort = axisSort?.querySelector('[data-quality-vertical-sort]');
+      if (axisSort && verticalSort) {
+        verticalSort.hidden = groupToggle?.checked !== false;
+        axisSort.style.gridTemplateColumns = verticalSort.hidden ? 'repeat(2,minmax(0,1fr))' : 'repeat(3,minmax(0,1fr))';
+        if (verticalSort.hidden && verticalSort.classList.contains('is-active')) {
+          verticalSort.classList.remove('is-active');
+          axisSort.querySelector('button:not([data-quality-vertical-sort])')?.classList.add('is-active');
+        }
+      }
     };
     if (multiSplit) multiSplit.onchange = () => {
       if (multiSplit.checked && summaryCategory) summaryCategory.checked = false;
@@ -1668,6 +1763,7 @@
         qualityEditorSelectedChart.dataset.originalKind = qualityEditorSelectedChart.dataset.chartKind;
         qualityEditorSelectedChart.dataset.originalDimension = qualityEditorSelectedChart.dataset.dimension;
         qualityEditorSelectedChart.dataset.originalMeasure = qualityEditorSelectedChart.dataset.measure;
+        qualityEditorSelectedChart.dataset.originalMeasureSettings = qualityEditorSelectedChart.dataset.measureSettings || '';
         qualityEditorSelectedChart.dataset.originalShowTitle = qualityEditorSelectedChart.dataset.showTitle;
         qualityEditorSelectedChart._qualityOriginalBody = qualityEditorSelectedChart.querySelector('.quality-chart-body')?.innerHTML || '';
         qualityEditorSelectedChart._qualityOriginalTitle = getText(qualityEditorSelectedChart.querySelector('.phead-title b'));
@@ -1681,6 +1777,7 @@
         chart.dataset.chartKind = chart.dataset.originalKind;
         chart.dataset.dimension = chart.dataset.originalDimension;
         chart.dataset.measure = chart.dataset.originalMeasure;
+        chart.dataset.measureSettings = chart.dataset.originalMeasureSettings || '';
         chart.dataset.showTitle = chart.dataset.originalShowTitle || 'true';
         chart.querySelector('.phead-title b').textContent = chart._qualityOriginalTitle;
         chart.querySelector('.phead-title b').hidden = chart.dataset.showTitle === 'false';
@@ -1693,7 +1790,7 @@
 
   function addQualityComponentControls(component) {
     if (!component || component.querySelector(':scope > .quality-component-tools')) return;
-    component.insertAdjacentHTML('beforeend', `<div class="quality-component-tools"><button type="button" class="quality-component-drag" draggable="true" title="拖动调整位置" aria-label="拖动调整位置">⠿</button><button type="button" class="quality-component-more" aria-label="组件操作">⋮</button><div class="quality-component-menu" hidden><button type="button" data-component-config>配置</button><button type="button" data-component-delete>删除</button></div></div><button type="button" class="quality-component-resize" title="拖动调整宽度和高度" aria-label="拖动调整宽度和高度"></button>`);
+    component.insertAdjacentHTML('beforeend', `<div class="quality-component-tools"><button type="button" class="quality-component-drag" draggable="true" title="拖动调整位置" aria-label="拖动调整位置">⠿</button><button type="button" class="quality-component-more" aria-label="组件操作">⋮</button><div class="quality-component-menu" hidden><button type="button" data-component-config>配置</button>${component.matches('[data-custom-chart]') ? '<div class="quality-copy-item"><button type="button" data-component-copy aria-expanded="false">复制　›</button><div class="quality-copy-submenu" hidden><button type="button" data-copy-current>复制到当前页面</button><div class="quality-copy-item"><button type="button" data-copy-other aria-expanded="false">复制到其他页面　›</button><div class="quality-copy-submenu quality-copy-pages" hidden></div></div></div></div>' : ''}<button type="button" data-component-delete>删除</button></div></div><button type="button" class="quality-component-resize" title="拖动调整宽度和高度" aria-label="拖动调整宽度和高度"></button>`);
     const tools = component.querySelector(':scope > .quality-component-tools');
     const more = tools.querySelector('.quality-component-more');
     const menu = tools.querySelector('.quality-component-menu');
@@ -1710,6 +1807,48 @@
       if (component.matches('[data-custom-metric]')) selectQualityEditorMetric(component);
       else selectQualityEditorChart(component);
     };
+    if (component.matches('[data-custom-chart]')) {
+      const pages = [['项目统计','01-项目统计首页.html'],['项目统计-项目详情','01A-项目明细.html'],['设备分析','09-设备质量分析.html'],['缺陷分析','03-缺陷分析.html'],['误报分析','04-误报分析.html'],['不良分析','04A-不良导出.html'],['告警分析','13-品质预警.html'],['设备运行监控','07-数据上传监控.html']];
+      const current = decodeURIComponent(location.pathname.split('/').pop());
+      const first = tools.querySelector('[data-component-copy]');
+      const second = tools.querySelector('[data-copy-other]');
+      const submenu = first.nextElementSibling;
+      const pageMenu = second.nextElementSibling;
+      const toggle = (button, target) => { target.hidden = !target.hidden; button.setAttribute('aria-expanded', String(!target.hidden)); };
+      first.onclick = event => { event.stopPropagation(); toggle(first, submenu); pageMenu.hidden = true; second.setAttribute('aria-expanded','false'); };
+      second.onclick = event => { event.stopPropagation(); toggle(second, pageMenu); };
+      const snapshot = () => ({title: getText(component.querySelector('.phead-title b')), type: component.dataset.chartKind || 'bar', dataset: {...component.dataset}, rows: window.spcQualityChartRows?.(component.dataset.dimension || '检测日期',component.dataset.measure || '检测PCB数') || [], body: component.querySelector('.quality-chart-body')?.innerHTML || ''});
+      tools.querySelector('[data-copy-current]').onclick = event => {
+        event.stopPropagation();
+        const clone = component.cloneNode(true);
+        clone.querySelector('.quality-component-tools')?.remove();
+        clone.querySelector('.quality-component-resize')?.remove();
+        clone.classList.remove('is-editor-selected');
+        clone.dataset.editorCreated = 'true';
+        clone._qualityOriginalBody = clone.querySelector('.quality-chart-body')?.innerHTML || '';
+        clone._qualityOriginalTitle = getText(clone.querySelector('.phead-title b'));
+        component.parentElement.insertBefore(clone, component.nextSibling);
+        clone.addEventListener('click', click => { if (!click.target.closest('button,input,select')) selectQualityEditorChart(clone); });
+        addQualityComponentControls(clone);
+        menu.hidden = true;
+        selectQualityEditorChart(clone);
+        toast('已复制到当前页面');
+      };
+      pages.filter(([,file]) => file !== current).forEach(([name,file]) => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.textContent = name;
+        button.onclick = event => {
+          event.stopPropagation();
+          const key = `spc-chart-copies:${file}`;
+          let items = []; try { items = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+          items.push(snapshot());
+          localStorage.setItem(key, JSON.stringify(items));
+          menu.hidden = true;
+          toast(`已复制到${name}`);
+        };
+        pageMenu.append(button);
+      });
+    }
     tools.querySelector('[data-component-delete]').onclick = event => {
       event.stopPropagation();
       menu.hidden = true;
@@ -1781,9 +1920,7 @@
   }
 
   const qualityComponentGroups = [
-    { title: '图表', items: [['metric', '指标卡', '123'], ['bar', '柱状图', '▥'], ['line', '折线图', '〽'], ['horizontalBar', '条形图', '▰'], ['area', '面积图', '⌁'], ['pie', '饼图', '◔'], ['donut', '环形图', '◎'], ['combo', '组合图', '▥'], ['radar', '雷达图', '◇'], ['scatter', '散点图', '⠿'], ['funnel', '漏斗图', '▽'], ['wordCloud', '词云', '☁']] },
-    { title: '视图', items: [['table', '表格', '▦'], ['kanban', '看板', '▣'], ['calendar', '日历', '▦'], ['gantt', '甘特图', '▤'], ['gallery', '画册', '▧']] },
-    { title: '其他', items: [['pivot', '透视表', '▦'], ['text', '文本', 'T'], ['button', '按钮', '＋'], ['ranking', '排行榜', '↟'], ['progress', '进度图', '▰'], ['countdown', '倒计时', '◷'], ['slicer', '切片器', '▽'], ['layout', '组合布局', '▦']] }
+    { title: '图表', items: [['metric', '指标卡', '123'], ['bar', '柱状图', '▥'], ['line', '折线图', '〽'], ['pie', '饼图', '◔'], ['horizontalBar', '条形图', '▰'], ['area', '面积图', '⌁'], ['scatter', '散点图', '⠿'], ['radar', '雷达图', '◇'], ['heatmap', '热力图', '▦']] }
   ];
 
   function createQualityEditorComponent(type, label) {
@@ -1868,7 +2005,7 @@
     if (!content || !grid) return;
     document.body.classList.add('quality-page-editor-open');
     content.insertAdjacentHTML('afterbegin', `<section class="quality-editor-bar" data-quality-editor-bar><div><b>编辑设备分析页面</b><span>　点击组件右上角菜单进行配置，拖动手柄可调整位置</span></div><div class="quality-editor-bar-actions"><button type="button" data-quality-add-chart>添加组件</button><button type="button" data-quality-reset-page>恢复默认</button><button type="button" data-quality-preview-page>页面预览</button><button type="button" class="primary" data-quality-publish>完成编辑</button></div></section>`);
-    document.body.insertAdjacentHTML('beforeend', qualityEditorDrawerMarkup());
+    document.body.insertAdjacentHTML('beforeend', window.spcQualityConfigTemplate?.drawerMarkup() || qualityEditorDrawerMarkup());
     const drawer = document.querySelector('[data-quality-config-drawer]');
     drawer.dataset.mode = 'chart';
     drawer._chartBodyHtml = drawer.querySelector('.quality-config-drawer-body').innerHTML;
@@ -1887,6 +2024,7 @@
     });
     document.querySelectorAll('[data-quality-editor-exit]').forEach(button => button.onclick = closeQualityPageEditor);
     content.querySelector('[data-quality-reset-page]').onclick = () => {
+      qualityMetricOverrides.clear();
       closeQualityPageEditor();
       renderDeviceQuality();
       openQualityPageEditor();
@@ -2034,6 +2172,15 @@
         ${metricBlock(`${label}器件 DPPM`, sourceMouth === 'original' ? '2,368' : sourceMouth === 'second' ? '884' : '1,042', '', 'componentDppm')}
       </section>
       ${deviceQualityCharts()}${deviceQualityFilters()}<section class="panel table-panel"><div class="panel-head"><div><span class="panel-title">设备明细</span></div><div class="table-tools"><button class="link-btn">显示列</button><button class="btn device-export" disabled>导出所选</button></div></div><div class="table-wrap"><div class="table-scroll"><table class="data-table" data-device-table>${tableMarkup(deviceColumns, rows, 'data-device-table')}</table></div><div class="pager"><span>共${rows.length}条</span>${paginationMarkup(rows.length)}</div></div></section>`;
+    content.querySelectorAll('[data-custom-metric]').forEach(metric => {
+      const override = qualityMetricOverrides.get(metric.dataset.customMetric);
+      if (!override) return;
+      metric.dataset.metricIndicator = override.indicator;
+      metric.querySelector('.metric-label').textContent = override.description;
+      metric.dataset.metricScope = override.scope || '{}';
+      metric.querySelector('.metric-value').innerHTML = deviceIndicatorValue(override.indicator,currentMouth,JSON.parse(metric.dataset.metricScope));
+
+    });
     applyDeviceColumns(activeDeviceColumns);
     initializeDeviceSelection(content);
     initializeDeviceTableSorting(content);

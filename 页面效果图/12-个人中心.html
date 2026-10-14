@@ -101,7 +101,7 @@
     <section class="pc-modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><div class="pc-modal-head"><h2 id="confirm-title" data-confirm-title>确认操作</h2><button class="pc-modal-close" type="button" data-confirm-cancel aria-label="关闭">×</button></div><div class="pc-modal-body"><p class="confirm-copy" data-confirm-message></p></div><div class="pc-modal-actions"><button class="btn" type="button" data-confirm-cancel>取消</button><button class="btn danger" type="button" data-confirm-submit>确认删除</button></div></section>
   </div>
   <div class="page-toast" data-page-toast role="status" aria-live="polite"></div>
-  <script src="spc-prototype-github.js"></script>
+  <link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><script src="spc-prototype-github.js"></script>
   <script>
     (() => {
       const storageKey = 'aoi-spc:basic-settings:admin';
@@ -291,5 +291,5 @@
       document.addEventListener('keydown', event => { if (event.key !== 'Escape') return; if (!passwordModal.hidden) closePasswordModal(); if (!confirmModal.hidden) closeConfirm(); });
     })();
   </script>
-<script src="sidebar-collapse.js"></script></body>
+<script src="sidebar-collapse.js"></script><link rel="stylesheet" href="metric-scope.css"><script src="metric-scope.js"></script></body>
 </html>

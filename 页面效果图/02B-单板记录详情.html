@@ -35,4 +35,4 @@ for(const [label,value] of values){if(!value)continue;const item=[...document.qu
 document.querySelector('.top .title h1').textContent='整板视图';document.querySelector('.detail-breadcrumb span:last-of-type').textContent='整板视图';
 const bad=params.get('source')==='bad';const destination=bad?'04A-不良导出.html':'04-误报分析.html';const parent=document.querySelector('.detail-breadcrumb a:not(.detail-back)');parent.textContent=bad?'不良分析':'误报分析';parent.href=destination;document.querySelector('.detail-back').href=destination;
 })();
-</script><script src="sidebar-collapse.js"></script><script src="board-detail-navigation.js"></script></body></html>
+</script><script src="sidebar-collapse.js"></script><script src="board-detail-navigation.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script></body></html>

@@ -1,0 +1,11 @@
+.chart-scope-combo{position:relative;min-width:0}
+.chart-scope-combo-trigger{box-sizing:border-box;width:100%;height:38px;padding:0 28px 0 10px;border:1px solid #cfd8e4;border-radius:5px;background:#fff;color:#334155;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.chart-scope-combo-trigger:after{content:'⌄';position:absolute;right:10px;color:#64748b}
+.chart-scope-combo-menu{position:absolute;z-index:120;top:42px;left:0;right:0;min-width:170px;max-height:240px;padding:6px;border:1px solid #cfd8e4;border-radius:6px;background:#fff;box-shadow:0 8px 20px #102a4c29}
+.chart-scope-combo-menu[hidden]{display:none}
+.chart-scope-combo-menu input[type=search]{width:100%;height:32px;margin-bottom:5px}
+.chart-scope-combo-options{max-height:184px;overflow-y:auto}
+.chart-scope-combo-options button{width:100%;min-height:30px;padding:4px 6px;border:0;border-radius:4px;background:#fff;color:#334155;text-align:left;display:flex;align-items:center;gap:6px;cursor:pointer}
+.chart-scope-combo-options button:hover,.chart-scope-combo-options button.is-selected{background:#edf4ff;color:#2468e8}
+.chart-scope-combo-options button[hidden]{display:none}
+.chart-scope-combo-options input{width:14px!important;height:14px!important;flex:0 0 14px;padding:0!important;pointer-events:none;accent-color:#3478f6}

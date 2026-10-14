@@ -1,0 +1,25 @@
+.quality-chart-type-picker{position:relative;margin-top:8px;min-width:0}
+.quality-chart-type-trigger{width:100%;height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 11px;border:1px solid #cfd8e4;border-radius:4px;background:#fff;color:#334155;text-align:left;cursor:pointer}
+.quality-chart-type-menu{position:absolute;z-index:40;top:43px;left:0;right:0;max-height:min(460px,55vh);overflow:auto;padding:12px 14px;background:#fff;border:1px solid #cfd8e4;border-radius:8px;box-shadow:0 12px 28px #102a4c2b}
+.quality-chart-type-menu[hidden]{display:none}
+.quality-chart-type-group+.quality-chart-type-group{margin-top:16px}
+.quality-chart-type-group-title{margin-bottom:9px;color:#102a4c;font-size:14px;font-weight:600}
+.quality-chart-type-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.quality-chart-type-tile{min-width:0;min-height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid #d7dfe9;border-radius:8px;background:#fff;cursor:pointer;color:#526176}
+.quality-chart-type-tile:hover,.quality-chart-type-tile.is-active{border-color:#3478f6;background:#f5f9ff}
+.quality-chart-type-tile svg{width:52px;height:42px}
+.quality-chart-type-tile span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.quality-live-svg{width:100%;height:100%;min-height:180px;display:block;overflow:visible}
+.quality-chart-body:has(.quality-live-svg){padding:12px 14px;min-height:180px}
+.quality-live-empty{height:100%;min-height:180px;display:grid;place-items:center;color:#718095;font-size:12px}
+.quality-config-drawer .quality-source-trigger{cursor:pointer;gap:12px}
+.quality-config-drawer .quality-source-trigger [data-theme-trigger-swatches]{flex:1;min-width:0}
+.quality-theme-swatch-strip{display:inline-flex;align-items:center;max-width:100%;overflow:hidden;border-radius:4px}
+.quality-theme-swatch-strip i{display:block;width:25px;height:21px;flex:0 1 25px}
+.quality-theme-choices{position:absolute;z-index:45;left:0;right:0;top:calc(100% + 6px);max-height:290px;overflow:auto;padding:6px;background:#fff;border:1px solid #dce3ec;border-radius:7px;box-shadow:0 8px 20px #102a4c24}
+.quality-theme-choices[hidden]{display:none}
+.quality-theme-choices .quality-theme-option{display:flex;align-items:center;gap:8px;width:100%;height:44px;padding:0 7px;border:0;border-radius:5px;background:#fff;color:#526176;text-align:left;cursor:pointer}
+.quality-theme-choices .quality-theme-option:hover,.quality-theme-choices .quality-theme-option.is-active{background:#f0f2f4}
+.quality-theme-choices .quality-theme-option .quality-theme-swatch-strip i{width:24px;height:22px;flex-basis:24px}
+.quality-theme-default-badge{padding:2px 5px;border:1px solid #e1e5ec;border-radius:4px;font-size:11px}
+.quality-config-field:has(>.quality-source-trigger){position:relative}
