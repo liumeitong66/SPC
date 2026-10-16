@@ -1,0 +1,13 @@
+.top-actions .editor-header-entry{display:grid;place-items:center;flex:none;width:34px;height:34px;margin:0;padding:0;border:1px solid #d5dfec;border-radius:5px;background:#fff;color:#3478f6;cursor:pointer}
+.top-actions .editor-header-entry svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.top-actions .editor-header-entry:hover{border-color:#3478f6;background:#f4f8ff}
+.quality-page-editor-open .top-actions .editor-header-entry{display:none!important}
+.quality-page-editor-open .proto-global-fresh,.quality-page-editor-open .proto-language-btn,.quality-page-editor-open .proto-theme-btn{display:none!important}
+.top-actions>.quality-editor-bar{display:flex;align-items:center;flex:none;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.top-actions>.quality-editor-bar>div:not(.quality-editor-bar-actions),.top-actions>.quality-editor-bar>b,.top-actions>.quality-editor-bar>span{display:none}
+.top-actions>.quality-editor-bar .quality-editor-bar-actions{display:flex;align-items:center;gap:7px;margin:0}
+.top-actions>.quality-editor-bar button{height:34px;padding:0 10px;white-space:nowrap;font-size:12px}
+.quality-page-editor-open .top-actions{margin-left:auto}
+@media(max-width:900px){.top-actions>.quality-editor-bar .quality-editor-bar-actions{gap:4px}.top-actions>.quality-editor-bar button{padding:0 6px}}
+.quality-config-drawer[hidden]{display:none!important}
+body.quality-page-editor-open:not(:has(.quality-config-drawer:not([hidden]))) .app{margin-right:0!important}

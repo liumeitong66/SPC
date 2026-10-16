@@ -1,0 +1,26 @@
+/* Shared select appearance, including dynamically generated configuration fields. */
+select:not([multiple]){appearance:none!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%236a88ad' stroke-width='1.5'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 10px center!important;padding-right:32px!important;border-radius:6px!important;cursor:pointer}
+select:focus,.spc-select-open,.chart-scope-combo-trigger:focus,.metric-scope-trigger:focus{outline:none!important;border-color:#1682ff!important;box-shadow:none!important}
+.spc-select-menu,.chart-scope-combo-menu,.proto-popover:not(.proto-time-popover){box-sizing:border-box;background:#fff!important;border:1px solid #e1e9f2!important;border-radius:8px!important;padding:6px!important;box-shadow:0 4px 18px #213e6514!important;color:#647b98}
+.spc-select-menu{position:fixed;z-index:100000;overflow:visible;font:inherit;font-size:14px}
+.spc-select-menu:before,.chart-scope-combo-menu:before{content:'';position:absolute;top:-9px;left:20px;width:16px;height:16px;background:#fff;border-left:1px solid #e1e9f2;border-top:1px solid #e1e9f2;transform:rotate(45deg)}
+.spc-select-options{position:relative;overflow:auto;max-height:inherit;background:#fff}
+.spc-select-option,.chart-scope-combo-options button,.proto-popover .proto-option{box-sizing:border-box;display:flex;align-items:center;width:100%;min-height:36px;padding:8px 14px!important;border:0;border-radius:6px!important;background:#fff;color:#647b98!important;text-align:left;font:inherit;line-height:1.4;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+.spc-select-option:hover,.spc-select-option:focus,.spc-select-option[aria-selected=true],.chart-scope-combo-options button:hover,.chart-scope-combo-options button.is-selected,.proto-popover .proto-option:hover,.proto-popover .proto-option[aria-selected=true]{outline:none;background:#e5f3ff!important;color:#1682ff!important}
+.spc-select-option:disabled{opacity:.45;cursor:default}
+.chart-scope-combo-trigger,.metric-scope-trigger{border-radius:6px!important}
+.shared-layout-table .table-tools{margin-left:auto!important}
+.shared-layout-table .shared-table-drag{order:2}
+.quality-config-drawer-body>.quality-metric-tabs{position:sticky!important;top:-16px;z-index:30;background:#fff;margin-top:-16px;flex-shrink:0}
+/* One closed-state treatment for native and button-based selectors. */
+:root{--spc-select-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%236a88ad' stroke-width='1.5'/%3E%3C/svg%3E")}
+select:not([multiple]),.metric-scope-trigger,.chart-scope-combo-trigger,.quality-chart-type-trigger,.quality-source-trigger,.control:has(>.chev):not(:has(input)){
+box-sizing:border-box!important;min-width:0;border:1px solid #cfd8e4!important;border-radius:6px!important;background-color:#fff!important;background-image:var(--spc-select-arrow)!important;background-repeat:no-repeat!important;background-position:right 10px center!important;padding-left:12px!important;padding-right:34px!important;color:#334155!important;font-family:inherit!important;font-size:13px!important;font-weight:400!important;text-align:left;box-shadow:none!important}
+.metric-scope-trigger,.chart-scope-combo-trigger,.quality-chart-type-trigger,.quality-source-trigger{position:relative;height:38px!important;line-height:normal!important}
+.metric-scope-trigger:after,.chart-scope-combo-trigger:after,.quality-source-trigger:after{content:none!important}
+.quality-chart-type-trigger>span:last-child,.control:has(>.chev):not(:has(input))>.chev,.select-control>i{display:none!important}
+select:not([multiple]):focus,.metric-scope-trigger:focus-visible,.chart-scope-combo-trigger:focus-visible,.quality-chart-type-trigger:focus-visible,.quality-source-trigger:focus-visible,.spc-select-open,.chart-scope-combo-trigger[aria-expanded=true],.quality-chart-type-trigger[aria-expanded=true],.quality-source-trigger[aria-expanded=true]{outline:none!important;border-color:#1682ff!important}
+select:disabled,.metric-scope-trigger:disabled,.chart-scope-combo-trigger:disabled{color:#a3afbf!important;background-color:#f7f9fc!important;cursor:not-allowed}
+/* A select already owns the arrow and border inside these wrappers. */
+.control.select-control:has(>select){padding:0!important;border:0!important;background:none!important}
+.control.select-control>select{height:36px!important}

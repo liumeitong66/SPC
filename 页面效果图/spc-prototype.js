@@ -172,7 +172,9 @@
   let currentComparisonType = 'device';
   let currentTrendPeriod = '7d';
   let currentComparisonPeriod = '7d';
+  let currentComparisonRange = { start: '2026-07-29', end: '2026-08-04' };
   let currentProjectTrendMode = 'day';
+  let currentProjectTrendRange = null;
 
   const projectSamples = [
     { name: '3267504J2G_A面', uuid: '6d7c21c8-9c32-4a10-a501-08e8fe634912', devices: ['AOI-01','AOI-03','AOI-04'], boardTotal: 60680, componentTotal: 5311420, original: { yield: 92.84, falseRate: 6.28, passRate: 92.84, componentNgRate: .194, componentFalseDppm: 1180, componentPassRate: 96.72 }, review: { yield: 98.76, falseRate: .86, passRate: 97.91, componentNgRate: .082, componentFalseDppm: 812, componentPassRate: 98.43 } },
@@ -272,6 +274,7 @@
     tooltip.style.top = `${top}px`;
   }
 
+  window.spcComboSamples={projects:projectSamples,devices:deviceSamples,stats:statsFor,getMouth:()=>currentMouth};
   function openModal(title, bodyHtml, confirmLabel = '保存设置', onConfirm) {
     const backdrop = document.createElement('div');
     backdrop.className = 'proto-backdrop';
@@ -574,6 +577,11 @@
   }
 
   function comparisonPeriodAdjustment(index) {
+    if (currentComparisonPeriod === 'custom') {
+      const days = Math.max(1, Math.round((new Date(`${currentComparisonRange.end}T00:00:00`) - new Date(`${currentComparisonRange.start}T00:00:00`)) / 86400000) + 1);
+      const base = Math.min(.55, Math.max(.04, days * .012));
+      return -base * (.72 + (index % 5) * .07);
+    }
     const adjustments = {
       '7d': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       month: [-.18, -.12, -.22, -.16, -.24, -.15, -.19, -.21, -.17, -.23, -.14, -.20],
@@ -586,7 +594,7 @@
     const data = comparisonDataset(type)
       .map((item, index) => ({ ...item, value: Math.max(88, mouthData(item, currentMouth).yield + comparisonPeriodAdjustment(index)) }))
       .sort((a, b) => b.value - a.value);
-    const items = showAll ? data : data.slice(0, 10);
+    const items = data;
     if (type === 'project') {
       const width = 560;
       const rowHeight = 32;
@@ -623,7 +631,7 @@
       const top = y(item.value);
       const barHeight = Math.max(2, margin.top + plotHeight - top);
       const label = item.name;
-      const detail = type === 'device' ? `${item.area} · ${item.name}` : item.name;
+      const detail = type === 'device' ? item.name : item.name;
       const labelMarkup = `<text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text>`;
       return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
@@ -646,48 +654,12 @@
       chart.innerHTML = comparisonChartMarkup(type, false);
     }
   }
+  window.spcApplyProjectComparisonScope = (period, range) => {
+    currentComparisonPeriod = period || '7d';
+    if (range?.start && range?.end) currentComparisonRange = range;
+    renderProjectComparison('project');
+  };
 
-  function openProjectComparisonModal() {
-    const body = `<div class="comparison-modal-toolbar"><div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button></div><span class="comparison-modal-note" data-comparison-count></span>${chartPeriodPicker('comparison', currentComparisonPeriod)}</div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
-    const backdrop = openModal('全部良率对比', body, '关闭');
-    backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
-    backdrop.querySelector('[data-close]').remove();
-    let modalType = currentComparisonType === 'project' ? 'device' : currentComparisonType;
-    const draw = () => {
-      backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
-        const active = button.dataset.modalComparisonType === modalType;
-        button.classList.toggle('is-active', active);
-        button.setAttribute('aria-selected', String(active));
-      });
-      const data = comparisonDataset(modalType);
-      backdrop.querySelector('[data-comparison-count]').textContent = `共 ${data.length} 个${modalType === 'area' ? '区域' : '设备'} · 按良率降序`;
-      backdrop.querySelector('[data-modal-comparison-chart]').innerHTML = comparisonChartMarkup(modalType, true);
-    };
-    backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
-      button.onclick = () => { modalType = button.dataset.modalComparisonType; draw(); };
-    });
-    backdrop.querySelectorAll('[data-chart-period]').forEach(button => {
-      button.onclick = () => {
-        currentComparisonPeriod = button.dataset.chartPeriod;
-        backdrop.querySelectorAll('[data-chart-period]').forEach(item => {
-          const active = item === button;
-          item.classList.toggle('is-active', active);
-          item.setAttribute('aria-pressed', String(active));
-        });
-        const projectPanel = document.querySelector('[data-comparison-panel]');
-        if (projectPanel) {
-          projectPanel.querySelectorAll('[data-chart-period]').forEach(item => {
-            const active = item.dataset.chartPeriod === currentComparisonPeriod;
-            item.classList.toggle('is-active', active);
-            item.setAttribute('aria-pressed', String(active));
-          });
-          renderProjectComparison(currentComparisonType);
-        }
-        draw();
-      };
-    });
-    draw();
-  }
 
   function initializeProjectComparison() {
     const panel = document.querySelector('[data-comparison-panel]');
@@ -708,26 +680,28 @@
         renderProjectComparison(currentComparisonType);
       };
     });
-    const allButton = panel.querySelector('[data-comparison-all]');
-    if (allButton) allButton.onclick = openProjectComparisonModal;
     renderProjectComparison(currentComparisonType);
   }
 
   function projectTrendDataset(mode = currentProjectTrendMode) {
-    if (mode === 'month') {
-      return {
+    const data = mode === 'month' ? {
         labels: ['03月', '04月', '05月', '06月', '07月', '08月'],
         original: [91.2, 91.8, 92.1, 91.7, 92.4, 92.8],
         review: [97.2, 97.6, 97.9, 97.5, 98.1, 98.4],
         second: [98.1, 98.4, 98.6, 98.3, 98.8, 99.0]
-      };
-    }
-    return {
+      } : {
       labels: ['07-29', '07-30', '07-31', '08-01', '08-02', '08-03', '08-04'],
       original: [91.4, 91.8, 91.2, 92.0, 91.6, 92.2, 92.8],
       review: [97.4, 97.8, 97.2, 98.0, 97.6, 98.2, 98.5],
       second: [98.2, 98.5, 98.1, 98.7, 98.4, 98.9, 99.1]
     };
+    if (!currentProjectTrendRange) return data;
+    const indices = data.labels.map((label,index) => {
+      const date = mode === 'month' ? `2026-${label.slice(0,2)}` : `2026-${label}`;
+      const start = currentProjectTrendRange.start.slice(0,date.length), end = currentProjectTrendRange.end.slice(0,date.length);
+      return date >= start && date <= end ? index : -1;
+    }).filter(index => index >= 0);
+    return Object.fromEntries(Object.entries(data).map(([key,values]) => [key,indices.map(index => values[index])]));
   }
 
   function projectTrendMarkup(mode = currentProjectTrendMode) {
@@ -761,6 +735,10 @@
     const chart = panel.querySelector('[data-project-trend-chart]');
     if (chart) chart.innerHTML = projectTrendMarkup(mode);
   }
+  window.spcApplyProjectTrendScope = range => {
+    currentProjectTrendRange = range?.start && range?.end ? range : null;
+    renderProjectTrend(currentProjectTrendMode);
+  };
 
   function initializeProjectTrend() {
     const panel = document.querySelector('[data-project-trend]');
@@ -912,7 +890,7 @@
   function deviceQualityCharts() {
     return `<section class="quality-grid device-quality-charts">
       <section class="quality-chart"><div class="phead"><div class="phead-title"><b>良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div>${chartPeriodPicker('trend', currentTrendPeriod)}</div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
-      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${chartPeriodPicker('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
+      <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${chartPeriodPicker('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
     </section>`;
   }
 
@@ -1080,6 +1058,7 @@
   function setMouth(mouth) {
     currentMouth = mouth;
     if (document.body.dataset.page === 'device-quality') renderDeviceQuality(); else renderProjectSummary(mouth);
+    window.dispatchEvent(new CustomEvent('spc-page-mouth-change'));
     const label = document.body.dataset.mouthPage === 'project' && mouth === 'original' ? '机器判定' : mouthLabel(mouth);
     toast(`统计口径已切换为${label}，页面数据已同步更新`, 'info');
   }
@@ -1381,6 +1360,7 @@
     });
   }
 
+  window.spcBindTimeControl = control => makeControlInteractive(control);
   function makeControlInteractive(control) {
     const field = control.closest('.field');
     const label = getText(field && field.querySelector('label'));
@@ -1822,11 +1802,13 @@
     if (buttons[0]) {
       buttons[0].classList.add('proto-top-icon', 'proto-language-btn');
       buttons[0].setAttribute('aria-label', '选择语言');
+      buttons[0].title = '切换语言';
       buttons[0].innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21M12 3C9.5 5.6 8.3 8.6 8.3 12S9.5 18.4 12 21"></path></svg>';
     }
     if (buttons[1]) {
       buttons[1].classList.add('proto-top-icon', 'proto-theme-btn');
       buttons[1].setAttribute('aria-label', '页面外观');
+      buttons[1].title = '切换模式';
       buttons[1].innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
     }
   }
@@ -2085,12 +2067,16 @@
         const action = button.dataset.alertAction;
         if (action === 'toggle') {
           const enabled = row.dataset.ruleStatus === 'enabled';
-          row.dataset.ruleStatus = enabled ? 'disabled' : 'enabled';
-          button.classList.toggle('on', !enabled);
-          button.setAttribute('aria-label', enabled ? '停用规则' : '启用规则');
-          const state = row.querySelector('.state');
-          if (state) { state.textContent = enabled ? '停用' : '启用'; state.classList.toggle('off', enabled); }
-          toast(enabled ? '规则已停用' : '规则已启用', 'info');
+          const apply = () => {
+            row.dataset.ruleStatus = enabled ? 'disabled' : 'enabled';
+            button.classList.toggle('on', !enabled);
+            button.setAttribute('role','switch');
+            button.setAttribute('aria-checked',String(!enabled));
+            button.setAttribute('aria-label', enabled ? '启用规则' : '停用规则');
+            toast(enabled ? '规则已停用' : '规则已启用', 'info');
+          };
+          if(enabled) openModal('停用告警规则','<p style="margin:0;color:#475569">确认停用该告警规则吗？</p>','停用',apply);
+          else apply();
           return;
         }
         if (action === 'delete' && row.dataset.ruleStatus === 'enabled') {

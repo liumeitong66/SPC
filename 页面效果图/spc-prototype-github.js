@@ -327,6 +327,7 @@
     tooltip.style.top = `${top}px`;
   }
 
+  window.spcComboSamples={projects:projectSamples,devices:deviceSamples,stats:statsFor,getMouth:()=>currentMouth};
   function openModal(title, bodyHtml, confirmLabel = '保存设置', onConfirm) {
     const backdrop = document.createElement('div');
     backdrop.className = 'proto-backdrop';
@@ -767,7 +768,7 @@
       })
       .filter(Boolean)
       .sort((a, b) => b.value - a.value);
-    const items = showAll ? data : data.slice(0, 10);
+    const items = data;
     if (type === 'project') {
       const width = 560;
       const rowHeight = 32;
@@ -803,7 +804,7 @@
         const centerY = margin.top + rowHeight * index + rowHeight / 2;
         const endX = x(item.value);
         const barWidth = Math.max(2, endX - x(minimum));
-        const label = type === 'area' ? item.name : `${item.area} · ${item.name}`;
+        const label = type === 'area' ? item.name : item.name;
         return `<g><title>${label}：${item.value.toFixed(2)}%</title><text class="comparison-label project-label" x="${margin.left - 8}" y="${centerY + 3}">${label}</text><rect class="comparison-bar-track" x="${x(minimum)}" y="${centerY - 7}" width="${plotWidth}" height="14" rx="3"/><rect class="comparison-bar" x="${x(minimum)}" y="${centerY - 7}" width="${barWidth.toFixed(1)}" height="14" rx="3"/><text class="comparison-value device-horizontal-value" x="${width - 8}" y="${centerY + 3}">${item.value.toFixed(2)}%</text></g>`;
       }).join('');
       const contentHeight = type === 'area' ? Math.max(height, showAll ? 320 : 180) : Math.max(height, showAll ? 400 : 360);
@@ -827,7 +828,7 @@
       const top = y(item.value);
       const barHeight = Math.max(2, margin.top + plotHeight - top);
       const label = item.name;
-      const detail = type === 'device' ? `${item.area} · ${item.name}` : item.name;
+      const detail = type === 'device' ? item.name : item.name;
       const labelMarkup = `<text class="comparison-label" x="${center.toFixed(1)}" y="${height - 18}">${label}</text>`;
       return `<g><title>${detail}：${item.value.toFixed(2)}%</title><rect class="comparison-bar" x="${(center - barWidth / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="3"/><text class="comparison-value" x="${center.toFixed(1)}" y="${Math.max(12, top - 6).toFixed(1)}">${item.value.toFixed(2)}%</text>${labelMarkup}</g>`;
     }).join('');
@@ -852,48 +853,6 @@
     }
   }
 
-  function openProjectComparisonModal() {
-    const comparisonPanel = document.querySelector('[data-comparison-panel]');
-    const isProjectScope = comparisonPanel?.dataset.comparisonScope === 'project';
-    const dimensionSwitch = isProjectScope ? '' : '<div class="comparison-switch" role="tablist" aria-label="全部良率对比维度"><button class="comparison-tab" type="button" data-modal-comparison-type="device">设备</button><button class="comparison-tab" type="button" data-modal-comparison-type="area">区域</button></div>';
-    const body = `<div class="comparison-modal-toolbar">${comparisonDateRangeMarkup()}${chartPeriodSelect('comparison', currentComparisonPeriod)}${dimensionSwitch}<span class="comparison-modal-note" data-comparison-count></span></div><div class="comparison-modal-chart" data-modal-comparison-chart></div>`;
-    const backdrop = openModal('全部良率对比', body, '关闭');
-    backdrop.querySelector('.proto-modal').classList.add('proto-comparison-modal');
-    backdrop.querySelector('[data-close]').remove();
-    let modalType = isProjectScope ? 'project' : currentComparisonType;
-    const draw = () => {
-      backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
-        const active = button.dataset.modalComparisonType === modalType;
-        button.classList.toggle('is-active', active);
-        button.setAttribute('aria-selected', String(active));
-      });
-      const data = comparisonDataset(modalType);
-      const dimensionLabel = modalType === 'area' ? '区域' : modalType === 'project' ? '模板' : '设备';
-      backdrop.querySelector('[data-comparison-count]').textContent = `共 ${data.length} 个${dimensionLabel} · 按良率降序`;
-      const modalChart = backdrop.querySelector('[data-modal-comparison-chart]');
-      modalChart.classList.toggle('is-horizontal', modalType === 'project');
-      modalChart.classList.toggle('is-device-horizontal', (modalType === 'device' || modalType === 'area') && document.body.dataset.page === 'device-quality');
-      modalChart.innerHTML = comparisonChartMarkup(modalType, true);
-    };
-    backdrop.querySelectorAll('[data-modal-comparison-type]').forEach(button => {
-      button.onclick = () => { modalType = button.dataset.modalComparisonType; draw(); };
-    });
-    backdrop.querySelectorAll('select[data-chart-period-context="comparison"]').forEach(select => {
-      select.onchange = () => {
-        setComparisonPeriod(select.value);
-        const projectPanel = document.querySelector('[data-comparison-panel]');
-        if (projectPanel) renderProjectComparison(currentComparisonType);
-        draw();
-      };
-    });
-    initializeComparisonDateRange(backdrop, () => {
-      const projectPanel = document.querySelector('[data-comparison-panel]');
-      if (projectPanel) renderProjectComparison(currentComparisonType);
-      draw();
-    });
-    syncComparisonControls(backdrop);
-    draw();
-  }
 
   function initializeProjectComparison() {
     const panel = document.querySelector('[data-comparison-panel]');
@@ -911,8 +870,6 @@
     });
     initializeComparisonDateRange(panel, () => renderProjectComparison(currentComparisonType));
     syncComparisonControls(panel);
-    const allButton = panel.querySelector('[data-comparison-all]');
-    if (allButton) allButton.onclick = openProjectComparisonModal;
     renderProjectComparison(currentComparisonType);
   }
 
@@ -1176,6 +1133,37 @@
     return dataset;
   }
 
+  function deviceHeatmapCells(chart) {
+    const data=chart.dataset,x=data.heatmapX||'时间',y=data.heatmapY||'设备名称',grain=data.heatmapGrain||'天';
+    if(data.heatmapColor==='平均检测耗时')return null;
+    const dimensions=['时间','设备名称','设备SN','设备位置（一级）','设备位置（二级）'];
+    if(!dimensions.includes(x)||!dimensions.includes(y))return null;
+    const records=[];
+    deviceSamples.forEach((device,index)=>{
+      const source=mouthData(device,currentMouth);if(!source)return;
+      const area=comparisonDevices.find(item=>item.name===device.name)?.area||'未分配';
+      const weights=Array.from({length:10},(_,day)=>.82+((day*3+index*2)%7)*.055),sum=weights.reduce((a,b)=>a+b,0);
+      const counts=weights.map(weight=>Math.floor(device.boardTotal*weight/sum));
+      for(let extra=device.boardTotal-counts.reduce((a,b)=>a+b,0),i=0;extra>0;extra--,i++)counts[i%10]++;
+      counts.forEach((count,day)=>{const date=new Date(Date.UTC(2026,6,26+day));records.push({'时间':date.toISOString().slice(0,10),'检测开始时间':date.toISOString().slice(0,10),'设备名称':device.name,'设备SN':device.sn,'设备位置（一级）':area,'设备位置（二级）':area.replace('区域','产线')+'1',count,good:count*source.yield/100,bad:count*(100-source.yield)/100,falseCount:count*source.falseRate/100,dppm:count*source.componentNgRate*10000})});
+    });
+    const groupRows=(chart.closest('[data-combo-layout]')||window.spcPageTimeRange)&&window.spcGroupDailyRows?.(chart.closest('[data-combo-layout]')||chart);const rows=groupRows?groupRows.map(r=>({...r,count:r.boardTotal,good:r.boardGood,bad:r.boardNg,falseCount:r.boardFalse,dppm:r.componentTotal?r.boardTotal*r.componentNg/r.componentTotal*1e6:0})):window.spcFilterQualityChartRows?.(chart,records,'','')||records,groups=new Map();
+    const label=(row,axis)=>{if(axis!=='时间')return row[axis];if(grain==='月')return row['时间'].slice(0,7);if(grain==='周'){const date=new Date(row['时间']+'T00:00:00Z');date.setUTCDate(date.getUTCDate()-(date.getUTCDay()+6)%7);return date.toISOString().slice(0,10)}return row['时间']};
+    rows.forEach(row=>{const xx=label(row,x),yy=label(row,y),key=JSON.stringify([xx,yy]),cell=groups.get(key)||{x:xx,y:yy,count:0,good:0,bad:0,falseCount:0,dppm:0};for(const key of ['count','good','bad','falseCount','dppm'])cell[key]+=row[key];groups.set(key,cell)});
+    const color=data.heatmapColor||'检测PCB数';
+    return [...groups.values()].map(cell=>({...cell,value:color==='PCB良率'?cell.good/(cell.count||1)*100:color==='PCB不良率'?cell.bad/(cell.count||1)*100:color==='误报率'?cell.falseCount/(cell.count||1)*100:color==='器件DPPM'?cell.dppm/(cell.count||1):cell.count}));
+  }
+  window.spcDeviceHeatmapCells=deviceHeatmapCells;
+  function renderDeviceHeatmap(chart) {
+    const cells=deviceHeatmapCells(chart);if(!cells)return false;
+    const xs=[...new Set(cells.map(cell=>cell.x))].sort(),ys=[...new Set(cells.map(cell=>cell.y))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+    const width=680,height=250,left=100,top=14,cw=(width-left-12)/Math.max(1,xs.length),ch=(height-top-30)/Math.max(1,ys.length),max=Math.max(1,...cells.map(cell=>cell.value));
+    const lookup=new Map(cells.map(cell=>[JSON.stringify([cell.x,cell.y]),cell]));
+    const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const values=ys.map((yy,r)=>`<text class="device-chart-axis" x="${left-8}" y="${top+(r+.5)*ch+3}" text-anchor="end">${escape(yy)}</text>`+xs.map((xx,c)=>{const cell=lookup.get(JSON.stringify([xx,yy]));return `<rect data-x="${escape(xx)}" data-y="${escape(yy)}"${cell?` data-cell-value="${cell.value}"`:''} x="${left+c*cw+1}" y="${top+r*ch+1}" width="${Math.max(.5,cw-2)}" height="${Math.max(.5,ch-2)}" rx="2" fill="${cell?'#3478f6':'#eef1f5'}" fill-opacity="${cell?(.2+.75*cell.value/max).toFixed(3):1}"><title>${escape(xx)} × ${escape(yy)}：${cell?Number(cell.value.toFixed(2)).toLocaleString():'无数据'}</title></rect>`}).join('')).join('');
+    chart.querySelector('.quality-chart-body').innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escape(chart.dataset.heatmapColor||'检测PCB数')}热力图">${values}${xs.map((xx,i)=>i%Math.max(1,Math.ceil(xs.length/8))===0?`<text class="device-chart-axis" x="${left+(i+.5)*cw}" y="${height-8}" text-anchor="middle">${escape(xx.slice(chart.dataset.heatmapGrain==='月'?2:5))}</text>`:'').join('')}</svg>`;
+    return true;
+  }
   function deviceYieldTrendChart(mode = currentTrendPeriod) {
     const dataset = deviceTrendDataset(mode);
     const dates = dataset.labels;
@@ -1212,8 +1200,65 @@
     });
     panel.querySelector('[data-device-trend-range]')?.classList.toggle('is-hidden', mode === 'month');
     const chart = panel.querySelector('.device-yield-trend');
-    if (chart) chart.innerHTML = deviceYieldTrendChart(mode);
+    if (chart && !renderDeviceHeatmap(panel)) chart.innerHTML = deviceYieldTrendChart(mode);
   }
+
+  window.spcApplyDeviceTrendScope = ({ devices, start, end }) => {
+    if (Array.isArray(devices)) selectedChartDevices = devices;
+    const inputs = document.querySelectorAll('[data-device-trend] [data-device-trend-range] input');
+    if (inputs[0] && start) inputs[0].value = start;
+    if (inputs[1] && end) inputs[1].value = end;
+    renderDeviceTrend(currentTrendPeriod);
+  };
+  function applyNativeChartScope(chart) {
+    if (!chart || !window.spcReadChartScope || document.body.dataset.page !== 'device-quality') return;
+    const { match, rules } = window.spcReadChartScope(chart);
+    const time = rules.find(rule => /时间|日期/.test(rule.field));
+    const reference = new Date('2026-08-04T00:00:00');
+    const iso = date => date.toISOString().slice(0, 10);
+    let start = '2026-07-26', end = '2026-08-04';
+    if (time) {
+      if (time.value === 'range') { start = time.start; end = time.end; }
+      else if (time.value === 'date') start = end = time.date;
+      else if (['today', 'tomorrow', 'yesterday'].includes(time.value)) { const day = new Date(reference); day.setDate(day.getDate() + (time.value === 'tomorrow' ? 1 : time.value === 'yesterday' ? -1 : 0)); start = end = iso(day); }
+      else if (['past7', 'past30', 'pastHalfYear', 'thisMonth', 'lastMonth'].includes(time.value)) {
+        const first = new Date(reference);
+        if (time.value === 'past7') first.setDate(first.getDate() - 6);
+        if (time.value === 'past30') first.setDate(first.getDate() - 29);
+        if (time.value === 'pastHalfYear') first.setMonth(first.getMonth() - 6);
+        if (time.value === 'thisMonth') first.setDate(1);
+        if (time.value === 'lastMonth') { first.setDate(1); first.setMonth(first.getMonth() - 1); reference.setDate(0); }
+        start = iso(first); end = iso(reference);
+      }
+    }
+    if(window.spcPageTimeRange){const range=window.spcPageTimeRange;start=time&&start>range.start.slice(0,10)?start:range.start.slice(0,10);end=time&&end<range.end.slice(0,10)?end:range.end.slice(0,10)}
+    if (chart.hasAttribute('data-device-trend')) {
+      const deviceRules = rules.filter(rule => /设备名称|设备SN|设备位置|所在位置/.test(rule.field));
+      const devices = deviceRules.length ? comparisonDevices.filter(device => {
+        const test = rule => {
+          const value = rule.field === '设备名称' ? device.name : rule.field === '设备SN' ? deviceSamples.find(item => item.name === device.name)?.sn : rule.field==='设备位置（二级）'?device.area.replace('区域','产线')+'1':device.area;
+          if (rule.operator === '等于') return value === rule.value;
+          if (rule.operator === '不等于') return value !== rule.value;
+          if (rule.operator === '包含') return (rule.values || []).includes(value);
+          if (rule.operator === '不包含') return !(rule.values || []).includes(value);
+          return true;
+        };
+        return match === '任意' ? deviceRules.some(test) : deviceRules.every(test);
+      }).map(device => device.name) : ['AOI-01', 'AOI-03', 'AOI-02', 'AOI-05', 'AOI-06'];
+      window.spcApplyDeviceTrendScope({ devices, start, end });
+    }
+    if (chart.hasAttribute('data-comparison-panel')) {
+      if (time) {
+        const period = time.value === 'pastHalfYear' ? 'halfYear' : time.value === 'past30' ? 'month' : time.value === 'past7' ? '7d' : 'custom';
+        if (period !== 'custom'&&!window.spcPageTimeRange) setComparisonPeriod(period);
+        else if (start && end) { currentComparisonPeriod = 'custom'; comparisonDateRange = { start, end }; syncComparisonControls(document); }
+      } else if(window.spcPageTimeRange){currentComparisonPeriod='custom';comparisonDateRange={start,end};syncComparisonControls(document)}else setComparisonPeriod('7d');
+      renderProjectComparison(chart.dataset.dimension === '设备位置（一级）' ? 'area' : 'device');
+    }
+  }
+  window.spcApplyNativeChartScope = chart => {applyNativeChartScope(chart);if(chart?.dataset.chartKind==='heatmap')renderDeviceHeatmap(chart)};
+  window.addEventListener('spc-chart-scope-change', event => window.spcApplyNativeChartScope(event.detail.chart));
+  window.addEventListener('spc-chart-time-grain-change', event => { if (event.target.hasAttribute('data-device-trend')) renderDeviceTrend(event.detail.grain === 'month' ? 'month' : 'day'); });
 
   function initializeDeviceTrendControls(root = document) {
     const panel = root.querySelector('[data-device-trend]');
@@ -1233,7 +1278,7 @@
       const sn = sample?.sn || `SI1020E${String(1238 + index * 22).padStart(4, '0')}`;
       return `<label class="proto-chart-device-row" data-chart-device-row><input type="checkbox" value="${device.name}"${selectedChartDevices.includes(device.name) ? ' checked' : ''}><b>${device.name}</b><span>${sn}</span><span class="proto-chart-device-area">${device.area}</span></label>`;
     }).join('');
-    const body = `<div class="proto-chart-device-tools"><input class="proto-chart-device-search" data-chart-device-search aria-label="搜索设备名称或SN" placeholder="搜索设备名称或SN"><span class="proto-chart-device-note" data-chart-device-note>已选 ${selectedChartDevices.length}/10 台</span></div><div class="proto-chart-device-list"><div class="proto-chart-device-header"><span aria-hidden="true"></span><span>设备名称</span><span>设备SN</span><span class="proto-chart-device-area">所在位置</span></div>${rows}<div class="proto-chart-device-empty" role="status" hidden>未找到匹配设备</div></div>`;
+    const body = `<div class="proto-chart-device-tools"><input class="proto-chart-device-search" data-chart-device-search aria-label="搜索设备名称或SN" placeholder="搜索设备名称或SN"><span class="proto-chart-device-note" data-chart-device-note>已选 ${selectedChartDevices.length}/10 台</span></div><div class="proto-chart-device-list"><div class="proto-chart-device-header"><span aria-hidden="true"></span><span>设备名称</span><span>设备SN</span><span class="proto-chart-device-area">设备位置</span></div>${rows}<div class="proto-chart-device-empty" role="status" hidden>未找到匹配设备</div></div>`;
     const backdrop = openModal('配置图表展示设备', body, '保存配置', modal => {
       const checked = Array.from(modal.querySelectorAll('[data-chart-device-row] input:checked')).map(input => input.value);
       if (!checked.length) { toast('请至少选择 1 台设备', 'error'); return false; }
@@ -1269,7 +1314,7 @@
   function deviceQualityCharts() {
     return `<section class="quality-grid device-quality-charts">
       <section class="quality-chart" data-device-trend data-custom-chart data-chart-kind="heatmap"><div class="phead"><div class="phead-title"><b>设备检测负载分布</b></div><div class="chart-head-actions"><div class="device-trend-date-range" data-device-trend-range><input type="date" value="2026-07-26" aria-label="开始时间"><span>至</span><input type="date" value="2026-08-04" aria-label="结束时间"></div><div class="comparison-switch" role="tablist" aria-label="检测负载统计周期"><button class="comparison-tab" type="button" data-device-trend-mode="day">按天</button><button class="comparison-tab" type="button" data-device-trend-mode="month">按月</button></div><button type="button" class="chart-device-config" data-chart-device-config>配置设备</button></div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
-      <section class="quality-chart" data-comparison-panel data-custom-chart data-chart-kind="horizontalBar"><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${comparisonDateRangeMarkup()}${chartPeriodSelect('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div><button type="button" class="link" data-comparison-all>查看全部</button></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
+      <section class="quality-chart" data-comparison-panel data-custom-chart data-chart-kind="horizontalBar"><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${comparisonDateRangeMarkup()}${chartPeriodSelect('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
     </section>`;
   }
 
@@ -1374,7 +1419,17 @@
     locations: ['区域A','区域B','区域C','区域D']
   });
   function deviceIndicatorValue(key, mouth = currentMouth, scope = {}) {
-    const rules = scope.rules || [];
+    const stageRules = (scope.rules || []).filter(rule => rule.field === 'judgementStage');
+    if ((scope.rules || []).some(rule => rule.field === 'defectType')) return '—';
+    if (stageRules.length) {
+      const stages = ['机器判定','一次复判','最终复判'].filter(stage => stageRules.every(rule => {
+        const selected = rule.values?.length ? rule.values : [rule.value];
+        return ['不等于','不包含'].includes(rule.operator) ? !selected.includes(stage) : selected.includes(stage);
+      }));
+      if (stages.length !== 1) return '—';
+      mouth = ({'机器判定':'original','一次复判':'review','最终复判':'second'})[stages[0]];
+    }
+    const rules = (scope.rules || []).filter(rule => rule.field !== 'judgementStage');
     if (rules.some(rule => rule.field === 'time') || scope.time && scope.time !== 'all') return '—';
     if ((rules.some(rule => rule.field === 'templates') || scope.templates?.length) && !['templateCount','participatingDevices'].includes(key)) return '—';
     const match = (actual, rule) => {
@@ -1388,13 +1443,14 @@
         return ({'等于':number===target,'不等于':number!==target,'大于':number>target,'大于或等于':number>=target,'小于':number<target,'小于或等于':number<=target})[rule.operator] ?? false;
       }
       if (rule.operator === '不等于') return values.every(value => value !== wanted);
-      if (rule.operator === '包含') return values.some(value => value.includes(wanted));
-      if (rule.operator === '不包含') return values.every(value => !value.includes(wanted));
+      const selected = rule.values?.length ? rule.values : [wanted];
+      if (rule.operator === '包含') return values.some(value => selected.some(item => value.includes(item)));
+      if (rule.operator === '不包含') return values.every(value => selected.every(item => !value.includes(item)));
       return values.some(value => value === wanted);
     };
     const devices = deviceSamples.filter(device => Number(device.boardTotal) > 0 && (rules.length ? rules.every(rule => {
       const area = comparisonDevices.find(item => item.name === device.name)?.area;
-      const actual = ({templates:device.projects.map(project => project.name),devices:device.name,locations:area,boardTotal:device.boardTotal,templateCount:device.projects.length})[rule.field];
+      const actual = ({templates:device.projects.map(project => project.name),devices:device.name,locations:area,locations2:area?.replace('区域','产线')+'1',boardTotal:device.boardTotal,templateCount:device.projects.length})[rule.field];
       return match(actual, rule);
     }) : (!scope.devices?.length || scope.devices.includes(device.name)) && (!scope.templates?.length || device.projects.some(project => scope.templates.includes(project.name))) && (!scope.locations?.length || scope.locations.includes(comparisonDevices.find(item => item.name === device.name)?.area))));
     if (key === 'participatingDevices') return `${devices.length}<small>台</small>`;
@@ -1437,8 +1493,9 @@
       <div class="quality-metric-panel" data-metric-panel="custom" hidden><div class="quality-config-grid"><div class="quality-config-field full"><label>背景颜色</label><select><option>默认</option><option>浅蓝</option><option>白色</option></select></div><div class="quality-config-field full"><label>文字颜色</label><select><option>默认</option><option>深色</option><option>蓝色</option></select></div><div class="quality-config-field full"><label>字体字号</label><div class="quality-segment-control" data-font-mode><button type="button" class="is-active" data-font-mode-value="adaptive">自适应</button><button type="button" data-font-mode-value="custom">自定义</button></div></div><div class="quality-color-row quality-font-custom-fields" style="grid-column:1/-1" hidden><div class="quality-config-field"><label>数据说明字号</label><select><option>12</option><option>14</option><option>16</option></select></div><div class="quality-config-field"><label>数字字号</label><select><option>22</option><option>24</option><option>28</option><option>36</option></select></div></div><div class="quality-config-field full"><label>小数精度</label><select><option>${config.precision}</option><option>1位小数</option><option>2位小数</option></select></div><div class="quality-config-field full"><label>数字格式</label><select><option>${config.format}</option><option>普通数字</option><option>百分比</option></select></div></div></div>`;
   }
 
+  function ensureQualityConfigDrawer(){let d=document.querySelector('[data-quality-config-drawer]');if(!d){document.body.insertAdjacentHTML('beforeend',window.spcQualityConfigTemplate?.drawerMarkup()||qualityEditorDrawerMarkup());d=document.querySelector('[data-quality-config-drawer]');d.dataset.mode='chart';d._chartBodyHtml=d.querySelector('.quality-config-drawer-body').innerHTML;bindQualityChartDrawer(d)}d.hidden=false;return d}
   function selectQualityEditorMetric(metric) {
-    if (!metric) return;
+    if (!metric) return; ensureQualityConfigDrawer();
     document.querySelectorAll('[data-custom-chart]').forEach(item => item.classList.remove('is-editor-selected'));
     document.querySelectorAll('[data-custom-metric]').forEach(item => item.classList.toggle('is-editor-selected', item === metric));
     qualityEditorSelectedChart = null;
@@ -1486,8 +1543,8 @@
   function qualityEditorDrawerMarkup() {
     return `<aside class="quality-config-drawer" data-quality-config-drawer><header class="quality-config-drawer-head"><h3>柱状图</h3><button class="quality-config-drawer-close" type="button" data-quality-editor-exit aria-label="关闭">×</button></header><div class="quality-config-drawer-body"><div class="quality-metric-tabs" role="tablist"><button type="button" class="quality-metric-tab is-active" data-chart-tab="base">基础配置</button><button type="button" class="quality-metric-tab" data-chart-tab="custom">自定义配置</button></div>
       <div class="quality-metric-panel" data-chart-panel="base"><section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full" data-quality-title-field><label>标题</label><input data-quality-config="name" value="设备检测负载分布"></div><div class="quality-config-field full"><label>图表类型</label><select data-quality-config="type" hidden><option value="bar">基础柱状图</option><option value="barStacked">堆积柱状图</option><option value="barPercent">百分比堆积柱状图</option><option value="line">基础折线图</option><option value="lineSmooth">平滑折线图</option><option value="pie">饼状图</option><option value="donut">环状图</option><option value="horizontalBar">基础条形图</option><option value="horizontalBarStacked">堆积条形图</option><option value="horizontalBarPercent">百分比堆积条形图</option><option value="area">基础面积图</option><option value="areaStacked">堆积面积图</option><option value="areaPercent">百分比堆积面积图</option><option value="scatter">基础散点图</option><option value="radar">基础雷达图</option><option value="radarFilled">填充雷达图</option><option value="heatmap">热力图</option></select><div class="quality-chart-type-picker" data-chart-type-picker></div><div class="quality-config-field full"><label>主题色</label><div class="quality-source-trigger"><span class="quality-theme-preview"><i></i><i></i><i></i><i></i><i></i></span><span>默认</span></div></div><label class="quality-config-check full"><input type="checkbox">渐变填充</label><div class="quality-config-field full"><label>图表选项</label><div class="quality-chart-check-grid"><label class="quality-config-check"><input type="checkbox" data-quality-config="legend" checked>图例</label><label class="quality-config-check"><input type="checkbox" data-quality-config="label" checked>数据标签</label><label class="quality-config-check"><input type="checkbox" checked>坐标轴</label><label class="quality-config-check"><input type="checkbox" checked>网格线</label></div></div><div class="quality-chart-switch-row"><span>切换行/列</span><label class="quality-switch"><input type="checkbox"><span></span></label></div></div></div></section>
-      <section class="quality-config-section"><h4 data-quality-dimension-heading>横轴（类别）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="dimension"><option>检测日期</option><option>设备名称</option><option>设备SN</option><option>设备所在位置</option><option>模板名称</option><option>模板ID</option><option>机器判定结果</option><option>一次复判结果</option><option>最终复判结果</option><option>运行状态</option><option>启用状态</option></select></div><div class="quality-exclusive-checks"><label class="quality-config-check"><input type="checkbox" data-quality-summary-category checked>汇总相同的类别</label></div><div class="quality-chart-option-box" data-quality-axis-sort><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control quality-segment-three"><button type="button" class="is-active">横轴值</button><button type="button" data-quality-vertical-sort hidden>纵轴值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
-      <section class="quality-config-section"><h4 data-quality-measure-heading>纵轴（字段）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="measure"><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option><option>平均检测耗时</option><option>误报率</option></select></div><label class="quality-config-check full" data-quality-group-toggle><input type="checkbox" data-quality-group checked>分组聚合</label><div class="quality-chart-option-box" data-quality-group-fields><div class="quality-config-field full"><label>分组依据</label><select><option>模板ID</option><option>机器判定结果</option><option>设备所在位置</option></select></div><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control"><button type="button" class="is-active">字段值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
+      <section class="quality-config-section"><h4 data-quality-dimension-heading>横轴（类别）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="dimension"><option>检测开始时间</option><option>设备名称</option><option>设备SN</option><option>设备位置（一级）</option><option>设备位置（二级）</option><option>模板名称</option><option>模板ID</option><option>机器判定结果</option><option>一次复判结果</option><option>最终复判结果</option><option>运行状态</option><option>启用状态</option></select></div><div class="quality-exclusive-checks"><label class="quality-config-check"><input type="checkbox" data-quality-summary-category checked>汇总相同的类别</label></div><div class="quality-chart-option-box" data-quality-axis-sort><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control quality-segment-three"><button type="button" class="is-active">横轴值</button><button type="button" data-quality-vertical-sort hidden>纵轴值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
+      <section class="quality-config-section"><h4 data-quality-measure-heading>纵轴（字段）</h4><div class="quality-config-grid"><div class="quality-config-field full"><select data-quality-config="measure"><option>检测PCB数</option><option>PCB良率</option><option>PCB不良率</option><option>器件DPPM</option><option>平均检测耗时</option><option>误报率</option></select></div><label class="quality-config-check full" data-quality-group-toggle><input type="checkbox" data-quality-group checked>分组聚合</label><div class="quality-chart-option-box" data-quality-group-fields><div class="quality-config-field full"><label>分组依据</label><select><option>模板ID</option><option>机器判定结果</option><option>设备位置（一级）</option><option>设备位置（二级）</option></select></div><div class="quality-config-field full"><label>排序依据</label><div class="quality-segment-control"><button type="button" class="is-active">字段值</button><button type="button">记录顺序</button></div></div><div class="quality-config-field full"><label>排序规则</label><div class="quality-segment-control"><button type="button">正序</button><button type="button" class="is-active">倒序</button></div></div></div></div></section>
       <section class="quality-config-section"><div class="quality-config-grid"><div class="quality-config-field full"><label>空单元格显示为</label><select><option>空</option><option>零</option></select></div></div></section></div>
       <div class="quality-metric-panel" data-chart-panel="custom" hidden>${qualityChartCustomMarkup()}</div>
     </div><footer class="quality-config-drawer-foot"><button type="button" class="primary" data-quality-chart-save>保存</button></footer></aside>`;
@@ -1539,7 +1596,7 @@
     picker.querySelectorAll('[data-chart-type-variant]').forEach(button=>button.onclick=()=>{const select=drawer.querySelector('[data-quality-config="type"]');select.value=button.dataset.chartTypeVariant;select.dispatchEvent(new Event('change',{bubbles:true}));});
   }
 
-  const heatmapDimensions = ['时间','设备名称','所在位置（一级）','所在位置（二级）','模板名称','缺陷类型','判定结果'];
+  const heatmapDimensions = ['时间','设备名称','设备位置（一级）','设备位置（二级）','模板名称','缺陷类型','判定结果'];
   function configureHeatmapFields(drawer, kind, chart) {
     const heatmap = kind === 'heatmap';
     let section = drawer.querySelector('[data-heatmap-fields]');
@@ -1627,7 +1684,7 @@
   }
 
   function selectQualityEditorChart(chart) {
-    if (!chart) return;
+    if (!chart) return; ensureQualityConfigDrawer();
     document.querySelectorAll('[data-custom-chart]').forEach(item => item.classList.toggle('is-editor-selected', item === chart));
     qualityEditorSelectedChart = chart;
     qualityEditorSelectedMetric = null;
@@ -1650,9 +1707,9 @@
     drawer.querySelector('.quality-config-drawer-head h3').textContent = typeLabels[chartKind] || '柱状图';
     drawer.querySelector('[data-quality-config="name"]').value = getText(chart.querySelector('.phead-title b')) || '未命名图表';
     drawer.querySelector('[data-quality-config="type"]').value = chartKind;
-    chart.dataset.dimension ||= chart.hasAttribute('data-comparison-panel') ? '设备名称' : '检测日期';
+    chart.dataset.dimension ||= chart.hasAttribute('data-comparison-panel') ? '设备名称' : '检测开始时间';
     if (chart.dataset.dimension === '设备') chart.dataset.dimension = '设备名称';
-    if (chart.dataset.dimension === '第二级位置') chart.dataset.dimension = '设备所在位置';
+    if (chart.dataset.dimension === '第二级位置') chart.dataset.dimension = '设备位置（一级）';
     chart.dataset.measure ||= chart.hasAttribute('data-comparison-panel') ? 'PCB良率' : '检测PCB数';
     chart.dataset.originalDimension ||= chart.dataset.dimension;
     chart.dataset.originalMeasure ||= chart.dataset.measure;
@@ -1685,6 +1742,7 @@
     if (drawerTitle) drawerTitle.textContent = qualityChartTypes.find(([,variants]) => variants.some(([value]) => value === type))?.[0] || typeTitles[type] || '柱状图';
     if (window.spcRenderQualityChartPreview?.(chart, drawer)) return;
     if (type === 'heatmap') {
+      if(renderDeviceHeatmap(chart))return;
       const data = chart.dataset;
       if (data.heatmapX !== '时间' || data.heatmapY !== '设备名称' || data.heatmapGrain !== '天' || data.heatmapColor !== '检测PCB数' || chart.dataset.editorCreated === 'true') {
         chart.querySelector('.quality-chart-body').innerHTML = `<div class="quality-custom-placeholder"><div><b>热力图</b>${data.heatmapX}${data.heatmapX === '时间' ? '（'+data.heatmapGrain+'）' : ''} × ${data.heatmapY}${data.heatmapY === '时间' ? '（'+data.heatmapGrain+'）' : ''}<small>颜色指标：${data.heatmapColor}</small><small>暂无该维度组合的统计数据</small></div></div>`;
@@ -1788,9 +1846,15 @@
     };
   }
 
+  function placeQualityCopyMenu(button,target,cascade=false){
+    target.style.position='fixed';target.style.zIndex='1200';target.style.right='auto';
+    const rect=button.getBoundingClientRect(),width=target.offsetWidth,height=target.offsetHeight;
+    const left=cascade?(rect.left-width-5>=8?rect.left-width-5:rect.right+5):rect.right-width;
+    target.style.left=Math.max(8,Math.min(left,innerWidth-width-8))+'px';target.style.top=Math.max(8,Math.min(rect.top,innerHeight-height-8))+'px';
+  }
   function addQualityComponentControls(component) {
     if (!component || component.querySelector(':scope > .quality-component-tools')) return;
-    component.insertAdjacentHTML('beforeend', `<div class="quality-component-tools"><button type="button" class="quality-component-drag" draggable="true" title="拖动调整位置" aria-label="拖动调整位置">⠿</button><button type="button" class="quality-component-more" aria-label="组件操作">⋮</button><div class="quality-component-menu" hidden><button type="button" data-component-config>配置</button>${component.matches('[data-custom-chart]') ? '<div class="quality-copy-item"><button type="button" data-component-copy aria-expanded="false">复制　›</button><div class="quality-copy-submenu" hidden><button type="button" data-copy-current>复制到当前页面</button><div class="quality-copy-item"><button type="button" data-copy-other aria-expanded="false">复制到其他页面　›</button><div class="quality-copy-submenu quality-copy-pages" hidden></div></div></div></div>' : ''}<button type="button" data-component-delete>删除</button></div></div><button type="button" class="quality-component-resize" title="拖动调整宽度和高度" aria-label="拖动调整宽度和高度"></button>`);
+    component.insertAdjacentHTML('beforeend', `<div class="quality-component-tools"><button type="button" class="quality-component-drag" draggable="true" title="拖动调整位置" aria-label="拖动调整位置">⠿</button><button type="button" class="quality-component-more" aria-label="组件操作">⋮</button><div class="quality-component-menu" hidden><button type="button" data-component-config>配置</button>${'<div class="quality-copy-item"><button type="button" data-component-copy aria-expanded="false">复制　›</button><div class="quality-copy-submenu" hidden><button type="button" data-copy-current>复制到当前页面</button><div class="quality-copy-item"><button type="button" data-copy-other aria-expanded="false">复制到其他页面　›</button><div class="quality-copy-submenu quality-copy-pages" hidden></div></div></div></div>'}<button type="button" data-component-delete>删除</button></div></div><button type="button" class="quality-component-resize" title="拖动调整宽度和高度" aria-label="拖动调整宽度和高度"></button>`);
     const tools = component.querySelector(':scope > .quality-component-tools');
     const more = tools.querySelector('.quality-component-more');
     const menu = tools.querySelector('.quality-component-menu');
@@ -1800,6 +1864,7 @@
       event.stopPropagation();
       document.querySelectorAll('.quality-component-menu').forEach(item => { if (item !== menu) item.hidden = true; });
       menu.hidden = !menu.hidden;
+      if(!menu.hidden)placeQualityCopyMenu(more,menu);
     };
     tools.querySelector('[data-component-config]').onclick = event => {
       event.stopPropagation();
@@ -1807,17 +1872,17 @@
       if (component.matches('[data-custom-metric]')) selectQualityEditorMetric(component);
       else selectQualityEditorChart(component);
     };
-    if (component.matches('[data-custom-chart]')) {
+    if (component.matches('[data-custom-chart],[data-custom-metric]')) {
       const pages = [['项目统计','01-项目统计首页.html'],['项目统计-项目详情','01A-项目明细.html'],['设备分析','09-设备质量分析.html'],['缺陷分析','03-缺陷分析.html'],['误报分析','04-误报分析.html'],['不良分析','04A-不良导出.html'],['告警分析','13-品质预警.html'],['设备运行监控','07-数据上传监控.html']];
       const current = decodeURIComponent(location.pathname.split('/').pop());
       const first = tools.querySelector('[data-component-copy]');
       const second = tools.querySelector('[data-copy-other]');
       const submenu = first.nextElementSibling;
       const pageMenu = second.nextElementSibling;
-      const toggle = (button, target) => { target.hidden = !target.hidden; button.setAttribute('aria-expanded', String(!target.hidden)); };
+      const toggle = (button, target) => { target.hidden = !target.hidden; button.setAttribute('aria-expanded', String(!target.hidden)); if(!target.hidden)placeQualityCopyMenu(button,target,true); };
       first.onclick = event => { event.stopPropagation(); toggle(first, submenu); pageMenu.hidden = true; second.setAttribute('aria-expanded','false'); };
       second.onclick = event => { event.stopPropagation(); toggle(second, pageMenu); };
-      const snapshot = () => ({title: getText(component.querySelector('.phead-title b')), type: component.dataset.chartKind || 'bar', dataset: {...component.dataset}, rows: window.spcQualityChartRows?.(component.dataset.dimension || '检测日期',component.dataset.measure || '检测PCB数') || [], body: component.querySelector('.quality-chart-body')?.innerHTML || ''});
+      const snapshot = () => component.matches('[data-custom-metric]') ? {html:component.outerHTML,state:{title:getText(component.querySelector('.metric-label')),indicator:component.dataset.metricIndicator||component.dataset.customMetric}} : ({title: getText(component.querySelector('.phead-title b')), type: component.dataset.chartKind || 'bar', dataset: {...component.dataset}, rows: window.spcQualityChartRows?.(component.dataset.dimension || '检测开始时间',component.dataset.measure || '检测PCB数') || [], body: component.querySelector('.quality-chart-body')?.innerHTML || ''});
       tools.querySelector('[data-copy-current]').onclick = event => {
         event.stopPropagation();
         const clone = component.cloneNode(true);
@@ -1831,7 +1896,7 @@
         clone.addEventListener('click', click => { if (!click.target.closest('button,input,select')) selectQualityEditorChart(clone); });
         addQualityComponentControls(clone);
         menu.hidden = true;
-        selectQualityEditorChart(clone);
+        if(component.matches('[data-custom-metric]')){clone.dataset.metricIndicator=component.dataset.metricIndicator||component.dataset.customMetric;clone.dataset.customMetric='copiedMetric'+Date.now();selectQualityEditorMetric(clone)}else selectQualityEditorChart(clone);
         toast('已复制到当前页面');
       };
       pages.filter(([,file]) => file !== current).forEach(([name,file]) => {
@@ -1839,7 +1904,7 @@
         button.type = 'button'; button.textContent = name;
         button.onclick = event => {
           event.stopPropagation();
-          const key = `spc-chart-copies:${file}`;
+          const key = `${component.matches('[data-custom-metric]')?'spc-metric-copies':'spc-chart-copies'}:${file}`;
           let items = []; try { items = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
           items.push(snapshot());
           localStorage.setItem(key, JSON.stringify(items));
@@ -1882,6 +1947,7 @@
         component.style.setProperty('width', `${Math.round(desiredWidth)}px`, 'important');
         component.style.setProperty('flex', '0 0 auto', 'important');
         component.style.setProperty('height', `${Math.round(desiredHeight)}px`, 'important');
+
       };
       const finish = () => {
         document.body.classList.remove('quality-component-resizing');
@@ -1905,7 +1971,7 @@
     });
     component.addEventListener('dragover', event => {
       const dragging = document.querySelector('.quality-component-dragging');
-      if (!dragging || dragging === component || dragging.parentElement !== component.parentElement) return;
+      if (!dragging || dragging === component || (dragging.parentElement !== component.parentElement && !dragging.matches('[data-custom-metric]'))) return;
       event.preventDefault();
       component.classList.add('quality-component-drop-before');
     });
@@ -1913,7 +1979,7 @@
     component.addEventListener('drop', event => {
       const dragging = document.querySelector('.quality-component-dragging');
       component.classList.remove('quality-component-drop-before');
-      if (!dragging || dragging === component || dragging.parentElement !== component.parentElement) return;
+      if (!dragging || dragging === component || (dragging.parentElement !== component.parentElement && !dragging.matches('[data-custom-metric]'))) return;
       event.preventDefault();
       component.parentElement.insertBefore(dragging, component);
     });
@@ -1927,7 +1993,7 @@
     const content = document.querySelector('.quality-content');
     if (!content) return;
     if (type === 'metric') {
-      const metrics = content.querySelector('.quality-metrics');
+      const metrics = content.querySelector('.quality-grid');
       if (!metrics) return;
       const metric = document.createElement('div');
       metric.className = 'quality-metric';
@@ -1957,6 +2023,10 @@
     selectQualityEditorChart(chart);
   }
 
+  window.spcFlushEditorPage=()=>{if(document.body.dataset.page!=='device-quality'||!document.body.classList.contains('quality-page-editor-open'))return;document.querySelector('[data-quality-chart-save]')?.click();const serialize=el=>{const c=el.cloneNode(true);c.querySelectorAll('.quality-component-tools,.quality-component-resize,.shared-layout-drag,.shared-layout-resize').forEach(n=>n.remove());c.classList.remove('is-editor-selected');delete c.dataset.layoutReady;return c.outerHTML};localStorage.setItem('spc-native-page:'+location.pathname,JSON.stringify({charts:[...document.querySelectorAll('[data-custom-chart]')].map(serialize),metrics:[...document.querySelectorAll('[data-custom-metric]')].map(serialize)}));};
+  function restoreNativeEditorPage(content){let state;try{state=JSON.parse(localStorage.getItem('spc-native-page:'+location.pathname)||'null')}catch{}if(state){for(const [kind,selector,container]of [['charts','[data-custom-chart]',content.querySelector('.quality-grid')],['metrics','[data-custom-metric]',content.querySelector('.quality-metrics')]]){const existing=[...content.querySelectorAll(selector)];state[kind]?.forEach((html,index)=>{const box=document.createElement('div');box.innerHTML=html;const el=box.firstElementChild;if(!el)return;existing[index]?existing[index].replaceWith(el):container?.append(el)})}}
+  const file=decodeURIComponent(location.pathname.split('/').pop());let copies=[];try{copies=JSON.parse(localStorage.getItem('spc-chart-copies:'+file)||'[]')}catch{}copies.forEach((item,index)=>{if(content.querySelector('[data-native-copy="'+index+'"]'))return;const c=document.createElement('section');c.className='quality-chart';c.dataset.customChart='';c.dataset.nativeCopy=String(index);c.dataset.chartKind=item.type||'bar';Object.assign(c.dataset,item.dataset||{});c.innerHTML='<div class="phead"><div class="phead-title"><b></b></div></div><div class="quality-chart-body"></div>';c.querySelector('b').textContent=item.title;c.querySelector('.quality-chart-body').innerHTML=item.body||'';content.querySelector('.quality-grid')?.append(c)});let metricCopies=[];try{metricCopies=JSON.parse(localStorage.getItem('spc-metric-copies:'+file)||'[]')}catch{}metricCopies.forEach((item,index)=>{if(content.querySelector('[data-native-metric-copy="'+index+'"]'))return;const box=document.createElement('div');box.innerHTML=item.html;const el=box.firstElementChild;if(!el)return;el.querySelectorAll('.quality-component-tools,.quality-component-resize,[data-shared-metric-menu],.spc-metric-drag,.spc-metric-resize').forEach(n=>n.remove());el.dataset.nativeMetricCopy=String(index);el.dataset.customMetric='importedMetric'+index;const name=String(item.state?.indicator||'').replace(/\s/g,'');const option=deviceIndicatorOptions.find(([key,label])=>key===name||label.replace(/\s/g,'')===name);el.dataset.metricIndicator=option?.[0]||({'PCB检测数':'pcbTotal','板卡直通率':'boardPassRate','板卡NG率':'boardNgRate','器件NG率':'componentNgRate'})[name]||name;content.querySelector('.quality-metrics')?.append(el)})}
+    window.spcRegisterGroupClone=(clone,source)=>{clone.querySelectorAll('.quality-component-tools,.quality-component-resize').forEach(n=>n.remove());delete clone.dataset.layoutReady;delete clone.dataset.layoutId;addQualityComponentControls(clone);clone.addEventListener('click',e=>{if(e.target.closest('button,a,input,select'))return;clone.matches('[data-custom-chart]')?selectQualityEditorChart(clone):selectQualityEditorMetric(clone)})};
   function openQualityComponentPicker() {
     document.querySelector('[data-quality-component-picker]')?.remove();
     const backdrop = document.createElement('div');
@@ -1999,12 +2069,13 @@
   }
 
   function openQualityPageEditor() {
+    window.spcEditSession?.begin();
     if (document.querySelector('[data-quality-config-drawer]')) return;
     const content = document.querySelector('.quality-content');
     const grid = content?.querySelector('.quality-grid');
     if (!content || !grid) return;
     document.body.classList.add('quality-page-editor-open');
-    content.insertAdjacentHTML('afterbegin', `<section class="quality-editor-bar" data-quality-editor-bar><div><b>编辑设备分析页面</b><span>　点击组件右上角菜单进行配置，拖动手柄可调整位置</span></div><div class="quality-editor-bar-actions"><button type="button" data-quality-add-chart>添加组件</button><button type="button" data-quality-reset-page>恢复默认</button><button type="button" data-quality-preview-page>页面预览</button><button type="button" class="primary" data-quality-publish>完成编辑</button></div></section>`);
+    (document.querySelector('.top-actions') || content).insertAdjacentHTML('beforeend', `<section class="quality-editor-bar" data-quality-editor-bar><div><b>编辑设备分析页面</b><span>　点击组件右上角菜单进行配置，拖动手柄可调整位置</span></div><div class="quality-editor-bar-actions"><button type="button" data-quality-add-chart>添加组件</button><button type="button" data-quality-reset-page>恢复默认</button><button type="button" data-quality-preview-page>页面预览</button><button type="button" class="primary" data-quality-publish>完成编辑</button></div></section>`);
     document.body.insertAdjacentHTML('beforeend', window.spcQualityConfigTemplate?.drawerMarkup() || qualityEditorDrawerMarkup());
     const drawer = document.querySelector('[data-quality-config-drawer]');
     drawer.dataset.mode = 'chart';
@@ -2022,20 +2093,21 @@
       metric.addEventListener('click', event => { if (!event.target.closest('button')) selectQualityEditorMetric(metric); });
       addQualityComponentControls(metric);
     });
-    document.querySelectorAll('[data-quality-editor-exit]').forEach(button => button.onclick = closeQualityPageEditor);
-    content.querySelector('[data-quality-reset-page]').onclick = () => {
+    document.querySelectorAll('[data-quality-editor-exit]').forEach(button => button.onclick = () => {button.closest('.quality-config-drawer').hidden=true});
+    document.querySelector('[data-quality-reset-page]').onclick = () => {
+      localStorage.removeItem('spc-native-page:'+location.pathname);
       qualityMetricOverrides.clear();
       closeQualityPageEditor();
       renderDeviceQuality();
       openQualityPageEditor();
       toast('页面已恢复默认');
     };
-    content.querySelector('[data-quality-add-chart]').onclick = openQualityComponentPicker;
-    content.querySelector('[data-quality-preview-page]').onclick = event => {
+    document.querySelector('[data-quality-add-chart]').onclick = openQualityComponentPicker;
+    document.querySelector('[data-quality-preview-page]').onclick = event => {
       const previewing = document.body.classList.toggle('quality-page-preview');
       event.currentTarget.textContent = previewing ? '返回编辑' : '页面预览';
     };
-    content.querySelector('[data-quality-publish]').onclick = () => {
+    document.querySelector('[data-quality-publish]').onclick = () => {
       closeQualityPageEditor();
       toast('页面编辑已完成');
     };
@@ -2044,6 +2116,7 @@
     };
     document.addEventListener('click', document._qualityMenuCloser);
     bindQualityChartDrawer(drawer);
+    window.syncEditorHeader?.();
     selectQualityEditorChart(content.querySelector('[data-custom-chart]'));
   }
 
@@ -2190,6 +2263,7 @@
     initializeProjectComparison();
     content.querySelector('[data-chart-device-config]')?.addEventListener('click', openChartDeviceConfig);
     content.querySelector('[data-quality-page-edit]')?.addEventListener('click', openQualityPageEditor);
+    restoreNativeEditorPage(content);
   }
 
   function renderDeviceQuality() {
@@ -2208,6 +2282,8 @@
   function setMouth(mouth) {
     currentMouth = mouth;
     if (document.body.dataset.page === 'device-quality') renderDeviceQuality(); else renderProjectSummary(mouth);
+    if(document.body.dataset.page==='device-quality'&&document.body.classList.contains('quality-page-editor-open')){document.querySelectorAll('.quality-config-drawer,.quality-editor-bar').forEach(el=>el.remove());openQualityPageEditor()}
+    window.dispatchEvent(new CustomEvent('spc-page-mouth-change'));
     const label = document.body.dataset.mouthPage === 'project' && mouth === 'original' ? '机器判定' : mouthLabel(mouth);
     toast(`统计口径已切换为${label}，页面数据已同步更新`, 'info');
   }
@@ -2413,7 +2489,7 @@
     const setSelection = id => {
       const item = byId.get(id);
       input.value = item ? item.id : '';
-      label.textContent = item ? item.path : '请选择设备所在位置';
+      label.textContent = item ? item.path : '请选择设备位置';
       trigger.title = item ? item.path : '';
       trigger.classList.toggle('is-placeholder', !item);
       tree.querySelectorAll('[data-org-choice]').forEach(choice => choice.classList.toggle('is-selected', choice.dataset.orgChoice === id));
@@ -2460,7 +2536,7 @@
   }
 
   function openAddDeviceModal() {
-    const backdrop = openModal('新增设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><div class="proto-device-identify-row"><input data-device-ip data-device-required inputmode="decimal" autocomplete="off" placeholder="例如：192.168.10.25"><button type="button" class="proto-device-identify-button" data-identify-device>识别设备</button></div><p class="proto-device-status" data-device-status>填写设备 IP 后识别设备信息</p></div><div class="proto-device-divider"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-device-sn data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-device-name data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备所在位置<em class="proto-required">*</em></label><div class="proto-org-picker"><input type="hidden" data-device-org-node data-device-required><button class="proto-org-trigger is-placeholder" type="button" data-device-org-trigger data-device-config aria-expanded="false" disabled><span>请选择设备所在位置</span><span aria-hidden="true">⌄</span></button><div class="proto-org-tree" data-device-org-tree role="tree" hidden></div></div></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-device-enabled data-device-config data-device-required disabled><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea data-device-config disabled placeholder="请输入备注（选填）"></textarea></div>`, '新增设备', modal => {
+    const backdrop = openModal('新增设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><div class="proto-device-identify-row"><input data-device-ip data-device-required inputmode="decimal" autocomplete="off" placeholder="例如：192.168.10.25"><button type="button" class="proto-device-identify-button" data-identify-device>识别设备</button></div><p class="proto-device-status" data-device-status>填写设备 IP 后识别设备信息</p></div><div class="proto-device-divider"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-device-sn data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-device-name data-device-required readonly placeholder="识别后自动获取" aria-readonly="true"></div><div class="proto-field"><label>设备位置<em class="proto-required">*</em></label><div class="proto-org-picker"><input type="hidden" data-device-org-node data-device-required><button class="proto-org-trigger is-placeholder" type="button" data-device-org-trigger data-device-config aria-expanded="false" disabled><span>请选择设备位置</span><span aria-hidden="true">⌄</span></button><div class="proto-org-tree" data-device-org-tree role="tree" hidden></div></div></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-device-enabled data-device-config data-device-required disabled><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea data-device-config disabled placeholder="请输入备注（选填）"></textarea></div>`, '新增设备', modal => {
       if (!validateRequiredDeviceFields(modal)) return false;
       const ip = modal.querySelector('[data-device-ip]').value.trim();
       if (modal.dataset.identifiedIp !== ip) { toast('请先识别当前设备 IP', 'error'); return false; }
@@ -2526,7 +2602,7 @@
         configFields.forEach(field => { field.disabled = false; });
         confirmButton.disabled = false;
         status.className = 'proto-device-status is-success';
-        status.textContent = '设备识别成功，请选择设备所在位置并设置启用状态';
+        status.textContent = '设备识别成功，请选择设备位置并设置启用状态';
         configFields[0].focus();
       }, 650);
     });
@@ -2537,7 +2613,7 @@
     const deviceModal = () => {
       const row = target.closest('tr');
       const cells = Array.from(row?.cells || []).filter(cell => !cell.classList.contains('sequence-cell'));
-      const backdrop = openModal('编辑设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><input data-edit-device-ip data-device-required placeholder="例如：192.168.10.21"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-edit-device-sn data-device-required readonly aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-edit-device-name data-device-required readonly aria-readonly="true"></div><div class="proto-field"><label>设备所在位置<em class="proto-required">*</em></label><div class="proto-org-picker"><input type="hidden" data-device-org-node data-device-required><button class="proto-org-trigger is-placeholder" type="button" data-device-org-trigger aria-expanded="false"><span>请选择设备所在位置</span><span aria-hidden="true">⌄</span></button><div class="proto-org-tree" data-device-org-tree role="tree" hidden></div></div></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-edit-device-enabled data-device-required><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea placeholder="请输入备注（选填）"></textarea></div>`, '保存修改', modal => {
+      const backdrop = openModal('编辑设备', `<div class="proto-field"><label>设备IP<em class="proto-required">*</em></label><input data-edit-device-ip data-device-required placeholder="例如：192.168.10.21"></div><div class="proto-field"><label>设备SN<em class="proto-required">*</em></label><input data-edit-device-sn data-device-required readonly aria-readonly="true"></div><div class="proto-field"><label>设备名称<em class="proto-required">*</em></label><input data-edit-device-name data-device-required readonly aria-readonly="true"></div><div class="proto-field"><label>设备位置<em class="proto-required">*</em></label><div class="proto-org-picker"><input type="hidden" data-device-org-node data-device-required><button class="proto-org-trigger is-placeholder" type="button" data-device-org-trigger aria-expanded="false"><span>请选择设备位置</span><span aria-hidden="true">⌄</span></button><div class="proto-org-tree" data-device-org-tree role="tree" hidden></div></div></div><div class="proto-field"><label>启用状态<em class="proto-required">*</em></label><select data-edit-device-enabled data-device-required><option>启用</option><option>停用</option></select></div><div class="proto-field"><label>备注</label><textarea placeholder="请输入备注（选填）"></textarea></div>`, '保存修改', modal => {
         if (!validateRequiredDeviceFields(modal)) return false;
         if (typeof window.moveSPCDeviceToOrganization === 'function' && !window.moveSPCDeviceToOrganization(row, modal.querySelector('[data-device-org-node]').value)) return false;
         const ip = modal.querySelector('[data-edit-device-ip]').value.trim();
@@ -2634,6 +2710,7 @@
     });
   }
 
+  window.spcBindTimeControl = control => makeControlInteractive(control);
   function makeControlInteractive(control) {
     const field = control.closest('.field');
     const label = getText(field && field.querySelector('label'));
@@ -3003,7 +3080,7 @@
   function normalizeRequestedNavigation() {
     const nav = document.querySelector('.nav');
     if (!nav) return;
-    const labels = ['项目统计','设备分析','缺陷分析','误报分析','不良分析','告警分析','单板查询','设备运行监控','设备管理','告警管理','用户管理','角色管理'];
+    const labels = ['项目统计','设备分析','缺陷分析','误报分析','不良分析','告警分析','设备运行监控','单板查询','设备管理','告警管理','用户管理','角色管理'];
     const routes = {'项目统计':'01-项目统计首页.html','设备分析':'09-设备质量分析.html','缺陷分析':'03-缺陷分析.html','误报分析':'04-误报分析.html','不良分析':'04A-不良导出.html','告警分析':'13-品质预警.html','单板查询':'02-单板查询与结果追溯.html','设备运行监控':'07-数据上传监控.html','设备管理':'08-设备与区域管理.html','告警管理':'14-告警管理.html','用户管理':'10-用户管理.html','角色管理':'11-角色管理.html'};
     const items = Array.from(nav.children).filter(item => item.matches('.nav-item,.item'));
     const groups = Array.from(nav.children).filter(item => item.classList.contains('group'));
@@ -3025,7 +3102,7 @@
       item.href = routes[label];
       return item;
     });
-    nav.replaceChildren(...ordered.slice(0,6), dataGroup, ...ordered.slice(6,10), systemGroup, ...ordered.slice(10));
+    nav.replaceChildren(...ordered.slice(0,7), dataGroup, ...ordered.slice(7,10), systemGroup, ...ordered.slice(10));
   }
   function openTopMenu(button, items) {
     closePopover();
@@ -3056,11 +3133,13 @@
     if (buttons[0]) {
       buttons[0].classList.add('proto-top-icon', 'proto-language-btn');
       buttons[0].setAttribute('aria-label', '选择语言');
+      buttons[0].title = '切换语言';
       buttons[0].innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21M12 3C9.5 5.6 8.3 8.6 8.3 12S9.5 18.4 12 21"></path></svg>';
     }
     if (buttons[1]) {
       buttons[1].classList.add('proto-top-icon', 'proto-theme-btn');
       buttons[1].setAttribute('aria-label', '页面外观');
+      buttons[1].title = '切换模式';
       buttons[1].innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
     }
   }
@@ -3256,12 +3335,16 @@
         const action = button.dataset.alertAction;
         if (action === 'toggle') {
           const enabled = row.dataset.ruleStatus === 'enabled';
-          row.dataset.ruleStatus = enabled ? 'disabled' : 'enabled';
-          button.classList.toggle('on', !enabled);
-          button.setAttribute('aria-label', enabled ? '停用规则' : '启用规则');
-          const state = row.querySelector('.state');
-          if (state) { state.textContent = enabled ? '停用' : '启用'; state.classList.toggle('off', enabled); }
-          toast(enabled ? '规则已停用' : '规则已启用', 'info');
+          const apply = () => {
+            row.dataset.ruleStatus = enabled ? 'disabled' : 'enabled';
+            button.classList.toggle('on', !enabled);
+            button.setAttribute('role','switch');
+            button.setAttribute('aria-checked',String(!enabled));
+            button.setAttribute('aria-label', enabled ? '启用规则' : '停用规则');
+            toast(enabled ? '规则已停用' : '规则已启用', 'info');
+          };
+          if(enabled) openModal('停用告警规则','<p style="margin:0;color:#475569">确认停用该告警规则吗？</p>','停用',apply);
+          else apply();
           return;
         }
         if (action === 'delete' && row.dataset.ruleStatus === 'enabled') {

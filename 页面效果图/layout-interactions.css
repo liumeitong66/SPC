@@ -1,0 +1,31 @@
+.shared-layout-group{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;gap:14px!important;height:auto!important;min-height:0!important;flex:0 0 auto!important;overflow:visible!important}
+.shared-layout-group>[data-custom-chart]{box-sizing:border-box;flex:0 0 auto!important;width:var(--shared-chart-width,calc(50% - 7px));max-width:100%;min-width:0;height:var(--shared-chart-height,250px);min-height:180px;overflow:hidden}
+.shared-layout-group.shared-layout-single>[data-custom-chart]{width:var(--shared-chart-width,100%)}
+.shared-layout-table{position:relative;min-width:0;max-width:100%}
+body[data-page="device-quality"] .quality-grid{flex:0 0 auto!important;height:auto!important;align-items:flex-start!important}
+body[data-page="device-quality"] .quality-grid>[data-custom-chart]{min-height:180px;height:clamp(250px,40vh,500px)}
+.shared-layout-drag{position:absolute;z-index:14;left:7px;bottom:7px;right:auto;top:auto;border-radius:4px;background:#fff!important}
+.shared-layout-resize{position:absolute;z-index:14;right:0;bottom:0}
+.shared-table-drag{display:none;flex:0 0 auto;margin-left:8px;border:0;background:transparent;color:#8a98a9;cursor:grab;font-size:16px}
+.quality-page-editor-open .shared-table-drag{display:inline-grid;place-items:center}
+body:not(.quality-page-editor-open) .shared-layout-drag,body:not(.quality-page-editor-open) .shared-layout-resize,.quality-page-preview .shared-layout-drag,.quality-page-preview .shared-layout-resize,.quality-page-preview .shared-table-drag{display:none!important}
+@media(max-width:1300px){body[data-page="alert-analysis"] .shared-layout-group>[data-custom-chart]:not([data-layout-resized]){width:calc(50% - 7px)}}
+@media(max-width:900px){.shared-layout-group>[data-custom-chart]:not([data-layout-resized]){width:100%!important}.shared-layout-group>[data-custom-chart]{max-width:100%}}
+
+/* Lists keep their own size when chart rows grow above them. */
+.shared-layout-table{box-sizing:border-box;display:flex!important;flex-direction:column!important;flex:0 0 480px!important;width:100%;height:480px;min-height:0!important;max-height:none!important;overflow:hidden}
+.shared-layout-table>.panel-head,.shared-layout-table>.phead,.shared-layout-table>.table-title,.shared-layout-table>.stats-head,.shared-layout-table>.pcb-toolbar,.shared-layout-table>.component-toolbar,.shared-layout-table>.pager{flex-shrink:0}
+.shared-layout-table>.table-wrap,.shared-layout-table>.tablebox,.shared-layout-table>.table-scroll,.shared-layout-table>.stats-tablebox,.shared-layout-table>.component-table-wrap,.shared-layout-table>.pcb-table-wrap{height:auto!important;flex:1 1 0!important;min-height:0!important;overflow:auto}
+.shared-layout-table>.table-wrap{display:flex;flex-direction:column;overflow:hidden}
+.shared-layout-table>.table-wrap>.table-scroll{flex:1 1 0;min-height:0;overflow:auto}
+.shared-layout-table>.table-wrap>.pager{flex:0 0 auto}
+main:has(.shared-layout-table),.quality-content:has(.shared-layout-table){overflow-y:auto!important;min-height:0}
+/* List headings share the device-detail heading specification. */
+.shared-layout-table>.table-title,.shared-layout-table>.panel-head,.table-panel>.table-title{box-sizing:border-box;height:50px;min-height:50px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edf2}
+.shared-layout-table>.table-title>b,.shared-layout-table>.panel-head .panel-title,.table-panel>.table-title>b{font-size:16px;font-weight:680;color:var(--ink,#1f3552);line-height:24px}
+.shared-layout-table>.table-title>.tools,.shared-layout-table>.panel-head>.tools{margin-left:auto}
+.quality-page-editor-open:not(.quality-page-preview) [data-custom-chart]>.phead,.quality-page-editor-open:not(.quality-page-preview) [data-custom-chart]>.panel-head,.quality-page-editor-open:not(.quality-page-preview) [data-custom-chart]>.export-chart-head{cursor:grab;touch-action:none}
+.quality-component-drag,.spc-metric-drag{touch-action:none}
+.spc-layout-drag-active,.spc-layout-drag-active *{cursor:grabbing!important;user-select:none!important}
+.spc-pointer-dragging{opacity:.5!important;pointer-events:none!important}
+.spc-pointer-drop-before{box-shadow:inset 4px 0 #3478f6!important}.spc-pointer-drop-after{box-shadow:inset -4px 0 #3478f6!important}

@@ -20,7 +20,7 @@
     name:[['eq','等于'],['ne','不等于'],['contains','包含'],['notContains','不包含'],['empty','为空'],['notEmpty','不为空']],
     number:[['eq','等于'],['ne','不等于'],['gt','大于'],['gte','大于或等于'],['lt','小于'],['lte','小于或等于'],['empty','为空'],['notEmpty','不为空']]
   };
-  const periods = [['specific','具体日期'],['today','今天'],['tomorrow','明天'],['yesterday','昨天'],['thisWeek','本周'],['lastWeek','上周'],['thisMonth','本月'],['lastMonth','上月'],['past7','过去7天内'],['next7','未来7天内'],['past30','过去30天内'],['next30','未来30天内']];
+  const periods = [['specific','具体日期'],['today','今天'],['yesterday','昨天'],['thisWeek','本周'],['lastWeek','上周'],['thisMonth','本月'],['lastMonth','上月'],['past7','过去7天内'],['next7','未来7天内'],['past30','过去30天内'],['next30','未来30天内']];
   const fallbackNames = {
     location:['区域A','区域B','区域C','区域D'],
     templateName:['3267504J2G_A面','1-A','329134S_P129','155042F_P9','C509048_B面','JLC_AOI_DEMO','20260804_NPI','0804-FPC','SMT2407301669-T','AOI02-MAIN','202608-NPI-02','B02-TEST','AOI04-BATCH','D04-NPI'],

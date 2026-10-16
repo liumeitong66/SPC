@@ -21,11 +21,11 @@
     const data = window.spcQualityChartSamples;
     if (!data) return [];
     let rows = [];
-    if (dimension === '检测日期') {
+    if (dimension === '检测开始时间') {
       const trend = data.trend(), labels = trend.labels;
       rows = labels.map((label, i) => ({label, recordCount:data.devices.slice(0,5).length,count: data.devices.slice(0,5).reduce((sum, d, j) => sum + Math.max(80, Math.round(d.boardTotal / labels.length * (.82 + ((i*3+j*2)%7)*.055))), 0), yield: trend.series.reduce((sum,s)=>sum+(s.values[i]||0),0)/Math.max(1,trend.series.length)}));
-    } else if (dimension === '设备名称' || dimension === '设备SN' || dimension === '设备所在位置' || dimension === '运行状态' || dimension === '启用状态') {
-      rows = data.devices.map(d => ({label: dimension === '设备SN' ? d.sn : dimension === '设备所在位置' ? (data.comparisonDevices.find(x=>x.name===d.name)?.area||'未分配') : dimension === '运行状态' ? (d.lastDataTime ? '运行中' : '离线') : dimension === '启用状态' ? '启用' : d.name, '设备名称':d.name,'设备SN':d.sn,'设备所在位置':data.comparisonDevices.find(x=>x.name===d.name)?.area||'未分配','运行状态':d.lastDataTime?'运行中':'离线','启用状态':'启用','模板名称':d.projects?.map(project=>project.name).join('、')||'','模板ID':d.projects?.map(project=>project.uuid).join('、')||'',recordCount:1,count:d.boardTotal, yield:d.review.yield, ng:100-d.review.yield, dppm:d.review.componentFalseDppm, falseRate:d.review.falseRate}));
+    } else if (dimension === '设备名称' || dimension === '设备SN' || dimension === '设备位置（一级）' || dimension === '设备位置（二级）' || dimension === '运行状态' || dimension === '启用状态') {
+      rows = data.devices.map(d => ({label: dimension === '设备SN' ? d.sn : dimension === '设备位置（一级）' ? (data.comparisonDevices.find(x=>x.name===d.name)?.area||'未分配') : dimension === '设备位置（二级）' ? (data.comparisonDevices.find(x=>x.name===d.name)?.area?.replace('区域','产线')+'1') : dimension === '运行状态' ? (d.lastDataTime ? '运行中' : '离线') : dimension === '启用状态' ? '启用' : d.name, '设备名称':d.name,'设备SN':d.sn,'设备位置（一级）':data.comparisonDevices.find(x=>x.name===d.name)?.area||'未分配','设备位置（二级）':(data.comparisonDevices.find(x=>x.name===d.name)?.area||'').replace('区域','产线')+'1','运行状态':d.lastDataTime?'运行中':'离线','启用状态':'启用','模板名称':d.projects?.map(project=>project.name).join('、')||'','模板ID':d.projects?.map(project=>project.uuid).join('、')||'',recordCount:1,count:d.boardTotal, yield:d.review.yield, ng:100-d.review.yield, dppm:d.review.componentFalseDppm, falseRate:d.review.falseRate}));
     } else if (dimension === '模板名称' || dimension === '模板ID') {
       rows = data.projects.filter(p=>Number.isFinite(p.boardTotal)).map(p => ({label:dimension==='模板ID'?p.uuid:p.name,'模板名称':p.name,'模板ID':p.uuid,recordCount:data.devices.filter(d=>d.projects?.some(item=>item.uuid===p.uuid)).length,count:p.boardTotal,yield:p.review.yield,ng:100-p.review.yield,dppm:p.review.componentFalseDppm,falseRate:p.review.falseRate}));
     }

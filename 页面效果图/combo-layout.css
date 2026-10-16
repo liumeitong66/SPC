@@ -1,0 +1,19 @@
+.combo-layout{position:relative;box-sizing:border-box;max-width:100%;flex:0 0 auto;min-width:0;background:#fff;border:1px solid #dce3ec;border-radius:8px;margin:0;overflow:visible}
+.combo-head{height:50px;box-sizing:border-box;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edf2;cursor:default}
+.combo-head>b{font-size:16px;font-weight:680;color:var(--ink,#1f3552)}
+.combo-tools{margin-left:auto;display:none;gap:5px;align-items:center}.combo-tools button{width:28px;height:28px;border:1px solid #d3dce8;border-radius:5px;background:#fff;color:#526176;cursor:pointer;font-size:17px}.combo-tools .combo-drag{border:0;cursor:grab}
+.combo-content{box-sizing:border-box;min-height:88px;min-width:0;display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;gap:14px!important;padding:14px;overflow:visible}
+.combo-content>[data-custom-chart]{width:calc(50% - 7px);min-width:0;max-width:100%;flex:0 0 auto;position:relative}
+.combo-content>.spc-independent-metric{width:calc((100% - 42px)/4)!important;min-width:min(160px,100%);max-width:100%}
+.combo-layout[data-show-title=false]>.combo-head>b{visibility:hidden}
+body:not(.quality-page-editor-open) .combo-layout[data-show-title=false]>.combo-head,.quality-page-preview .combo-layout[data-show-title=false]>.combo-head{display:none}
+.quality-page-editor-open:not(.quality-page-preview) .combo-tools{display:flex}
+.quality-page-editor-open:not(.quality-page-preview) .combo-head{cursor:grab;touch-action:none}
+.quality-page-editor-open:not(.quality-page-preview) .combo-content:empty{border:1px dashed #b8cdf2;margin:14px;border-radius:6px;background:#f7faff}
+.combo-resize{display:none;position:absolute;right:0;bottom:0;width:16px;height:16px;border:0;background:transparent;cursor:nwse-resize;touch-action:none}.combo-resize:after{content:'';position:absolute;right:3px;bottom:3px;width:8px;height:8px;border-right:2px solid #6c8ab6;border-bottom:2px solid #6c8ab6}
+.quality-page-editor-open:not(.quality-page-preview) .combo-resize{display:block}
+.combo-moving{opacity:.45;pointer-events:none!important}.combo-drop-target{outline:2px dashed #3478f6!important;outline-offset:-3px}
+.combo-inherited-scope [data-chart-scope-field],.combo-inherited-scope .metric-scope-field{display:none!important}
+.combo-layout>[hidden]{display:none!important}
+@media(max-width:900px){.combo-content>[data-custom-chart]{width:100%}.combo-content>.spc-independent-metric{width:calc(50% - 7px)!important}}
+[data-custom-metric][hidden],.combo-layout[hidden]{display:none!important}

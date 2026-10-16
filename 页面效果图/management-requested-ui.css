@@ -1,9 +1,9 @@
-.management-page[data-page="device-management"] .status-button,.management-page[data-page="user-management"] .status-button{position:relative;display:inline-block;width:36px;height:20px;border-radius:10px;background:#3478f6;color:transparent!important;font-size:0;vertical-align:middle;transition:background .16s}
+.management-page[data-page="device-management"] .status-button,.management-page:is([data-page="user-management"],[data-page="role-management"]) .status-button{position:relative;display:inline-block;width:36px;height:20px;border-radius:10px;background:#3478f6;color:transparent!important;font-size:0;vertical-align:middle;transition:background .16s}
 .management-page[data-page="device-management"] .management-filters{height:60px!important;min-height:60px!important;flex:0 0 60px!important;align-content:center!important}
 @media(max-width:1400px){.management-page[data-page="device-management"] .management-filters{height:150px!important;min-height:150px!important;flex:0 0 150px!important}}
-.management-page[data-page="device-management"] .status-button.off,.management-page[data-page="user-management"] .status-button.off{background:#c5ced9}
-.management-page[data-page="device-management"] .status-button:after,.management-page[data-page="user-management"] .status-button:after{content:"";position:absolute;top:3px;left:19px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #62708655;transition:left .16s}
-.management-page[data-page="device-management"] .status-button.off:after,.management-page[data-page="user-management"] .status-button.off:after{left:3px}
+.management-page[data-page="device-management"] .status-button.off,.management-page:is([data-page="user-management"],[data-page="role-management"]) .status-button.off{background:#c5ced9}
+.management-page[data-page="device-management"] .status-button:after,.management-page:is([data-page="user-management"],[data-page="role-management"]) .status-button:after{content:"";position:absolute;top:3px;left:19px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #62708655;transition:left .16s}
+.management-page[data-page="device-management"] .status-button.off:after,.management-page:is([data-page="user-management"],[data-page="role-management"]) .status-button.off:after{left:3px}
 .management-page[data-page="user-management"] .table,.management-page[data-page="role-management"] .table{min-width:1350px}
 .management-page[data-page="role-management"] .role-operation{display:flex;align-items:center;gap:14px;overflow:visible}
 .management-page[data-page="role-management"] .role-more-wrap{position:relative;display:inline-flex}

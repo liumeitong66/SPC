@@ -2,7 +2,7 @@
   const table = document.querySelector('.pcb-table');
   const labels = [...window.SPCBoardExportFields.labels];
   labels.splice(6, 0, '整板SN', '拼板SN', '器件SN');
-  const defaults = ['PCB ID','条码号','设备SN','设备名称','设备所在位置','机器判定','一次复判','一次复判操作员','最终复判','最终复判操作员','检测开始时间'];
+  const defaults = ['PCB ID','条码号','设备SN','设备名称','设备位置','机器判定','一次复判','一次复判操作员','最终复判','最终复判操作员','检测开始时间'];
   let selected = new Set(defaults), rows = [], name = '', detailUrl;
   const esc = value => String(value ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const width = label => label === 'PCB ID' || label === '条码号' ? 230 : label.includes('时间') ? 180 : 160;
@@ -10,7 +10,7 @@
     const fields = labels.filter(label => selected.has(label));
     table.style.width = (192 + fields.reduce((sum, label) => sum + width(label), 0)) + 'px';
     table.innerHTML = '<colgroup><col style="width:52px"><col style="width:60px">'+fields.map(label=>`<col style="width:${width(label)}px">`).join('')+'<col style="width:80px"></colgroup><thead><tr><th><input type="checkbox" aria-label="全选"></th><th>序号</th>'+fields.map(label=>`<th>${label}</th>`).join('')+'<th>操作</th></tr></thead><tbody data-project-pcb-rows>'+rows.map((row,index)=>{
-      const values = {'PCB ID':row.id,'条码号':row.barcode,'模板名称':name,'设备SN':row.sn,'设备名称':row.device,'设备所在位置':row.area,'机器判定':row.algorithm,'一次复判':row.review,'一次复判操作员':row.reviewer,'最终复判':row.second,'最终复判操作员':row.secondReviewer,'检测开始时间':row.time,'检测时长（s）':row.duration,'器件总数':row.total,'器件OK总数':row.ok};
+      const values = {'PCB ID':row.id,'条码号':row.barcode,'模板名称':name,'设备SN':row.sn,'设备名称':row.device,'设备位置':row.area,'机器判定':row.algorithm,'一次复判':row.review,'一次复判操作员':row.reviewer,'最终复判':row.second,'最终复判操作员':row.secondReviewer,'检测开始时间':row.time,'检测时长（s）':row.duration,'器件总数':row.total,'器件OK总数':row.ok};
       return `<tr><td><input type="checkbox" aria-label="选择 ${esc(row.id)}"></td><td>${index+1}</td>`+fields.map(label=>{
         const value=esc(values[label]);
         const status=['机器判定','一次复判','最终复判'].includes(label);

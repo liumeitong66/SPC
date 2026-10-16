@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
+<head><script src="analysis-edit-session.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>AOI SPC - 本机只读</title>
@@ -56,5 +56,5 @@
   <script>
     (()=>{const params=new URLSearchParams(location.search);const device=params.get('device')||'AOI-01';const ip=params.get('ip')||'192.168.10.21';document.title=`${device} AOI SPC - 只读`;document.querySelectorAll('[data-device]').forEach(el=>el.textContent=device);document.querySelectorAll('[data-ip]').forEach(el=>el.textContent=ip);const labels={project:'项目统计',board:'单板统计',defect:'缺陷统计',false:'误报统计',ng:'不良数据查看'};document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(item=>item.classList.toggle('active',item===button));const isProject=button.dataset.view==='project';document.querySelectorAll('[data-project-content]').forEach(el=>el.classList.toggle('hidden',!isProject));document.querySelector('[data-other-content]').classList.toggle('hidden',isProject);document.querySelector('[data-view-title]').textContent=labels[button.dataset.view];document.querySelector('[data-empty-title]').textContent=labels[button.dataset.view];}));document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(item=>item.classList.toggle('active',item===tab));}));})();
   </script>
-<script src="sidebar-collapse.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script></body>
+<script src="sidebar-collapse.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script></body>
 </html>

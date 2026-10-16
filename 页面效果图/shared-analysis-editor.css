@@ -12,7 +12,18 @@ body.quality-page-editor-open main{min-width:0;overflow:auto}
 .quality-editor-bar{margin-bottom:12px}
 .quality-config-drawer [hidden]{display:none!important}
 .quality-chart-body.shared-preview{position:absolute!important;inset:50px 8px 8px;z-index:3;height:auto!important;min-height:0!important;display:grid;place-items:center;overflow:hidden;background:#fff}
-.quality-chart-body.shared-preview svg{display:block;width:100%;max-height:260px}
+.quality-chart-body.shared-preview svg{display:block;width:100%;height:100%;max-height:100%}
 .quality-config-drawer .quality-config-field input,.quality-config-drawer .quality-config-field select{box-sizing:border-box}
 @media(max-width:1180px){body.quality-page-editor-open .app{margin-right:380px}.quality-config-drawer{width:380px}}
 @media(max-width:900px){body.quality-page-editor-open .app{margin-right:0}.quality-config-drawer{width:min(380px,47vw)}}
+.shared-chart-menu-trigger{display:none;position:absolute;right:10px;top:9px;z-index:22;width:28px;height:28px;border:1px solid #d9e2ed;border-radius:4px;background:#fff;color:#64748b;cursor:pointer;font-size:18px;line-height:24px}
+.quality-page-editor-open:not(.quality-page-preview) .shared-chart-menu-trigger{display:block}
+.quality-page-editor-open:not(.quality-page-preview) [data-custom-chart]:has(>.shared-chart-menu-trigger)>.phead,.quality-page-editor-open:not(.quality-page-preview) [data-custom-chart]:has(>.shared-chart-menu-trigger)>.panel-head{padding-right:48px}
+.shared-chart-action-menu{position:fixed;z-index:1200;width:152px;max-height:calc(100vh - 32px);overflow:auto;padding:4px;border:1px solid #d9e1eb;border-radius:6px;background:#fff;box-shadow:0 8px 20px #1d345229}
+.shared-chart-action-menu button{display:block;width:100%;min-height:34px;padding:6px 10px;border:0;border-radius:4px;background:#fff;color:#334155;text-align:left;cursor:pointer;font:13px inherit}
+.shared-chart-action-menu button:hover{background:#edf4ff;color:#2468e8}.shared-chart-action-menu [data-delete]{color:#df4a4a}
+[data-custom-chart][hidden]{display:none!important}
+.quality-page-editor-open:not(.quality-page-preview) .shared-metric-menu-trigger{display:block}
+.quality-page-editor-open:not(.quality-page-preview) [data-custom-metric]:has(>[data-shared-metric-menu])>.metric-label,.quality-page-editor-open:not(.quality-page-preview) [data-custom-metric]:has(>[data-shared-metric-menu])>label{padding-right:52px;box-sizing:border-box}
+.shared-metric-menu-trigger{top:6px;right:7px}
+.spc-copy-cascade{z-index:1250;overflow-y:auto}

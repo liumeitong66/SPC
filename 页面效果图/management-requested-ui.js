@@ -1,7 +1,7 @@
 (() => {
   const page=document.body.dataset.page;
-  if(page==='device-management'||page==='user-management'){
-    const attr=page==='device-management'?'data-device-status':'data-user-status';
+  if(page==='device-management'||page==='user-management'||page==='role-management'){
+    const attr=page==='device-management'?'data-device-status':page==='role-management'?'data-role-status':'data-user-status';
     const sync=()=>document.querySelectorAll('.status-button['+attr+']').forEach(button=>{button.setAttribute('role','switch');button.setAttribute('aria-checked',String(button.getAttribute(attr)==='enabled'));button.setAttribute('aria-label',button.getAttribute(attr)==='enabled'?'启用':'停用')});
     sync();new MutationObserver(sync).observe(document.querySelector('.table tbody'),{attributes:true,childList:true,subtree:true,attributeFilter:[attr]});
   }

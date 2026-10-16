@@ -11,7 +11,7 @@
   const page=document.body.dataset.page||(document.body.dataset.mouthPage==='project'||document.title.includes('项目统计')?'project-stats':''),setting=targets[page];if(!setting)return;
   function place(){
     const [filterSelector,panelSelector,headingSelector]=setting;
-    const filter=document.querySelector(filterSelector),panel=document.querySelector(panelSelector),heading=panel?.querySelector(headingSelector);
+    const filter=document.querySelector(filterSelector+':not([data-page-time-filter])'),panel=document.querySelector(panelSelector),heading=panel?.querySelector(headingSelector);
     if(!filter||!panel||!heading||filter.hasAttribute('data-list-filter-placed'))return;
     if(heading.nextElementSibling!==filter)heading.after(filter);
     filter.setAttribute('data-list-filter-placed','true');filter.classList.add('spc-list-filter');

@@ -1,5 +1,27 @@
 (() => {
   const states = new Map();
+  function separateCards(){
+    const cards=[...document.querySelectorAll('.metric,.quality-metric,[data-custom-metric]')].filter(el=>el.querySelector('.metric-value,strong'));
+    for(const parent of new Set(cards.map(el=>el.parentElement))){
+      if(!parent)continue;
+      const children=cards.filter(el=>el.parentElement===parent);
+      if(!parent.classList.contains('spc-independent-metrics')&&!parent.classList.contains('spc-metric-mixed-layout')){
+        const heights=children.map(el=>Math.max(94,Math.round(el.getBoundingClientRect().height)));
+        parent.style.setProperty('--spc-metric-columns',String(parent.querySelector('[data-custom-chart]')?5:children.length));
+        parent.classList.add(parent.querySelector('[data-custom-chart]')?'spc-metric-mixed-layout':'spc-independent-metrics');
+        children.forEach((el,i)=>el.style.setProperty('--spc-metric-height',`${heights[i]}px`));
+      }
+      children.forEach(el=>{el.classList.add('spc-independent-metric');if(!el.style.getPropertyValue('--spc-metric-height'))el.style.setProperty('--spc-metric-height','94px');
+        if(document.body.dataset.page==='device-quality'||!el.hasAttribute('data-custom-metric')||el.querySelector('.spc-metric-resize'))return;
+        const handle=document.createElement('button');handle.type='button';handle.className='spc-metric-resize';handle.setAttribute('aria-label','拖动调整宽度和高度');handle.title='拖动调整宽度和高度';el.append(handle);
+        const drag=document.createElement('button');drag.type='button';drag.className='spc-metric-drag';drag.draggable=true;drag.textContent='⠿';drag.title='拖动调整位置';drag.setAttribute('aria-label',drag.title);el.append(drag);drag.onclick=event=>event.stopPropagation();drag.ondragstart=event=>{if(!document.body.classList.contains('quality-page-editor-open')){event.preventDefault();return}el.classList.add('spc-metric-dragging');event.dataTransfer.setData('text/plain','spc-metric')};drag.ondragend=()=>el.classList.remove('spc-metric-dragging');
+        handle.onclick=event=>event.stopPropagation();
+        handle.onpointerdown=event=>{if(!document.body.classList.contains('quality-page-editor-open'))return;event.preventDefault();event.stopPropagation();const rect=el.getBoundingClientRect(),x=event.clientX,y=event.clientY;const move=e=>{el.style.setProperty('width',`${Math.min(parent.clientWidth,Math.max(160,rect.width+e.clientX-x))}px`,'important');el.style.setProperty('height',`${Math.max(94,rect.height+e.clientY-y)}px`,'important')};const stop=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop);window.removeEventListener('pointercancel',stop)};window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop);window.addEventListener('pointercancel',stop)};
+      });
+    }
+  }
+  document.addEventListener('dragover',event=>{if(document.querySelector('.spc-metric-dragging')&&event.target.closest('[data-custom-chart],.spc-independent-metric'))event.preventDefault()});
+  document.addEventListener('drop',event=>{const moving=document.querySelector('.spc-metric-dragging'),target=event.target.closest('[data-custom-chart],.spc-independent-metric');if(!moving||!target||moving===target)return;event.preventDefault();target.before(moving);moving.classList.remove('spc-metric-dragging')});
   const colors = ['#3370FF','#4D49ED','#7C32F4','#008580','#2694CF','#FFC400','#F57300','#E72A27','#52565E','#DFE8FF','#F2F3FF','#EEE5FF','#E9FAF8','#EAF8FE','#FFF0BF','#FFF3E7','#FFE4E4','#FFFFFF'];
   const textColorBases = ['#858B94','#3370FF','#009BD6','#00B99C','#25B420','#83B400','#FFC400','#F58A00','#E7362F','#E93691','#7C32F4','#4520A8'];
   const textColors = [1,.18,.38,.65,.82,.45].flatMap((shade,row)=>textColorBases.map(hex=>{
@@ -81,6 +103,6 @@
     const el=card(),drawer=e.target.closest('.quality-config-drawer,.metric-card-editor'),panel=drawer&&customPanel(drawer);if(!el||!panel)return;
     const state={};panel.querySelectorAll('[data-appearance-color]').forEach(btn=>state[btn.dataset.appearanceColor]={...btn._color});panel.querySelectorAll('[data-appearance-size]').forEach(select=>state[select.dataset.appearanceSize]=Number(select.value));state.fontMode=panel.querySelector('[data-font-mode-value="custom"].is-active,[data-font-mode-value="custom"].active')?'custom':'adaptive';state.precision=panel.querySelector('[data-appearance-precision]')?.value;state.format=panel.querySelector('[data-appearance-format]')?.value;states.set(key(el),state);setTimeout(()=>apply(el,state),0);if(popup)popup.hidden=true;
   },true);
-  let queued=false;const scan=()=>{queued=false;document.querySelectorAll('[data-metric-panel="custom"]').forEach(initPanel);document.querySelectorAll('[data-custom-metric],.metric').forEach(el=>{const state=states.get(key(el));if(state&&!el.dataset.appearanceRestored){el.dataset.appearanceRestored='true';apply(el,state)}})};
+  let queued=false;const scan=()=>{queued=false;separateCards();document.querySelectorAll('[data-metric-panel="custom"]').forEach(initPanel);document.querySelectorAll('[data-custom-metric],.metric').forEach(el=>{const state=states.get(key(el));if(state&&!el.dataset.appearanceRestored){el.dataset.appearanceRestored='true';apply(el,state)}})};
   new MutationObserver(records=>{if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(!popup||!popup.contains(n))))&&!queued){queued=true;queueMicrotask(scan)}}).observe(document.documentElement,{childList:true,subtree:true});scan();
 })();

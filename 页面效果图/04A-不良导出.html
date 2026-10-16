@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
+<head><script src="analysis-edit-session.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SPC集中管理平台 - 不良分析</title>
@@ -73,7 +73,7 @@
             <div class="field"><label>设备名称/SN</label><div class="control"><span>⌕</span><input type="text" aria-label="设备名称/SN" placeholder="请输入设备名称或SN"></div></div>
             <div class="actions"><button class="btn">重置</button><button class="btn primary">查询</button></div>
           </section>
-          <div class="component-tablebox"><table class="component-table"><colgroup><col style="width:60px"><col style="width:170px"><col style="width:170px"><col style="width:110px"><col style="width:150px"><col style="width:180px"><col style="width:100px"><col style="width:150px"><col style="width:90px"><col style="width:90px"><col style="width:220px"><col style="width:140px"><col style="width:180px"><col style="width:190px"><col style="width:190px"><col style="width:190px"></colgroup><thead><tr><th class="sticky-seq">序号</th><th class="sticky-order">PCB ID</th><th>条码号</th><th>模板名称</th><th>封装类型</th><th>不良类型</th><th>料号</th><th>位号</th><th>设备 SN</th><th>RGB图</th><th>白图</th><th>拼板ID</th><th>检测开始时间</th><th>机器判定</th><th>一次复判</th><th>二次复判</th></tr></thead><tbody data-component-rows><tr class="empty-row"><td colspan="16">请在左侧选择一个具体位号</td></tr></tbody></table></div>
+          <div class="component-tablebox"><table class="component-table"><colgroup><col style="width:60px"><col style="width:170px"><col style="width:170px"><col style="width:110px"><col style="width:150px"><col style="width:180px"><col style="width:100px"><col style="width:150px"><col style="width:90px"><col style="width:90px"><col style="width:220px"><col style="width:140px"><col style="width:180px"><col style="width:190px"><col style="width:190px"><col style="width:190px"></colgroup><thead><tr><th class="sticky-seq">序号</th><th class="sticky-order">PCB ID</th><th>条码号</th><th>模板名称</th><th>封装类型</th><th>不良类型</th><th>料号</th><th>位号</th><th>设备 SN</th><th>RGB图</th><th>白图</th><th>拼板ID</th><th>检测开始时间</th><th>机器判定</th><th>一次复判</th><th>最终复判</th></tr></thead><tbody data-component-rows><tr class="empty-row"><td colspan="16">请在左侧选择一个具体位号</td></tr></tbody></table></div>
           <div class="pager"><span data-component-count>共0条</span><div class="pages"><span class="page">‹</span><span class="page on">1</span><span class="page">›</span></div></div>
         </div>
       </section>
@@ -96,28 +96,28 @@
         package: {
           label:'封装类型', rootLabel:'封装类型', leafLabel:'不良类型', summaryUnit:'种', leafUnit:'个不良类型', seed:'PK',
           roots:[
-            {name:'0402', code:'PKG-0402', count:5826, leaves:[['少锡 / INSUFFICIENT_SOLDER',1352],['偏移 / MISALIGNED',986],['缺件 / MISSING',728]]},
-            {name:'0603', code:'PKG-0603', count:4638, leaves:[['定位异常 / LOCATE',1108],['连锡 / BRIDGE',764],['少锡 / INSUFFICIENT_SOLDER',632]]},
-            {name:'SOT-23', code:'PKG-SOT23', count:2954, leaves:[['偏移 / MISALIGNED',684],['缺件 / MISSING',519],['极性反 / POLARITY',308]]},
-            {name:'QFN-32', code:'PKG-QFN32', count:1876, leaves:[['连锡 / BRIDGE',472],['少锡 / INSUFFICIENT_SOLDER',386],['偏移 / MISALIGNED',264]]}
+            {name:'0402', code:'PKG-0402', count:5826, leaves:[['少锡',1352],['偏移',986],['缺件',728]]},
+            {name:'0603', code:'PKG-0603', count:4638, leaves:[['定位异常',1108],['连锡',764],['少锡',632]]},
+            {name:'SOT-23', code:'PKG-SOT23', count:2954, leaves:[['偏移',684],['缺件',519],['极性反',308]]},
+            {name:'QFN-32', code:'PKG-QFN32', count:1876, leaves:[['连锡',472],['少锡',386],['偏移',264]]}
           ]
         },
         part: {
           label:'料号', rootLabel:'料号', leafLabel:'不良类型', summaryUnit:'个', leafUnit:'个不良类型', seed:'PN',
           roots:[
-            {name:'RC0402FR-0710KL', code:'PN-RC0402', count:3248, leaves:[['偏移 / MISALIGNED',618],['少锡 / INSUFFICIENT_SOLDER',506],['缺件 / MISSING',297]]},
-            {name:'CL10A105KA8NNNC', code:'PN-CL10A', count:2864, leaves:[['定位异常 / LOCATE',589],['少锡 / INSUFFICIENT_SOLDER',441],['连锡 / BRIDGE',276]]},
-            {name:'MMBT3904', code:'PN-MMBT3904', count:1782, leaves:[['偏移 / MISALIGNED',352],['极性反 / POLARITY',284],['缺件 / MISSING',196]]},
-            {name:'STM32G031K8U6', code:'PN-STM32', count:948, leaves:[['连锡 / BRIDGE',188],['偏移 / MISALIGNED',142],['少锡 / INSUFFICIENT_SOLDER',117]]}
+            {name:'RC0402FR-0710KL', code:'PN-RC0402', count:3248, leaves:[['偏移',618],['少锡',506],['缺件',297]]},
+            {name:'CL10A105KA8NNNC', code:'PN-CL10A', count:2864, leaves:[['定位异常',589],['少锡',441],['连锡',276]]},
+            {name:'MMBT3904', code:'PN-MMBT3904', count:1782, leaves:[['偏移',352],['极性反',284],['缺件',196]]},
+            {name:'STM32G031K8U6', code:'PN-STM32', count:948, leaves:[['连锡',188],['偏移',142],['少锡',117]]}
           ]
         },
         position: {
           label:'位号', rootLabel:'位号', leafLabel:'不良类型', summaryUnit:'个', leafUnit:'个不良类型', seed:'PS',
           roots:[
-            {name:'R118', code:'POS-R118', count:526, leaves:[['偏移 / MISALIGNED',156],['少锡 / INSUFFICIENT_SOLDER',124],['缺件 / MISSING',48]]},
-            {name:'C56', code:'POS-C56', count:418, leaves:[['定位异常 / LOCATE',132],['少锡 / INSUFFICIENT_SOLDER',98],['连锡 / BRIDGE',56]]},
-            {name:'U15', code:'POS-U15', count:364, leaves:[['偏移 / MISALIGNED',116],['极性反 / POLARITY',84],['缺件 / MISSING',51]]},
-            {name:'D2', code:'POS-D2', count:296, leaves:[['定位异常 / LOCATE',92],['偏移 / MISALIGNED',68],['少锡 / INSUFFICIENT_SOLDER',44]]}
+            {name:'R118', code:'POS-R118', count:526, leaves:[['偏移',156],['少锡',124],['缺件',48]]},
+            {name:'C56', code:'POS-C56', count:418, leaves:[['定位异常',132],['少锡',98],['连锡',56]]},
+            {name:'U15', code:'POS-U15', count:364, leaves:[['偏移',116],['极性反',84],['缺件',51]]},
+            {name:'D2', code:'POS-D2', count:296, leaves:[['定位异常',92],['偏移',68],['少锡',44]]}
           ]
         }
       };
@@ -317,5 +317,5 @@
       };
     })();
     const preview=document.querySelector('.image-preview');document.addEventListener('click',event=>{const button=event.target.closest('[data-image-preview]');if(button){preview.classList.add('open');preview.setAttribute('aria-hidden','false');preview.querySelector('[data-preview-title]').textContent=button.dataset.imagePreview;preview.querySelector('[data-preview-image]').textContent=button.dataset.imagePreview+'占位预览';}if(event.target===preview||event.target.closest('.image-preview-close')){preview.classList.remove('open');preview.setAttribute('aria-hidden','true');}});  </script>
-<script src="barcode-query-component.js"></script><script src="sidebar-collapse.js"></script><script src="metric-card-catalog.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><link rel="stylesheet" href="metric-scope.css"><script src="metric-scope.js"></script><link rel="stylesheet" href="chart-config-enhance.css"><script src="chart-config-enhance.js"></script><link rel="stylesheet" href="quality-config-template.css"><link rel="stylesheet" href="chart-live-preview.css"><link rel="stylesheet" href="chart-measure-fields.css"><link rel="stylesheet" href="shared-analysis-editor.css"><script src="quality-config-template.js"></script><script src="chart-measure-fields.js"></script><script src="shared-analysis-editor.js"></script><link rel="stylesheet" href="chart-copy-menu.css"><link rel="stylesheet" href="metric-scope.css"><link rel="stylesheet" href="chart-scope.css"><script src="chart-scope.js"></script></body>
+<script src="barcode-query-component.js"></script><script src="sidebar-collapse.js"></script><script src="metric-card-catalog.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><link rel="stylesheet" href="metric-scope.css"><script src="metric-scope.js"></script><link rel="stylesheet" href="chart-config-enhance.css"><script src="chart-config-enhance.js"></script><link rel="stylesheet" href="quality-config-template.css"><link rel="stylesheet" href="chart-live-preview.css"><link rel="stylesheet" href="chart-measure-fields.css"><link rel="stylesheet" href="shared-analysis-editor.css"><script src="quality-config-template.js"></script><script src="chart-measure-fields.js"></script><script src="copy-cascade.js"></script><script src="shared-analysis-editor.js"></script><link rel="stylesheet" href="chart-copy-menu.css"><link rel="stylesheet" href="metric-scope.css"><link rel="stylesheet" href="chart-scope.css"><script src="chart-scope.js"></script><link rel="stylesheet" href="chart-time-grain.css"><script src="chart-time-grain.js"></script><link rel="stylesheet" href="layout-interactions.css"><script src="layout-interactions.js"></script><link rel="stylesheet" href="editor-header.css"><script src="editor-header.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script><link rel="stylesheet" href="combo-layout.css"><script src="combo-data.js"></script><script src="combo-layout.js"></script><link rel="stylesheet" href="radar-config.css"><script src="radar-config.js"></script><link rel="stylesheet" href="page-time-filter.css"><script src="page-time-filter.js"></script></body>
 </html>

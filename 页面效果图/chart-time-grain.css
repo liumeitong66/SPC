@@ -1,0 +1,5 @@
+.quality-config-drawer [data-chart-time-grain-field][hidden]{display:none!important}
+[data-custom-chart].chart-has-time-grain [data-project-trend-mode],
+[data-custom-chart].chart-has-time-grain [data-device-trend-mode],
+[data-custom-chart].chart-has-time-grain .comparison-switch:has([data-project-trend-mode]),
+[data-custom-chart].chart-has-time-grain .comparison-switch:has([data-device-trend-mode]){display:none!important}
