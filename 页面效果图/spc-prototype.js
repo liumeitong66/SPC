@@ -535,6 +535,7 @@
       if (!selected.size) { toast('请至少保留一个显示字段', 'error'); return false; }
       Array.from(table.rows).forEach(row => Array.from(row.cells).forEach((cell, index) => { if (index > 0) cell.style.display = selected.has(index) ? '' : 'none'; }));
       Array.from(table.querySelectorAll('colgroup col')).forEach((column, index) => { if (index > 0) column.style.display = selected.has(index) ? '' : 'none'; });
+      table._syncPinnedColumns?.();
       toast(`显示列已更新，当前显示 ${selected.size} 列`);
     });
     backdrop.querySelector('.proto-modal').classList.add('proto-column-modal');
@@ -544,7 +545,7 @@
     backdrop.querySelectorAll('[data-column-action]').forEach(button => {
       button.onclick = () => {
         const checked = button.dataset.columnAction !== 'none';
-        inputs.forEach(input => { input.checked = input.disabled || checked; });
+        inputs.forEach(input => {let defaults=null;try{defaults=JSON.parse(table.dataset.defaultColumns||'null')}catch{}input.checked=input.disabled||(button.dataset.columnAction==='default'&&defaults?defaults.includes(headers.find(h=>String(h.index)===input.value)?.label):checked);});
         updateCount();
       };
     });
@@ -718,7 +719,7 @@
     const path = values => values.map((value, index) => `${index ? 'L' : 'M'}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(' ');
     const dots = (values, className, label) => values.map((value, index) => `<circle class="dot ${className}" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3"><title>${data.labels[index]} ${label}：${value.toFixed(2)}%</title></circle>`).join('');
     const labels = data.labels.map((label, index) => `<text class="axis" x="${x(index).toFixed(1)}" y="${height - 10}" text-anchor="middle">${label}</text>`).join('');
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${mode === 'day' ? '按天最近7天' : '按月最近6个月'}质量趋势">${grid}<path class="line-original" d="${path(data.original)}"/><path class="line-review" d="${path(data.review)}"/><path class="line-second" d="${path(data.second)}"/>${dots(data.original, 'trend-original-dot', '机器判定')}${dots(data.review, 'trend-review-dot', '一次复判')}${dots(data.second, 'trend-second-dot', '二次复判')}${labels}</svg>`;
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${mode === 'day' ? '按天最近7天' : '按月最近6个月'}质量趋势">${grid}<path class="line-original" d="${path(data.original)}"/><path class="line-review" d="${path(data.review)}"/><path class="line-second" d="${path(data.second)}"/>${dots(data.original, 'trend-original-dot', '机器判定')}${dots(data.review, 'trend-review-dot', '一次复判')}${dots(data.second, 'trend-second-dot', '最终复判')}${labels}</svg>`;
   }
 
   function renderProjectTrend(mode = currentProjectTrendMode) {
@@ -863,7 +864,7 @@
   }
 
   function deviceQualityMouthToolbar() {
-    return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">二次复判</div></div></section>`;
+    return `<section class="quality-mouth-toolbar"><span class="quality-mouth-label">统计口径</span><div class="segmented"><div class="seg ${currentMouth === 'original' ? 'active' : ''}" data-mouth="original">机器判定</div><div class="seg ${currentMouth === 'review' ? 'active' : ''}" data-mouth="review">一次复判</div><div class="seg ${currentMouth === 'second' ? 'active' : ''}" data-mouth="second">最终复判</div></div></section>`;
   }
 
   function deviceYieldTrendChart() {
@@ -871,7 +872,7 @@
     const series = [
       { label: '机器判定', color: '#8ba3c7', values: [91.34, 91.78, 91.12, 91.82] },
       { label: '一次复判', color: '#3478f6', values: [98.12, 98.46, 98.03, 98.38] },
-      { label: '二次复判', color: '#20a464', values: [98.56, 98.87, 98.49, 98.91] }
+      { label: '最终复判', color: '#20a464', values: [98.56, 98.87, 98.49, 98.91] }
     ];
     const width = 680, height = 210, left = 42, right = 12, top = 18, bottom = 30;
     const min = 88, max = 100, chartWidth = width - left - right, chartHeight = height - top - bottom;
@@ -884,12 +885,12 @@
       const dots = seriesItem.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="2.5" fill="#fff" stroke="${seriesItem.color}" stroke-width="2"><title>${seriesItem.label} ${dates[index]}：${value.toFixed(2)}%</title></circle>`).join('');
       return `<polyline fill="none" stroke="${seriesItem.color}" stroke-width="2.5" points="${points}"/>${dots}`;
     }).join('');
-    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="所有设备按天的PCB良率趋势，包含机器判定、一次复判与二次复判">${grid}${lines}${dateLabels}</svg>`;
+    return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="所有设备按天的PCB良率趋势，包含机器判定、一次复判与最终复判">${grid}${lines}${dateLabels}</svg>`;
   }
 
   function deviceQualityCharts() {
     return `<section class="quality-grid device-quality-charts">
-      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>二次复判</span></div>${chartPeriodPicker('trend', currentTrendPeriod)}</div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
+      <section class="quality-chart"><div class="phead"><div class="phead-title"><b>良率趋势</b></div><div class="chart-head-actions"><div class="legend"><span><i style="background:#8ba3c7"></i>机器判定</span><span><i style="background:#3478f6"></i>一次复判</span><span><i style="background:#20a464"></i>最终复判</span></div>${chartPeriodPicker('trend', currentTrendPeriod)}</div></div><div class="quality-chart-body device-yield-trend">${deviceYieldTrendChart()}</div></section>
       <section class="quality-chart" data-comparison-panel><div class="phead"><div class="phead-title"><b>良率对比</b></div><div class="chart-head-actions">${chartPeriodPicker('comparison', currentComparisonPeriod)}<div class="comparison-switch" role="tablist" aria-label="良率对比维度"><button type="button" class="comparison-tab" data-comparison-type="device">设备</button><button type="button" class="comparison-tab" data-comparison-type="area">区域</button></div></div></div><div class="quality-chart-body" data-comparison-chart></div></section>
     </section>`;
   }

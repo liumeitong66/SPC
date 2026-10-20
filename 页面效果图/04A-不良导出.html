@@ -3,7 +3,7 @@
 <head><script src="analysis-edit-session.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SPC集中管理平台 - 不良分析</title>
+  <title>SPC集中管理平台 - 器件分析</title>
   <link rel="stylesheet" href="spc-common.css">
   <style>
     .component-list-filters{grid-template-columns:repeat(4,minmax(120px,230px)) minmax(116px,1fr)!important}
@@ -42,13 +42,13 @@
     <div class="foot"><div class="avatar">管</div><div><b>admin</b><small>平台管理员</small></div><span style="margin-left:auto">⌄</span></div>
   </aside>
   <div class="app">
-    <header class="top"><div class="title"><h1>不良分析</h1><span>统计口径：机器判定不良</span></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
-    <main class="main">
-      <section class="dimension-tabs" aria-label="分析维度">
+    <header class="top"><div class="title"><h1>器件分析</h1></div><div class="top-actions"><button class="iconbtn">?</button><button class="iconbtn">◌</button><a class="account-entry" href="12-个人中心.html" title="账号信息"><span class="account-avatar">管</span><span class="account-copy"><b>admin</b><small>平台管理员</small></span><span class="account-chevron">⌄</span></a></div></header>
+    <main class="main"><section class="dimension-tabs component-analysis-toolbar" aria-label="器件分析维度及统计口径">
         <button class="dimension-tab on" data-export-dimension="defect">不良类型</button>
         <button class="dimension-tab" data-export-dimension="package">封装类型</button>
         <button class="dimension-tab" data-export-dimension="part">料号</button>
         <button class="dimension-tab" data-export-dimension="position">位号</button>
+        <label class="component-mouth-field"><span>统计口径</span><select data-component-mouth-select aria-label="统计口径"><option value="original">机器判定</option><option value="review">一次复判</option><option value="second">最终复判</option></select></label>
       </section>
       <section class="export-charts">
         <div class="panel export-chart" data-overview-chart data-chart-type="pie"><div class="phead"><div class="phead-title"><b data-overview-title>不良类型占比</b></div></div><div class="export-chart-body" data-overview-body></div></div>
@@ -82,6 +82,8 @@
   <div class="image-preview" aria-hidden="true"><div class="image-preview-card"><div class="image-preview-head"><span data-preview-title>图片预览</span><button class="image-preview-close" type="button" aria-label="关闭">×</button></div><div class="image-preview-image" data-preview-image>图片占位预览</div></div></div>  <script src="spc-prototype.js"></script>
   <script>
     (() => {
+      let currentMouth = new URLSearchParams(location.search).get('mouth') || 'original';
+      if (!['original','review','second'].includes(currentMouth)) currentMouth='original';
       const dimensionData = {
         defect: {
           label:'不良类型', rootLabel:'不良类型', leafLabel:'位号', summaryUnit:'类', leafUnit:'个位号', seed:'DF',
@@ -167,7 +169,9 @@
       const emptyChartMarkup = message => `<div class="chart-empty"><div><b>暂无匹配数据</b><span>${message}</span></div></div>`;
       const normalizeQuery = value => value.trim().toLocaleLowerCase('zh-CN');
       const getFilteredConfig = key => {
-        const base = dimensionData[key];
+        const source = dimensionData[key];
+        const ratio = currentMouth === 'original' ? 1 : currentMouth === 'review' ? 2/6 : 3/6;
+        const base = {...source, roots:source.roots.map(root=>({...root,count:Math.round(root.count*ratio),leaves:root.leaves.map(([name,count])=>[name,Math.round(count*ratio)])}))};
         const rootQuery = normalizeQuery(queryState[key].root);
         const leafQuery = normalizeQuery(queryState[key].leaf);
         const roots = base.roots.reduce((result,root) => {
@@ -178,6 +182,10 @@
           return result;
         },[]);
         return {...base,roots};
+      };
+      window.spcComponentChartRows = dimension => {
+        const key={'封装类型':'package','料号':'part','位号':'position','不良类型':'defect'}[dimension] || currentDimension;
+        return getFilteredConfig(key).roots.map(root=>({label:root.name,value:root.count,'检测开始时间':'2026-08-04 14:29:18'}));
       };
       const renderQueryFields = key => {
         const {field,label} = queryFieldConfig[key];
@@ -190,7 +198,7 @@
       const renderOverviewChart = config => {
         const isPie = currentDimension === 'defect';
         overviewChart.dataset.chartType = isPie ? 'pie' : 'bar';
-        overviewTitle.textContent = isPie ? '不良类型占比' : `${config.label}数量分布`;
+        overviewTitle.textContent = isPie ? (currentMouth === 'original' ? '不良类型占比' : '误报类型占比') : `${config.label}数量分布`;
         overviewBody.innerHTML = config.roots.length ? (isPie ? pieMarkup(rootItems(config)) : barMarkup(rootItems(config))) : emptyChartMarkup('请调整当前查询条件');
       };
       const renderTree = config => {
@@ -224,13 +232,13 @@
             sn:{defect:['SI1020E1112','SI1020E1148'],package:['SI1020E1206','SI1020E1218'],part:['SI1020E1322','SI1020E1336'],position:['SI1020E1412','SI1020E1428']}[currentDimension][index%2],
             project:projectsByDimension[currentDimension][index%3], pcb, barcode:`BORDER-${config.seed}-${String(8401+index)}`, panel:`PANEL-${config.seed}-${String(index+1).padStart(2,'0')}`,
             packageName, partNumber, defectType, position, startTime:`2026-08-04 14:${String(29-index*2).padStart(2,'0')}:18`,
-            machine:reviewResult, firstReview:reviewResult, secondReview:reviewResult
+            machine:reviewResult, firstReview:index%3===0?'OK':reviewResult, secondReview:index%2===0?'OK':reviewResult
           };
-        });
+        }).filter(row => currentMouth === 'original' || (currentMouth === 'review' ? row.firstReview : row.secondReview) === 'OK');
       };
       const judgeClass = value => value==='OK' ? 'good' : 'bad';
       const renderComponentRows = (rows,path,{leafSelected=false}={}) => {
-        rowsBody.innerHTML = rows.map((row,index) => `<tr><td class="sticky-seq">${index+1}</td><td class="sticky-order" title="${row.pcb}"><a class="pcb-view-link" href="02B-单板记录详情.html?view=board&source=bad&pcb=${encodeURIComponent(row.pcb)}&barcode=${encodeURIComponent(row.barcode)}&project=${encodeURIComponent(row.project)}&sn=${encodeURIComponent(row.sn)}" title="查看整板视图">${row.pcb}</a></td><td title="${row.barcode}">${row.barcode}</td><td>${row.project}</td><td>${row.packageName}</td><td>${row.defectType}</td><td title="${row.partNumber}">${row.partNumber}</td><td>${row.position}</td><td>${row.sn}</td><td><button class="image-thumb" type="button" data-image-preview="RGB图" aria-label="查看 RGB图"></button></td><td><button class="image-thumb" type="button" data-image-preview="白图" aria-label="查看 白图"></button></td><td>${row.panel}</td><td>${row.startTime}</td><td><span class="judge ${judgeClass(row.machine)}">${row.machine}</span></td><td><span class="judge ${judgeClass(row.firstReview)}">${row.firstReview}</span></td><td><span class="judge ${judgeClass(row.secondReview)}">${row.secondReview}</span></td></tr>`).join('');
+        rowsBody.innerHTML = rows.map((row,index) => `<tr><td class="sticky-seq">${index+1}</td><td class="sticky-order" title="${row.pcb}"><a class="pcb-view-link" href="02B-单板记录详情.html?view=board&source=${currentMouth==='original'?'bad':'false'}&pcb=${encodeURIComponent(row.pcb)}&barcode=${encodeURIComponent(row.barcode)}&project=${encodeURIComponent(row.project)}&sn=${encodeURIComponent(row.sn)}" title="查看整板视图">${row.pcb}</a></td><td title="${row.barcode}">${row.barcode}</td><td>${row.project}</td><td>${row.packageName}</td><td>${row.defectType}</td><td title="${row.partNumber}">${row.partNumber}</td><td>${row.position}</td><td>${row.sn}</td><td><button class="image-thumb" type="button" data-image-preview="RGB图" aria-label="查看 RGB图"></button></td><td><button class="image-thumb" type="button" data-image-preview="白图" aria-label="查看 白图"></button></td><td>${row.panel}</td><td>${row.startTime}</td><td><span class="judge ${judgeClass(row.machine)}">${row.machine}</span></td><td><span class="judge ${judgeClass(row.firstReview)}">${row.firstReview}</span></td><td><span class="judge ${judgeClass(row.secondReview)}">${row.secondReview}</span></td></tr>`).join('');
         selectionPath.innerHTML = path;
         countText.textContent = `共${rows.length}条`;
         exportRoot.disabled = false;
@@ -307,7 +315,20 @@
         queryState[currentDimension] = {root:'',leaf:''};
         renderDimension(currentDimension);
       });
+      const syncMouth = () => {
+        document.querySelector('[data-component-mouth-select]').value=currentMouth;
+        const previousRoot=selectedRoot,previousLeaf=selectedLeaf;
+        renderDimension(currentDimension);
+        const root=currentConfig.roots.find(item=>item.code===previousRoot);
+        if(root){
+          const target=previousLeaf?[...tree.querySelectorAll('[data-tree-leaf]')].find(item=>item.dataset.parentRoot===previousRoot&&item.dataset.treeLeaf===previousLeaf):[...tree.querySelectorAll('[data-tree-root]')].find(item=>item.dataset.treeRoot===previousRoot);
+          target?.click();
+        }
+        window.dispatchEvent(new CustomEvent('spc-page-mouth-change'));
+      };
+      document.querySelector('[data-component-mouth-select]').addEventListener('change',event=>{currentMouth=event.target.value;syncMouth();});
       renderDimension('defect');
+      syncMouth();
       window.__defectExportState = {
         get rowSignature(){ return lastRowSignature; },
         get currentDimension(){ return currentDimension; },
@@ -317,5 +338,5 @@
       };
     })();
     const preview=document.querySelector('.image-preview');document.addEventListener('click',event=>{const button=event.target.closest('[data-image-preview]');if(button){preview.classList.add('open');preview.setAttribute('aria-hidden','false');preview.querySelector('[data-preview-title]').textContent=button.dataset.imagePreview;preview.querySelector('[data-preview-image]').textContent=button.dataset.imagePreview+'占位预览';}if(event.target===preview||event.target.closest('.image-preview-close')){preview.classList.remove('open');preview.setAttribute('aria-hidden','true');}});  </script>
-<script src="barcode-query-component.js"></script><script src="sidebar-collapse.js"></script><script src="metric-card-catalog.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><link rel="stylesheet" href="metric-scope.css"><script src="metric-scope.js"></script><link rel="stylesheet" href="chart-config-enhance.css"><script src="chart-config-enhance.js"></script><link rel="stylesheet" href="quality-config-template.css"><link rel="stylesheet" href="chart-live-preview.css"><link rel="stylesheet" href="chart-measure-fields.css"><link rel="stylesheet" href="shared-analysis-editor.css"><script src="quality-config-template.js"></script><script src="chart-measure-fields.js"></script><script src="copy-cascade.js"></script><script src="shared-analysis-editor.js"></script><link rel="stylesheet" href="chart-copy-menu.css"><link rel="stylesheet" href="metric-scope.css"><link rel="stylesheet" href="chart-scope.css"><script src="chart-scope.js"></script><link rel="stylesheet" href="chart-time-grain.css"><script src="chart-time-grain.js"></script><link rel="stylesheet" href="layout-interactions.css"><script src="layout-interactions.js"></script><link rel="stylesheet" href="editor-header.css"><script src="editor-header.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script><link rel="stylesheet" href="combo-layout.css"><script src="combo-data.js"></script><script src="combo-layout.js"></script><link rel="stylesheet" href="radar-config.css"><script src="radar-config.js"></script><link rel="stylesheet" href="page-time-filter.css"><script src="page-time-filter.js"></script></body>
+<script src="barcode-query-component.js"></script><script src="sidebar-collapse.js"></script><script src="metric-card-catalog.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><link rel="stylesheet" href="metric-scope.css"><script src="metric-scope.js"></script><link rel="stylesheet" href="chart-config-enhance.css"><script src="chart-config-enhance.js"></script><link rel="stylesheet" href="quality-config-template.css"><link rel="stylesheet" href="chart-live-preview.css"><link rel="stylesheet" href="chart-measure-fields.css"><link rel="stylesheet" href="shared-analysis-editor.css"><script src="quality-config-template.js"></script><script src="chart-measure-fields.js"></script><script src="copy-cascade.js"></script><script src="shared-analysis-editor.js"></script><link rel="stylesheet" href="chart-copy-menu.css"><link rel="stylesheet" href="metric-scope.css"><link rel="stylesheet" href="chart-scope.css"><script src="chart-scope.js"></script><link rel="stylesheet" href="chart-time-grain.css"><script src="chart-time-grain.js"></script><link rel="stylesheet" href="layout-interactions.css"><script src="layout-interactions.js"></script><link rel="stylesheet" href="editor-header.css"><script src="editor-header.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script><link rel="stylesheet" href="combo-layout.css"><script src="combo-data.js"></script><script src="combo-layout.js"></script><link rel="stylesheet" href="radar-config.css"><script src="radar-config.js"></script><link rel="stylesheet" href="page-time-filter.css"><script src="page-time-filter.js"></script><link rel="stylesheet" href="chart-tooltips.css"><script src="chart-tooltips.js"></script></body>
 </html>

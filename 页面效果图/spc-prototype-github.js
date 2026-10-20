@@ -1776,16 +1776,7 @@
       const fields = drawer.querySelector('[data-quality-group-fields]');
       if (groupToggleWrap && summaryCategory) groupToggleWrap.hidden = !summaryCategory.checked;
       if (fields && groupToggle && summaryCategory) fields.hidden = !summaryCategory.checked || !groupToggle.checked;
-      const axisSort = drawer.querySelector('[data-quality-axis-sort] .quality-segment-three');
-      const verticalSort = axisSort?.querySelector('[data-quality-vertical-sort]');
-      if (axisSort && verticalSort) {
-        verticalSort.hidden = groupToggle?.checked !== false;
-        axisSort.style.gridTemplateColumns = verticalSort.hidden ? 'repeat(2,minmax(0,1fr))' : 'repeat(3,minmax(0,1fr))';
-        if (verticalSort.hidden && verticalSort.classList.contains('is-active')) {
-          verticalSort.classList.remove('is-active');
-          axisSort.querySelector('button:not([data-quality-vertical-sort])')?.classList.add('is-active');
-        }
-      }
+      window.spcQualityConfigTemplate?.syncAxisSort(drawer,drawer.querySelector('[data-quality-config="type"]')?.value);
     };
     if (multiSplit) multiSplit.onchange = () => {
       if (multiSplit.checked && summaryCategory) summaryCategory.checked = false;

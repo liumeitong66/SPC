@@ -132,6 +132,7 @@
     return true;
   }
   window.spcFilterQualityChartRows=(element,rows,dimension,measure)=>{const scope=read(element);if(!scope.rules.length)return rows;return rows.filter(row=>scope.match==='任意'?scope.rules.some(rule=>matches(row,rule,dimension,measure)):scope.rules.every(rule=>matches(row,rule,dimension,measure)))};
+  window.spcFilterChartScopeRows=window.spcFilterQualityChartRows;
   window.spcOpenGroupScope=(element,choices)=>{active=element;activeFields=choices;draft=read(element);if(!draft.rules.length)draft.rules=[{field:choices[0],operator:'等于',value:''}];if(!popup){popup=document.createElement('section');popup.className='metric-scope-dialog';popup.setAttribute('role','dialog');popup.setAttribute('aria-label','统计范围');document.body.append(popup)}render();popup.hidden=false;popup.style.top='100px'};
   window.spcReadChartScope=read;
   window.spcScopeValueOptions=field=>enumerations[field]?[...enumerations[field]]:valuesFor(field);

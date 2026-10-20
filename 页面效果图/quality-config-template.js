@@ -68,5 +68,15 @@
   }
 
 
-window.spcQualityConfigTemplate={metricMarkup:metricCardConfigMarkup,drawerMarkup:qualityEditorDrawerMarkup,chartCustomMarkup:qualityChartCustomMarkup,renderTypePicker:renderQualityChartTypePicker,chartTypes:qualityChartTypes};
+function syncAxisSort(drawer,type){
+  if(!/^(line|bar|horizontalBar|area|scatter)/.test(type||''))return {changed:false};
+  const group=drawer.querySelector('[data-quality-group]'),axis=drawer.querySelector('[data-quality-axis-sort] .quality-segment-three'),vertical=axis?.querySelector('[data-quality-vertical-sort]');
+  if(!axis||!vertical)return {changed:false};
+  vertical.hidden=group?.checked!==false;vertical.style.display=vertical.hidden?'none':'';
+  axis.style.gridTemplateColumns=vertical.hidden?'repeat(2,minmax(0,1fr))':'repeat(3,minmax(0,1fr))';
+  const changed=vertical.hidden&&vertical.classList.contains('is-active');
+  if(changed){vertical.classList.remove('is-active');axis.querySelector('button:not([data-quality-vertical-sort])')?.classList.add('is-active')}
+  return {changed,sortBy:axis.querySelector('button.is-active')?.textContent.trim()};
+}
+window.spcQualityConfigTemplate={syncAxisSort,metricMarkup:metricCardConfigMarkup,drawerMarkup:qualityEditorDrawerMarkup,chartCustomMarkup:qualityChartCustomMarkup,renderTypePicker:renderQualityChartTypePicker,chartTypes:qualityChartTypes};
 })();

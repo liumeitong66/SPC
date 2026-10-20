@@ -30,24 +30,41 @@
   event('aoi-04','2026-08-04 12:58:20','disconnected');
   event('aoi-05','2026-08-04 14:10:12','delayed');
   const metrics = {
+    rates:{name:'连接率与传输正常率',title:'连接率与传输正常率趋势',type:'line',typeName:'折线图',template:'设备状态明细',available:false,fields:[]},
     status:{name:'设备状态数量',title:'设备状态数量趋势',type:'stack',typeName:'堆叠柱状图',template:'设备状态明细',available:true,fields:['location','since','duration']},
     duration:{name:'设备异常累计时长',title:'设备异常累计时长',type:'bar',typeName:'条形图',template:'异常事件记录',available:true,fields:['location','since','until']},
+    distribution:{name:'设备状态分布',title:'设备状态分布',type:'donut',typeName:'环形图',template:'设备状态明细',available:true,fields:[]},
     upload:{name:'数据上传量',title:'数据上传量趋势',type:'column',typeName:'柱状图',template:'设备上传量明细',available:false,fields:['location']}
   };
   const fieldNames={location:'设备位置',since:'状态开始时间',until:'结束时间',duration:'截至所选时刻的持续时长'};
   const key='spc-runtime-dashboard-v1';
-  const defaults=()=>({charts:[{id:'status-main',metric:'status',title:metrics.status.title,scope:'all',hours:24,step:2,width:'full',drill:true}],templates:{status:['location','since','duration'],duration:['location','since','until'],upload:['location']}});
+  const defaults=()=>({charts:[{id:'duration-main',metric:'rates',title:metrics.rates.title,scope:'all',hours:24,step:2,width:'half',drill:true},{id:'state-distribution',metric:'distribution',title:metrics.distribution.title,scope:'all',hours:24,step:2,width:'half',drill:false}],templates:{rates:[],status:['location','since','duration'],duration:['location','since','until'],upload:['location']}});
   let config=defaults(),editing=false,layer=null,returnFocus=null;
   try {const saved=JSON.parse(localStorage.getItem(key));if(saved && Array.isArray(saved.charts)&&saved.charts.length<=12 && saved.charts.every(c=>metrics[c.metric]&&typeof c.title==='string'&&c.title.length<=40&&['all',...devices.map(d=>d.id)].includes(c.scope)&&(!c.deviceIds||Array.isArray(c.deviceIds)&&c.deviceIds.every(id=>devices.some(d=>d.id===id)))&&[6,12,24].includes(c.hours)&&[1,2,4].includes(c.step)&&['full','half'].includes(c.width))){config={charts:saved.charts,templates:{...defaults().templates,...saved.templates}};for(const m of Object.keys(metrics))config.templates[m]=config.templates[m].filter(f=>metrics[m].fields.includes(f));}}catch{}
+  config.charts.forEach((chart,index)=>{
+    if(index===0&&(chart.id==='duration-main'||/设备异常累计时长/.test(chart.title))&&chart.metric!=='rates'){
+      chart.metric='rates';chart.title=metrics.rates.title;chart.drill=false;
+    }
+    const migration='spc-runtime-rate-chart-v2:'+location.pathname+':'+chart.id;
+    if(chart.metric==='rates'&&!localStorage.getItem(migration)){
+      localStorage.removeItem('spc-page-chart:'+location.pathname+':'+index);
+      const visualKey='spc-page-visual:'+location.pathname;
+      try{const visuals=JSON.parse(localStorage.getItem(visualKey)||'[]');if(visuals[index]?.dataset){for(const field of ['runtimeMetric','runtimeChart','chartType','dimension','measureSettings','copyConfig'])delete visuals[index].dataset[field];localStorage.setItem(visualKey,JSON.stringify(visuals))}}catch{}
+      localStorage.setItem(migration,'1');
+    }
+  });
+  if(!config.charts.some(c=>c.metric==='distribution'))config.charts.push({...defaults().charts.find(c=>c.metric==='distribution')});
+  config.charts.forEach(c=>{c.title=c.title.replace(/最近\s*24\s*小时/g,'').trim()});
+  overview.querySelector('.exception-panel')?.remove();
   const grid=document.createElement('div');grid.className='runtime-chart-grid';overview.querySelector('.trend-panel').replaceWith(grid);
   const editButton=document.createElement('button');editButton.className='quality-page-edit-button';editButton.type='button';editButton.textContent='编辑页面';document.querySelector('.top-actions').prepend(editButton);
   const toolbar=document.createElement('section');toolbar.className='quality-editor-bar';toolbar.hidden=true;toolbar.innerHTML='<b>编辑设备运行监控页面</b><div class="quality-editor-bar-actions"><button type="button" data-add>添加组件</button><button type="button" data-reset>恢复默认</button><button type="button" data-preview>页面预览</button><button type="button" class="primary" data-finish>完成编辑</button></div>';main.prepend(toolbar);
   // Native hidden must override the shared editor toolbar display rule.
   toolbar.style.display='none';
   const persist=()=>{try{localStorage.setItem(key,JSON.stringify(config));return true;}catch{window.SPCPrototype.toast('浏览器无法保存配置，请检查存储权限','warning');return false;}};
-  function scopeDevices(chart){return history.filter(d=>chart.metric==='duration'&&Array.isArray(chart.deviceIds)?chart.deviceIds.includes(d.id):chart.scope==='all'||d.id===chart.scope);}
+  function scopeDevices(chart){const panel=[...main.querySelectorAll('[data-runtime-chart]')].find(p=>p.dataset.runtimeChart===chart.id),scope=window.spcReadChartScope?.(panel),hasRules=!!scope?.rules.length;let rows=history.filter(d=>hasRules?true:chart.metric==='duration'&&Array.isArray(chart.deviceIds)?chart.deviceIds.includes(d.id):chart.scope==='all'||d.id===chart.scope);if(!hasRules||!window.spcFilterChartScopeRows)return rows;const proxy=document.createElement('div');proxy.dataset.chartScope=JSON.stringify({...scope,rules:scope.rules.filter(r=>!/时间|日期/.test(r.field))});return window.spcFilterChartScopeRows(proxy,rows.map(d=>({...d,'设备名称':d.name,'设备SN':d.sn,'设备位置（一级）':d.location.split(/[\/／]/)[0].trim(),'设备位置（二级）':d.location.split(/[\/／]/).at(-1).trim()})),'','')}
   function scopeName(chart){return devices.find(d=>d.id===chart.scope)?.name||'全部设备';}
-  function snapshot(chart,time){return scopeDevices(chart).map(d=>{const e=d.events.filter(e=>e.at<=time).at(-1);return {...d,state:e.state,since:e.at};});}
+  function snapshot(chart,time){return scopeDevices(chart).map(d=>{const e=d.events.filter(e=>e.at<=time).at(-1);return e?{...d,state:e.state,since:e.at}:null;}).filter(Boolean);}
   function intervals(chart){const from=end-chart.hours*3600000;return scopeDevices(chart).flatMap(d=>d.events.flatMap((e,i)=>{const a=Math.max(from,e.at),b=Math.min(end,d.events[i+1]?.at??end);return ['disconnected','delayed'].includes(e.state)&&b>a?[{...d,state:e.state,since:e.at,until:d.events[i+1]?.at??null,minutes:(b-a)/60000}]:[];}));}
   function samples(chart){const from=end-chart.hours*3600000;const times=[];for(let t=from;t<=end;t+=chart.step*3600000)times.push(t);if(times.at(-1)!==end)times.push(end);return times;}
   function closeLayer(){if(!layer)return;layer.remove();layer=null;document.removeEventListener('keydown',modalKeys);returnFocus?.focus();}
@@ -95,10 +112,48 @@
     pager.querySelector('select').onchange=e=>{size=parseInt(e.target.value,10);page=1;update();};pager.querySelector('input').onkeydown=e=>{if(e.key==='Enter'){page=Number(e.target.value)||1;update();e.target.value='';}};update();
   }
   const observers=[];
+  window.spcRenderRuntimeScope=panel=>{const chart=config.charts.find(c=>c.id===panel?.dataset.runtimeChart);if(!chart)return false;panel.querySelector('.shared-preview')?.remove();draw(panel,chart);return true};
   function draw(panel,chart){
     const host=panel.querySelector('.runtime-chart-plot');const w=host.clientWidth-24,h=198,left=40,right=w-10,top=22,bottom=164;
     if(w<120)return;
-    if(chart.metric==='upload'){host.innerHTML='<div class="runtime-chart-empty">暂无上传历史数据</div>';return;}
+    if(chart.metric==='rates'){
+      const range=window.spcPageTimeRange;
+      const requestedFrom=range?new Date(range.start).getTime():end-chart.hours*3600000;
+      const from=Math.max(start,requestedFrom);
+      const until=range?Math.min(end,new Date(range.end).getTime()+59999):end;
+      if(until<from||!scopeDevices(chart).length){host.innerHTML='<div class="runtime-chart-empty">所选时间范围暂无历史数据</div>';return;}
+      const step=Math.max(1,Math.ceil((until-from)/(12*3600000))) * 3600000;
+      const times=[];for(let t=from;t<=until;t+=step)times.push(t);
+      if(until>=from&&times.at(-1)!==until)times.push(until);
+      const series=[{name:'连接率',color:'#3478f6',test:d=>['normal','delayed'].includes(d.state)},{name:'传输正常率',color:'#20a464',test:d=>d.state==='normal',dash:'6 4'}];
+      const chartBottom=140;
+      const x=t=>left+(t-from)/Math.max(1,until-from)*(right-left),y=v=>chartBottom-v/100*(chartBottom-top);
+      let markup='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="连接率与传输正常率趋势">';
+      [0,20,40,60,80,100].forEach(value=>markup+='<line x1="'+left+'" x2="'+right+'" y1="'+y(value)+'" y2="'+y(value)+'" stroke="#e8edf2"/><text x="'+(left-6)+'" y="'+(y(value)+4)+'" text-anchor="end">'+value+'%</text>');
+      series.forEach(line=>{
+        const points=times.map(time=>{const data=snapshot(chart,time).filter(d=>d.state!=='disabled');return {time,value:data.length?data.filter(line.test).length/data.length*100:null}});
+        let path='',connected=false;
+        points.forEach(point=>{if(point.value===null){connected=false;return}path+=(connected?' L ':' M ')+x(point.time)+' '+y(point.value);connected=true});
+        markup+='<path d="'+path+'" fill="none" stroke="'+line.color+'" stroke-width="2.5"'+(line.dash?' stroke-dasharray="'+line.dash+'"':'')+'/>';
+        points.filter(point=>point.value!==null).forEach(point=>markup+='<circle cx="'+x(point.time)+'" cy="'+y(point.value)+'" r="3" fill="#fff" stroke="'+line.color+'" stroke-width="2"><title>'+format(point.time)+'，'+line.name+'：'+point.value.toFixed(2)+'%</title></circle>');
+      });
+      markup+='<line x1="'+left+'" x2="'+right+'" y1="'+chartBottom+'" y2="'+chartBottom+'" stroke="#cfd8e4"/>';
+      const ticks=Math.max(1,Math.min(5,Math.floor((right-left)/110)));
+      for(let i=0;i<=ticks;i++){
+        const time=from+(until-from)*i/ticks,pos=x(time),anchor=i===0?'start':i===ticks?'end':'middle',label=format(time);
+        markup+='<line x1="'+pos+'" x2="'+pos+'" y1="'+chartBottom+'" y2="'+(chartBottom+4)+'" stroke="#a9b6c6"/><text x="'+pos+'" y="158" text-anchor="'+anchor+'"><tspan x="'+pos+'">'+label.slice(5,10)+'</tspan><tspan x="'+pos+'" dy="14">'+label.slice(11,16)+'</tspan></text>';
+      }
+      markup+='<text x="'+right+'" y="193" text-anchor="end">时间</text>';
+      host.innerHTML=markup+'</svg>';return;
+    }
+    if(chart.metric==='distribution'){
+      const range=window.spcPageTimeRange,at=range?Math.min(end,new Date(range.end).getTime()):end,items=snapshot(chart,at),total=items.length,cx=Math.min(w*.28,115),cy=95,r=62,rows=states.map(state=>({...state,count:items.filter(d=>d.state===state.id).length}));let offset=0;
+      let markup='<svg viewBox="0 0 '+w+' 198" role="img" aria-label="设备状态分布"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#edf1f5" stroke-width="22"/>';
+      rows.forEach((state,i)=>{const percent=total?state.count/total*100:0;markup+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" pathLength="100" fill="none" stroke="'+state.color+'" stroke-width="22" stroke-dasharray="'+percent+' '+(100-percent)+'" stroke-dashoffset="'+(-offset)+'" transform="rotate(-90 '+cx+' '+cy+')"><title>'+escape(state.name)+'：'+state.count+' 台（'+percent.toFixed(1)+'%）</title></circle>';offset+=percent;const x=Math.max(cx+r+28,w*.52),y=44+i*34;markup+='<g><title>'+escape(state.name)+'：'+state.count+' 台</title><rect x="'+x+'" y="'+(y-9)+'" width="9" height="9" rx="2" fill="'+state.color+'"/><text x="'+(x+16)+'" y="'+y+'">'+escape(state.name)+'</text><text x="'+(w-8)+'" y="'+y+'" text-anchor="end">'+state.count+' 台</text></g>'});
+      markup+='<text x="'+cx+'" y="'+cy+'" text-anchor="middle" style="font-size:24px;font-weight:650">'+total+'</text><text x="'+cx+'" y="'+(cy+20)+'" text-anchor="middle">设备总数（台）</text></svg>';host.innerHTML=markup;return;
+    }
+    if(chart.metric==='upload'){
+host.innerHTML='<div class="runtime-chart-empty">暂无上传历史数据</div>';return;}
     let svg=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${escape(chart.title)}，示例数据"><text x="0" y="13">${chart.metric==='status'?'设备数（台）':'设备'}</text>`;
     const targets=[];
     const mark=(x,y,width,height,color,label,selection)=>{const index=targets.push(selection)-1;return `<g ${chart.drill?`role="button" tabindex="0" data-hit="${index}" aria-label="${escape(label)}，查看明细"`:''}><title>${escape(label)}</title><rect x="${x}" y="${y}" width="${Math.max(0,width)}" height="${Math.max(0,height)}" fill="${color}"/></g>`;};
@@ -118,7 +173,7 @@
     host.querySelectorAll('[data-hit]').forEach(el=>{const run=()=>detail(chart,targets[Number(el.dataset.hit)]);el.addEventListener('click',run);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run();}});});
   }
   function render(){observers.splice(0).forEach(o=>o.disconnect());grid.innerHTML='';
-    config.charts.forEach((chart,index)=>{const panel=document.createElement('section');panel.className='panel runtime-chart'+(chart.width==='half'?' half':'');panel.dataset.runtimeChart=chart.id;panel.innerHTML=`<div class="phead"><div class="phead-title"><b>${escape(chart.title)}</b>${chart.metric==='duration'?'<span>最近24小时</span>':`<span>最近 ${chart.hours} 小时 · ${escape(scopeName(chart))} · 示例数据</span>`}</div><div class="runtime-chart-tools">${chart.metric==='duration'?'<button type="button" class="chart-device-config" data-config-devices>配置设备</button>':''}${editing?'<button type="button" class="btn" data-config>配置</button><button type="button" class="btn" data-up aria-label="上移组件">↑</button><button type="button" class="btn" data-down aria-label="下移组件">↓</button><button type="button" class="btn" data-remove>删除</button>':''}</div></div>${chart.metric==='status'?`<div class="runtime-chart-legend">${states.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join('')}</div>`:''}<div class="runtime-chart-plot"></div>`;grid.appendChild(panel);if(chart.metric==='duration'){panel.querySelector('[data-config-devices]').onclick=()=>configureDurationDevices(chart);}if(editing){panel.querySelector('[data-config]').onclick=()=>configure(chart);panel.querySelector('[data-up]').disabled=index===0;panel.querySelector('[data-down]').disabled=index===config.charts.length-1;const move=delta=>{[config.charts[index],config.charts[index+delta]]=[config.charts[index+delta],config.charts[index]];render();};panel.querySelector('[data-up]').onclick=()=>move(-1);panel.querySelector('[data-down]').onclick=()=>move(1);panel.querySelector('[data-remove]').onclick=()=>{config.charts=config.charts.filter(c=>c.id!==chart.id);render();};}const observer=new ResizeObserver(()=>draw(panel,chart));observer.observe(panel);observers.push(observer);draw(panel,chart);});
+    config.charts.forEach((chart,index)=>{const panel=document.createElement('section');panel.className='panel runtime-chart'+(chart.width==='half'||config.charts.length===2?' half':'');panel.dataset.runtimeChart=chart.id;panel.dataset.runtimeMetric=chart.metric;panel.dataset.chartType=chart.metric==='rates'?'line':chart.metric==='distribution'?'donut':chart.metric==='duration'?'horizontalBar':'barStacked';panel.innerHTML=`<div class="phead"><div class="phead-title"><b>${escape(chart.title)}</b>${['rates','duration','distribution'].includes(chart.metric)?'':`<span>最近 ${chart.hours} 小时 · ${escape(scopeName(chart))} · 示例数据</span>`}</div><div class="runtime-chart-tools">${editing?'<button type="button" class="btn" data-config>配置</button><button type="button" class="btn" data-up aria-label="上移组件">↑</button><button type="button" class="btn" data-down aria-label="下移组件">↓</button><button type="button" class="btn" data-remove>删除</button>':''}</div></div>${chart.metric==='rates'?'<div class="runtime-chart-legend"><span><i style="background:#3478f6"></i>连接率</span><span><i style="background:#20a464"></i>传输正常率</span></div>':''}${chart.metric==='status'?`<div class="runtime-chart-legend">${states.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join('')}</div>`:''}<div class="runtime-chart-plot"></div>`;grid.appendChild(panel);if(editing){panel.querySelector('[data-config]').onclick=()=>configure(chart);panel.querySelector('[data-up]').disabled=index===0;panel.querySelector('[data-down]').disabled=index===config.charts.length-1;const move=delta=>{[config.charts[index],config.charts[index+delta]]=[config.charts[index+delta],config.charts[index]];render();};panel.querySelector('[data-up]').onclick=()=>move(-1);panel.querySelector('[data-down]').onclick=()=>move(1);panel.querySelector('[data-remove]').onclick=()=>{config.charts=config.charts.filter(c=>c.id!==chart.id);render();};}const observer=new ResizeObserver(()=>draw(panel,chart));observer.observe(panel);observers.push(observer);draw(panel,chart);});
     if(!config.charts.length){const empty=document.createElement('section');empty.className='panel runtime-chart runtime-chart-empty';empty.textContent='暂无图表';grid.appendChild(empty);}
   }
   editButton.onclick=()=>{editing=true;toolbar.hidden=false;toolbar.style.display='flex';editButton.hidden=true;render();};
