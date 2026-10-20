@@ -17,3 +17,10 @@ body:not(.quality-page-editor-open) .combo-layout[data-show-title=false]>.combo-
 .combo-layout>[hidden]{display:none!important}
 @media(max-width:900px){.combo-content>[data-custom-chart]{width:100%}.combo-content>.spc-independent-metric{width:calc(50% - 7px)!important}}
 [data-custom-metric][hidden],.combo-layout[hidden]{display:none!important}
+.combo-move-submenu{z-index:1300;min-width:152px;max-width:min(280px,calc(100vw - 16px));max-height:min(360px,calc(100vh - 16px));overflow:auto}
+.combo-move-submenu button{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Group menus also run on the native device editor, without shared-analysis-editor.css. */
+.combo-action-menu,.combo-move-submenu{position:fixed;z-index:1300;width:152px;box-sizing:border-box;max-height:calc(100vh - 16px);overflow:auto;padding:4px;border:1px solid #d9e1eb;border-radius:6px;background:#fff;box-shadow:0 8px 20px #1d345229}
+.combo-action-menu button,.combo-move-submenu button{display:block;box-sizing:border-box;width:100%;min-height:34px;padding:6px 10px;border:0;border-radius:4px;background:#fff;color:#334155;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;line-height:20px}
+.combo-action-menu button:hover,.combo-action-menu button:focus-visible,.combo-move-submenu button:hover,.combo-move-submenu button:focus-visible{background:#edf4ff;color:#2468e8}
+.combo-action-menu [data-group-delete],.combo-action-menu [data-remove]{color:#df4a4a}

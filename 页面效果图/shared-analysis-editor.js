@@ -34,7 +34,7 @@
   const metrics=[...document.querySelectorAll('.metrics .metric,[data-custom-metric]')];
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const palettes=[['默认',['#3478f6','#6c9cf8','#74c6b5','#efbb78','#9586df','#43b8ed']],['清新',['#4d8bff','#00c7bd','#58ce67','#b9db30','#ffd456','#ff995a']],['明快',['#2f70f5','#ff8c35','#1cbbec','#ffc000','#3fcc55','#818c9b']],['对比',['#477fff','#f36a64','#a9b0bc','#6266dd','#ec4dbb','#863af5']],['柔和',['#b7ccff','#acdfff','#9ee6df','#b9eabe','#e8ee9a','#ffebba']],['玫瑰',['#16a7d6','#4e70d4','#304fae','#f48ccb','#e968aa','#bf4e98']]];
-  const typeNames={bar:'柱状图',horizontalBar:'条形图',line:'折线图',area:'面积图',pie:'饼图',donut:'环形图',scatter:'散点图',radar:'雷达图'};
+  const typeNames={bar:'柱状图',horizontalBar:'条形图',line:'折线图',area:'面积图',pie:'饼状图',donut:'环状图',scatter:'散点图',radar:'雷达图'};
   const pageTypes={
     'project-stats':['line','horizontalBar'],
     'project-detail':['donut','horizontalBar'],
@@ -190,10 +190,10 @@
     window.spcRenderChartMeasureControls?.(drawer,charts[selected]);
     const theme=q(drawer,'.quality-source-trigger');theme.setAttribute('role','button');theme.tabIndex=0;theme.innerHTML=`<span class="quality-theme-swatch-strip">${palettes[s.theme][1].map(c=>`<i style="background:${c}"></i>`).join('')}</span><span>${palettes[s.theme][0]}</span>`;const choices=document.createElement('div');choices.className='quality-theme-choices';choices.hidden=true;choices.innerHTML=palettes.map(([name,colors],i)=>`<button type="button" data-theme-index="${i}" class="quality-theme-option"><span class="quality-theme-swatch-strip">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${name}</button>`).join('');theme.after(choices);theme.onclick=()=>choices.hidden=!choices.hidden;choices.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{s.theme=Number(btn.dataset.themeIndex);choices.hidden=true;renderDrawer();preview()});
     configure(drawer,s.type,selected);
-    const customControls=[...drawer.querySelectorAll('[data-chart-panel="custom"] select,[data-chart-panel="custom"] input')];
+    const customControls=[...drawer.querySelectorAll('[data-chart-panel="custom"] select,[data-chart-panel="custom"] input:not([data-quality-gradient])')];
     if(s.custom)customControls.forEach((control,i)=>{if(s.custom[i]===undefined)return;if(control.type==='checkbox')control.checked=s.custom[i]==='true';else control.value=s.custom[i]});
     setTimeout(()=>{if(!drawer||selected<0)return;drawer.querySelectorAll('[data-chart-color]').forEach(button=>{const label=button.dataset.chartColor;if(s.colors?.[label])window.spcBindColorTrigger?.(button,label==='背景颜色'?'background':'text',s.colors[label]);new MutationObserver(()=>{s.colors||={};s.colors[label]={...button._color};preview()}).observe(button,{childList:true,subtree:true,attributes:true,attributeFilter:['style']})})},0);
-    const gradient=q(drawer,'[data-chart-panel="base"] .quality-config-check.full input:not([data-quality-summary-category]):not([data-quality-group])');
+    const gradient=q(drawer,'[data-quality-gradient]');
     if(gradient){gradient.checked=s.gradient;gradient.onchange=()=>{s.gradient=gradient.checked;preview()}}
     const checks=[['legend','[data-quality-config="legend"]'],['labels','[data-quality-config="label"]'],['axes','.quality-chart-check-grid label:nth-child(3) input'],['grid','.quality-chart-check-grid label:nth-child(4) input'],['total','[data-quality-show-total]']];checks.forEach(([name,sel])=>{const input=q(drawer,sel);if(input){input.checked=s[name];input.onchange=()=>{s[name]=input.checked;preview()}}});
     const switchInput=q(drawer,'.quality-chart-switch-row input');if(switchInput){switchInput.checked=!!s.switched;switchInput.onchange=()=>{s.switched=switchInput.checked;preview()}}

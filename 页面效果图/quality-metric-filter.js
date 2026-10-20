@@ -67,7 +67,7 @@
       const available = type ? operators[type] : [];
       return `<div class="quality-conditions-row" data-condition-index="${index}"><select data-condition-field aria-label="筛选字段">${options([['','请选择字段'],...fields.map(item => [item.key,item.label])],condition.field)}</select><select data-condition-operator aria-label="计算方式"${type?'':' disabled'}>${options([['','请选择计算方式'],...available],condition.operator)}</select>${valueMarkup(condition,type)}<button class="quality-conditions-remove" type="button" data-remove-condition aria-label="删除条件">×</button></div>`;
     }).join('');
-    popover.innerHTML = `<div class="quality-conditions-head"><strong>设置筛选条件</strong><div class="quality-conditions-mode"><span>符合以下</span><select data-condition-join aria-label="条件关系"><option value="all"${draft.join==='all'?' selected':''}>所有</option><option value="any"${draft.join==='any'?' selected':''}>任一</option></select><span>条件</span></div></div><div data-condition-rows>${rows}</div><button class="quality-conditions-add" type="button" data-add-condition>＋ 添加条件</button>`;
+    popover.innerHTML = `<div class="quality-conditions-head"><strong>设置筛选条件</strong><div class="quality-conditions-mode"><span>符合以下</span><select data-condition-join aria-label="条件关系"><option value="all"${draft.join==='all'?' selected':''}>所有</option><option value="any"${draft.join==='any'?' selected':''}>任意</option></select><span>条件</span></div></div><div data-condition-rows>${rows}</div><button class="quality-conditions-add" type="button" data-add-condition>＋ 添加条件</button>`;
   }
   function place(trigger) {
     const rect = trigger.getBoundingClientRect();

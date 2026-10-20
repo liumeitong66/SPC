@@ -55,8 +55,30 @@
   const original=window.spcFilterQualityChartRows;
   window.spcFilterQualityChartRows=(el,rows,dimension,measure)=>window.spcFilterPageTimeRows(original?.(el,rows,dimension,measure)||rows,dimension);
   const bar=document.createElement('section');bar.className='filters page-time-filter';bar.dataset.pageTimeFilter='';bar.innerHTML='<div class="field time"><label>时间范围</label><div class="control" data-page-time-control></div></div><select class="page-time-preset" aria-label="快捷时间范围" data-page-time-preset><option value="" disabled hidden>请选择</option><option value="7d">最近7天</option><option value="month">最近1个月</option><option value="halfYear">最近半年</option></select><div class="actions"><button class="btn" type="button" data-page-time-reset>重置</button><button class="btn primary" type="button" data-page-time-query>查询</button></div>';
+  let bounding=false;
+  function enforceVisualBounds(){
+    if(bounding)return;bounding=true;
+    try{
+      const region=main.querySelector('[data-page-visual-region]'),body=region?.querySelector('[data-page-visual-body]');
+      if(!body)return;
+      document.querySelectorAll('[data-combo-layout],[data-custom-chart],[data-custom-metric]').forEach(el=>{
+        if(body.contains(el)||el.closest('.quality-config-drawer,.proto-modal,.metric-card-editor'))return;
+        if(el.closest('[data-combo-layout]')!==el&&el.closest('[data-combo-layout]'))return;
+        let block=el;
+        while(block.parentElement&&block.parentElement!==main&&block.parentElement!==region.parentElement&&!block.parentElement.matches('.quality-content,.alert-content')&&!block.parentElement.querySelector('table')&&!block.parentElement.matches('body'))block=block.parentElement;
+        if(block.contains(region)||block.querySelector('table'))block=el;
+        body.append(block);
+      });
+      const parent=region.parentElement,table=[...parent.children].find(node=>node!==region&&(node.matches('.shared-layout-table,.table-panel,.records,.export-workspace,.component-panel')||node.querySelector('table')));
+      if(table&&(table.compareDocumentPosition(region)&Node.DOCUMENT_POSITION_FOLLOWING))table.before(region);
+      main.querySelectorAll('.shared-table-drag').forEach(handle=>handle.remove());
+    }finally{bounding=false}
+  }
+  window.spcEnforceVisualBounds=enforceVisualBounds;
+  let boundsScheduled=false;
+  new MutationObserver(()=>{if(boundsScheduled)return;boundsScheduled=true;queueMicrotask(()=>{boundsScheduled=false;enforceVisualBounds()})}).observe(document.body,{subtree:true,childList:true});
   function layoutVisuals(){
-    if(main.querySelector('[data-page-visual-region]')?.contains(bar))return;
+    if(main.querySelector('[data-page-visual-region]')?.contains(bar)){enforceVisualBounds();return;}
   if(document.body.dataset.page==='device-runtime-monitor'){main.querySelectorAll('[data-config-devices]').forEach(n=>n.remove());main.querySelectorAll('[data-runtime-chart] .phead-title span').forEach(n=>{if(n.textContent.trim()==='最近24小时')n.remove()})}
   const container=main.querySelector('.quality-content,.alert-content')||main;
   const mouth=main.querySelector('.quality-mouth-toolbar,.project-mouth-toolbar,.defect-mouth-toolbar,.project-mouth-global');

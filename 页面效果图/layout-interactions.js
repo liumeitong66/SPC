@@ -91,6 +91,7 @@
     return block && groupBlock && block !== groupBlock ? { host, block, groupBlock } : null;
   }
   function prepareTable(table) {
+    if(document.querySelector('[data-page-visual-region]'))return;
     const panel = table.closest('section.panel,article.panel,.project-pcb-panel,.component-panel,.records,.table-panel,.alert-stats-panel');
     if (!panel || panel.hasAttribute('data-layout-table-ready')) return;
     panel.dataset.layoutTableReady = '';
