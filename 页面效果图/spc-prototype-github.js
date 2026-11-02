@@ -194,11 +194,12 @@
     { key: 'index', label: '序号', group: '基础信息' },
     { key: 'deviceName', label: '设备名称', group: '基础信息' },
     { key: 'deviceSn', label: '设备SN', group: '基础信息' },
+    { key: 'deviceLocation', label: '所在位置', group: '基础信息' },
     { key: 'projectCount', label: '检测模板数', group: '基础信息' },
     ...deviceMetricColumns,
     { key: 'lastDataTime', label: '最后接收数据时间', group: '基础信息' }
   ];
-  const defaultDeviceColumnKeys = ['index', 'deviceName', 'deviceSn', 'projectCount', 'boardTotal', 'boardDppm', 'boardGood', 'boardYield', 'boardFalseRate', 'boardPassRate', 'componentDppm', 'componentNgRate', 'lastDataTime'];
+  const defaultDeviceColumnKeys = ['index', 'deviceName', 'deviceSn', 'deviceLocation', 'projectCount', 'boardTotal', 'boardDppm', 'boardGood', 'boardYield', 'boardFalseRate', 'boardPassRate', 'componentDppm', 'componentNgRate', 'lastDataTime'];
   const deviceSortableColumnKeys = new Set(['projectCount', 'boardTotal', 'boardGood', 'boardFalseRate']);
   let activeDeviceColumns = new Set(defaultDeviceColumnKeys);
   let currentMouth = 'review';
@@ -452,7 +453,7 @@
   }
 
   function columnWidth(key) {
-    const widths = { index: 60, projectName: 170, projectUuid: 240, projectNames: 210, projectUuids: 290, deviceCount: 110, deviceNames: 330, deviceName: 140, deviceSn: 150, projectCount: 110, lastDataTime: 170, componentSpecialNg: 190, componentSpecialFalse: 210, componentSpecialMiss: 210 };
+    const widths = { index: 60, projectName: 170, projectUuid: 240, projectNames: 210, projectUuids: 290, deviceCount: 110, deviceNames: 330, deviceName: 140, deviceSn: 150, deviceLocation: 180, projectCount: 110, lastDataTime: 170, componentSpecialNg: 190, componentSpecialFalse: 210, componentSpecialMiss: 210 };
     return widths[key] || (key.includes('Rate') ? 140 : 130);
   }
 
@@ -1084,7 +1085,7 @@
   function deviceOverviewRows(mouth) {
     return deviceSamples.map(device => {
       const stats = statsFor(device, mouth);
-      return stats ? { deviceName: device.name, ip: device.ip, deviceSn: device.sn, projectCount: device.projects.length, projectNames: device.projects.map(project => project.name), projectUuids: device.projects.map(project => project.uuid), lastDataTime: device.lastDataTime, ...stats } : null;
+      return stats ? { deviceName: device.name, ip: device.ip, deviceSn: device.sn, deviceLocation: comparisonDevices.find(item => item.name === device.name)?.area || '—', projectCount: device.projects.length, projectNames: device.projects.map(project => project.name), projectUuids: device.projects.map(project => project.uuid), lastDataTime: device.lastDataTime, ...stats } : null;
     }).filter(Boolean).map((device, index) => ({ index: index + 1, ...device }));
   }
 

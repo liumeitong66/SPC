@@ -19,7 +19,18 @@
       records.push({'时间':date.toISOString().slice(0,10),'设备名称':device,'设备SN':sns[deviceIndex],'设备位置（一级）':areas[device],'设备位置（二级）':areas[device].replace('区域','产线')+'1','项目名称':projects[(n+t)%projects.length],'告警类型':type,'告警级别':(n+t+week)%6===0?'紧急':'一般','告警次数':1});
     }
   });
+  records.forEach((record,index)=>{record['推送成功']=index%17!==0});
   window.spcAlertDailyRecords = records;
+  const cards=document.createElement('section');cards.className='metrics alert-summary-metrics';
+  const indicators=[['alertTotal','告警总次数','次'],['urgentTotal','紧急告警次数','次'],['alertDevices','告警设备数','台'],['pushSuccessRate','推送成功率','%']];
+  cards.innerHTML=indicators.map(([id,title,unit])=>'<div class="metric" data-alert-summary="'+id+'"><label>'+title+'</label><strong>—<small>'+unit+'</small></strong></div>').join('');
+  document.querySelector('.alert-content').prepend(cards);
+  function updateSummary(){
+    const filtered=window.spcFilterPageTimeRows?.(records,'时间')||records;
+    const values=[filtered.length,filtered.filter(r=>r['告警级别']==='紧急').length,new Set(filtered.map(r=>r['设备名称'])).size,filtered.length?(filtered.filter(r=>r['推送成功']).length/filtered.length*100).toFixed(2):'—'];
+    indicators.forEach(([id,,unit],i)=>{const target=cards.querySelector('[data-alert-summary="'+id+'"] strong');target.innerHTML=values[i]+'<small>'+unit+'</small>'});
+  }
+  window.addEventListener('spc-page-time-change',updateSummary);updateSummary();
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   window.spcAlertChartRows = (chart, dimension, grain = 'day') => {
     const filtered = window.spcFilterQualityChartRows?.(chart, records, '', '') || records;
@@ -43,7 +54,16 @@
     if (index === 2) {
       let offset=0; const circumference=358.14;
       body.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px';
-      body.innerHTML=`<svg style="max-width:132px;flex:0 0 110px" viewBox="0 0 190 174" aria-label="告警分布">${data.map((row,i)=>{const percent=total?row.value/total*100:0,length=circumference*percent/100;const circle=`<circle cx="87" cy="87" r="57" fill="none" stroke="${colors[i%colors.length]}" stroke-width="34" stroke-dasharray="${length} ${circumference-length}" stroke-dashoffset="${-offset}" transform="rotate(-90 87 87)"><title>${esc(row.label)}：${row.value}次，占比${percent.toFixed(1)}%</title></circle>`;offset+=length;return circle}).join('')}</svg><div class="legend alert-rule-legend" style="flex:1;min-width:0;grid-template-columns:1fr;max-height:100%;overflow:auto">${data.map((row,i)=>`<span title="${esc(row.label)}：${row.value}次"><i style="background:${colors[i%colors.length]}"></i>${esc(row.label)} ${(row.value/(total||1)*100).toFixed(1)}% · ${row.value}次</span>`).join('')}</div>`;
+      body.innerHTML=`<svg style="max-width:132px;flex:0 0 110px" viewBox="0 0 190 174" aria-label="告警分布">${data.map((row,i)=>{const percent=total?row.value/total*100:0,length=circumference*percent/100;const circle=`<circle cx="87" cy="87" r="57" fill="none" stroke="${colors[i%colors.length]}" stroke-width="34" stroke-dasharray="${length} ${circumference-length}" stroke-dashoffset="${-offset}" transform="rotate(-90 87 87)"><title>${esc(row.label)}：${row.value}次，占比${percent.toFixed(1)}%</title></circle>`;offset+=length;return circle}).join('')}<text x="87" y="84" text-anchor="middle" fill="#102a4c" style="font-size:22px;font-weight:700">${total}</text><text x="87" y="103" text-anchor="middle" fill="#64748b" style="font-size:10px">累计告警次数</text></svg><div class="legend alert-rule-legend" style="flex:1;min-width:0;grid-template-columns:1fr;max-height:100%;overflow:auto">${data.map((row,i)=>`<span title="${esc(row.label)}：${row.value}次"><i style="background:${colors[i%colors.length]}"></i>${esc(row.label)} ${(row.value/(total||1)*100).toFixed(1)}% · ${row.value}次</span>`).join('')}</div>`;
+    } else if(index===1){
+      const max=Math.max(1,...data.flatMap(row=>[row.normal,row.urgent])),x=i=>48+i*480/Math.max(1,data.length-1),y=value=>150-value/max*120;
+      let svg='<svg viewBox="0 0 560 174" role="img" aria-label="告警趋势统计"><path d="M38 18H545M38 61H545M38 104H545M38 150H545" class="grid"/>';
+      [['normal','一般','#3478f6'],['urgent','紧急','#df4a4a']].forEach(([key,label,color])=>{
+        svg+='<path d="'+data.map((row,i)=>(i?'L':'M')+x(i)+' '+y(row[key])).join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2.5"/>';
+        data.forEach((row,i)=>svg+='<circle cx="'+x(i)+'" cy="'+y(row[key])+'" r="3" fill="#fff" stroke="'+color+'" stroke-width="2"><title>'+esc(row.label)+' '+label+'：'+row[key]+'次</title></circle>');
+      });
+      const stride=Math.max(1,Math.ceil(data.length/7));data.forEach((row,i)=>{if(i%stride===0||i===data.length-1)svg+='<text class="axis" x="'+x(i)+'" y="168" text-anchor="middle">'+esc(row.label.slice(grain==='month'?2:5))+'</text>'});
+      body.innerHTML=svg+'</svg>';
     } else {
       const max=Math.max(1,...data.map(row=>row.value)),step=480/Math.max(1,data.length),labelStep=Math.max(1,Math.ceil(data.length/8));
       body.innerHTML=`<svg viewBox="0 0 560 174" aria-label="${esc(title)}"><path d="M38 18H545M38 61H545M38 104H545M38 150H545" class="grid"/>${data.map((row,i)=>{const x=48+i*step+step*.2,w=Math.max(.5,Math.min(46,step*.6)),normal=row.normal/max*120,urgent=row.urgent/max*120;return `<rect x="${x}" y="${150-normal}" width="${w}" height="${normal}" fill="#3478f6"><title>${esc(row.label)} 一般：${row.normal}次</title></rect><rect x="${x}" y="${150-normal-urgent}" width="${w}" height="${urgent}" fill="#df4a4a"><title>${esc(row.label)} 紧急：${row.urgent}次</title></rect>${i%labelStep===0?`<text class="axis" x="${x+w/2}" y="168" text-anchor="middle">${esc(/时间|日期/.test(dimension)?row.label.slice(grain==='month'?2:5):row.label)}</text>`:''}`}).join('')}</svg>`;

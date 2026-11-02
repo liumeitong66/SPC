@@ -1,6 +1,17 @@
 (()=>{
   if(!document.querySelector('script[src^="shared-analysis-editor.js"],script[src^="spc-prototype-github.js"]'))return;
   const key='spc-combo-layout:'+location.pathname,componentSelector='[data-custom-chart],[data-custom-metric]';
+  if(document.body.dataset.page==='device-quality'){
+    const repairKey='spc-device-default-groups-v1:'+location.pathname;
+    if(!localStorage.getItem(repairKey)){
+      try{
+        const stored=JSON.parse(localStorage.getItem(key)||'[]');
+        const remaining=stored.filter(group=>!['指标卡组合','未命名组合'].includes(group.title));
+        if(remaining.length!==stored.length){localStorage.setItem('spc-device-groups-backup:'+location.pathname,JSON.stringify(stored));localStorage.setItem(key,JSON.stringify(remaining))}
+        localStorage.setItem(repairKey,'1');
+      }catch{}
+    }
+  }
   const clone=o=>JSON.parse(JSON.stringify(o)),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const editing=()=>document.body.classList.contains('quality-page-editor-open')&&!document.body.classList.contains('quality-page-preview');
   let selectedGroup=null,pendingGroup=null,drag=null,restoreDone=false,writing=false;

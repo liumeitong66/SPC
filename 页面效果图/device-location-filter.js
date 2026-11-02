@@ -1,0 +1,17 @@
+(()=>{
+ if(document.body.dataset.page!=='device-quality')return;
+ function install(){const bar=document.querySelector('.quality-filter');if(!bar||bar.querySelector('[data-location-tree]'))return;
+ const devices=window.spcQualityChartSamples?.comparisonDevices||[],areas=[...new Set(devices.map(d=>d.area).filter(Boolean))];
+ const field=document.createElement('div');field.className='field device-location-filter';field.dataset.locationTree='';field.innerHTML='<label>所在位置</label><button type="button" class="control location-tree-trigger" aria-expanded="false">请选择所在位置<span class="chev">⌄</span></button><div class="location-tree-menu" hidden></div>';
+ bar.querySelector('.device-search').after(field);const trigger=field.querySelector('button'),menu=field.lastElementChild;
+ areas.forEach(area=>{const branch=document.createElement('details');branch.open=true;const summary=document.createElement('summary'),label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.dataset.area=area;label.append(input,document.createTextNode(area));summary.append(label);branch.append(summary);[{name:area.replace('区域','产线')+'1',area}].forEach(device=>{const leaf=document.createElement('label');leaf.className='location-tree-leaf';const check=document.createElement('input');check.type='checkbox';check.value=device.area;leaf.append(check,document.createTextNode(device.name));branch.append(leaf)});input.onchange=()=>branch.querySelectorAll('.location-tree-leaf input').forEach(c=>c.checked=input.checked);branch.addEventListener('change',()=>{const checks=[...branch.querySelectorAll('.location-tree-leaf input')];input.checked=checks.every(c=>c.checked);input.indeterminate=checks.some(c=>c.checked)&&!input.checked;paint()});menu.append(branch)});
+ function paint(){const n=menu.querySelectorAll('.location-tree-leaf input:checked').length;trigger.firstChild.textContent=n?'已选 '+n+' 个位置':'请选择所在位置'}
+ trigger.onclick=e=>{e.stopPropagation();menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))};menu.addEventListener('click',e=>e.stopPropagation());
+ bar.addEventListener('click',e=>{if(field.dataset.merged)return;const button=e.target.closest('.filter-actions .btn');if(!button)return;e.preventDefault();e.stopImmediatePropagation();if(!button.classList.contains('primary')){bar.querySelector('.proto-search').value='';menu.querySelectorAll('input').forEach(c=>{c.checked=false;c.indeterminate=false});paint()}
+ const selected=[...menu.querySelectorAll('.location-tree-leaf input:checked')].map(c=>c.value),keyword=bar.querySelector('.proto-search').value.trim().toLowerCase();let count=0;document.querySelectorAll('[data-device-table] tbody tr').forEach(row=>{const name=row.querySelector('[data-column-key="deviceName"]')?.textContent.trim()||row.cells[2]?.textContent.trim();row.hidden=!!((selected.length&&!selected.includes(devices.find(device=>device.name===name)?.area))||(keyword&&!row.textContent.toLowerCase().includes(keyword)));if(!row.hidden)count++});const pager=document.querySelector('.table-panel .pager>span');if(pager)pager.textContent='共'+count+'条';menu.hidden=true;trigger.setAttribute('aria-expanded','false');},true);
+ document.addEventListener('click',e=>{if(!field.contains(e.target)){menu.hidden=true;trigger.setAttribute('aria-expanded','false')}});
+ }
+ new MutationObserver(install).observe(document.body,{childList:true,subtree:true});install();
+})();
+
+

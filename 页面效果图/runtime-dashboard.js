@@ -30,7 +30,7 @@
   event('aoi-04','2026-08-04 12:58:20','disconnected');
   event('aoi-05','2026-08-04 14:10:12','delayed');
   const metrics = {
-    rates:{name:'连接率与传输正常率',title:'连接率与传输正常率趋势',type:'line',typeName:'折线图',template:'设备状态明细',available:false,fields:[]},
+    rates:{name:'连接率与传输正常率',title:'设备传输状态趋势',type:'line',typeName:'折线图',template:'设备状态明细',available:false,fields:[]},
     status:{name:'设备状态数量',title:'设备状态数量趋势',type:'stack',typeName:'堆叠柱状图',template:'设备状态明细',available:true,fields:['location','since','duration']},
     duration:{name:'设备异常累计时长',title:'设备异常累计时长',type:'bar',typeName:'条形图',template:'异常事件记录',available:true,fields:['location','since','until']},
     distribution:{name:'设备状态分布',title:'设备状态分布',type:'donut',typeName:'环形图',template:'设备状态明细',available:true,fields:[]},
@@ -54,7 +54,7 @@
     }
   });
   if(!config.charts.some(c=>c.metric==='distribution'))config.charts.push({...defaults().charts.find(c=>c.metric==='distribution')});
-  config.charts.forEach(c=>{c.title=c.title.replace(/最近\s*24\s*小时/g,'').trim()});
+  config.charts.forEach(c=>{if(c.metric==='rates'&&c.title==='连接率与传输正常率趋势')c.title='设备传输状态趋势';c.title=c.title.replace(/最近\s*24\s*小时/g,'').trim()});
   overview.querySelector('.exception-panel')?.remove();
   const grid=document.createElement('div');grid.className='runtime-chart-grid';overview.querySelector('.trend-panel').replaceWith(grid);
   const editButton=document.createElement('button');editButton.className='quality-page-edit-button';editButton.type='button';editButton.textContent='编辑页面';document.querySelector('.top-actions').prepend(editButton);
@@ -128,7 +128,7 @@
       const series=[{name:'连接率',color:'#3478f6',test:d=>['normal','delayed'].includes(d.state)},{name:'传输正常率',color:'#20a464',test:d=>d.state==='normal',dash:'6 4'}];
       const chartBottom=140;
       const x=t=>left+(t-from)/Math.max(1,until-from)*(right-left),y=v=>chartBottom-v/100*(chartBottom-top);
-      let markup='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="连接率与传输正常率趋势">';
+      let markup='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="设备传输状态趋势">';
       [0,20,40,60,80,100].forEach(value=>markup+='<line x1="'+left+'" x2="'+right+'" y1="'+y(value)+'" y2="'+y(value)+'" stroke="#e8edf2"/><text x="'+(left-6)+'" y="'+(y(value)+4)+'" text-anchor="end">'+value+'%</text>');
       series.forEach(line=>{
         const points=times.map(time=>{const data=snapshot(chart,time).filter(d=>d.state!=='disabled');return {time,value:data.length?data.filter(line.test).length/data.length*100:null}});
@@ -149,7 +149,7 @@
     if(chart.metric==='distribution'){
       const range=window.spcPageTimeRange,at=range?Math.min(end,new Date(range.end).getTime()):end,items=snapshot(chart,at),total=items.length,cx=Math.min(w*.28,115),cy=95,r=62,rows=states.map(state=>({...state,count:items.filter(d=>d.state===state.id).length}));let offset=0;
       let markup='<svg viewBox="0 0 '+w+' 198" role="img" aria-label="设备状态分布"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#edf1f5" stroke-width="22"/>';
-      rows.forEach((state,i)=>{const percent=total?state.count/total*100:0;markup+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" pathLength="100" fill="none" stroke="'+state.color+'" stroke-width="22" stroke-dasharray="'+percent+' '+(100-percent)+'" stroke-dashoffset="'+(-offset)+'" transform="rotate(-90 '+cx+' '+cy+')"><title>'+escape(state.name)+'：'+state.count+' 台（'+percent.toFixed(1)+'%）</title></circle>';offset+=percent;const x=Math.max(cx+r+28,w*.52),y=44+i*34;markup+='<g><title>'+escape(state.name)+'：'+state.count+' 台</title><rect x="'+x+'" y="'+(y-9)+'" width="9" height="9" rx="2" fill="'+state.color+'"/><text x="'+(x+16)+'" y="'+y+'">'+escape(state.name)+'</text><text x="'+(w-8)+'" y="'+y+'" text-anchor="end">'+state.count+' 台</text></g>'});
+      rows.forEach((state,i)=>{const percent=total?state.count/total*100:0;markup+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" pathLength="100" fill="none" stroke="'+state.color+'" stroke-width="22" stroke-dasharray="'+percent+' '+(100-percent)+'" stroke-dashoffset="'+(-offset)+'" transform="rotate(-90 '+cx+' '+cy+')"><title>'+escape(state.name)+'：'+state.count+' 台（'+percent.toFixed(1)+'%）</title></circle>';offset+=percent;const x=Math.max(cx+r+28,w*.52),y=44+i*34;markup+='<g><title>'+escape(state.name)+'：'+state.count+' 台</title><rect x="'+x+'" y="'+(y-9)+'" width="9" height="9" rx="2" fill="'+state.color+'"/><text x="'+(x+16)+'" y="'+y+'">'+escape(({normal:'连接/传输正常',delayed:'连接/传输异常',disconnected:'未连接',disabled:'停用'})[state.id])+'</text><text x="'+(w-8)+'" y="'+y+'" text-anchor="end">'+state.count+' 台</text></g>'});
       markup+='<text x="'+cx+'" y="'+cy+'" text-anchor="middle" style="font-size:24px;font-weight:650">'+total+'</text><text x="'+cx+'" y="'+(cy+20)+'" text-anchor="middle">设备总数（台）</text></svg>';host.innerHTML=markup;return;
     }
     if(chart.metric==='upload'){

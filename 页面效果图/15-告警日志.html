@@ -23,7 +23,7 @@
       </section>
       <section class="panel log-panel">
         <div class="phead"><b id="log-title">告警日志</b></div>
-        <div class="tablebox"><table class="tbl"><thead><tr><th style="width:28%">触发时间</th><th style="width:22%">设备名称</th><th style="width:20%">所属区域</th><th style="width:30%">模板名称</th></tr></thead><tbody id="log-body">
+        <div class="tablebox"><table class="tbl"><thead><tr><th style="width:28%">触发时间</th><th style="width:22%">设备名称</th><th style="width:20%">所在位置</th><th style="width:30%">模板名称</th></tr></thead><tbody id="log-body">
           <tr data-device="AOI-01" data-area="区域A" data-time="2026-08-20T14:18"><td>2026-08-20 14:18:32</td><td>AOI-01</td><td>区域A</td><td>3267504J2G_A面</td></tr>
           <tr data-device="AOI-03" data-area="区域B" data-time="2026-08-20T11:42"><td>2026-08-20 11:42:08</td><td>AOI-03</td><td>区域B</td><td>C509048_B面</td></tr>
           <tr data-device="AOI-02" data-area="区域A" data-time="2026-08-19T20:07"><td>2026-08-19 20:07:45</td><td>AOI-02</td><td>区域A</td><td>329134S_P129</td></tr>
@@ -43,9 +43,9 @@
       var params=new URLSearchParams(location.search),ruleNames={'wrong-material':'严重不良报警（错料）','bridge':'严重不良报警（连锡）','board-yield':'板卡良率报警','pass-drop':'直通率突降报警','false-positive':'误报率偏高报警','area-defect':'区不良率波动报警','full-board':'整片不良告警'};
       var ruleName=ruleNames[params.get('rule')];if(ruleName){document.getElementById('log-title').textContent=ruleName+' · 告警日志'}
       var order=document.getElementById('order-number'),device=document.getElementById('device-name'),area=document.getElementById('area-name'),start=document.getElementById('start-date'),end=document.getElementById('end-date'),rows=Array.prototype.slice.call(document.querySelectorAll('#log-body tr:not(.empty-row)')),empty=document.querySelector('.empty-row'),pager=document.getElementById('log-pager');
-      function filterRows(){var keyword=order.value.trim().toLowerCase(),startTime=start.value||'',endTime=end.value||'',count=0;rows.forEach(function(row){var orderNumber=row.cells[3].textContent.toLowerCase(),rowTime=row.dataset.time||'',visible=(!keyword||orderNumber.indexOf(keyword)>-1)&&(!device.value||row.dataset.device===device.value)&&(!area.value||row.dataset.area===area.value)&&(!startTime||rowTime>=startTime)&&(!endTime||rowTime<=endTime);row.style.display=visible?'':'none';if(visible){count++}});empty.style.display=count?'none':'table-row';pager.firstChild.nodeValue='共 '+count+' 条'}
+      function filterRows(){var keyword=order.value.trim().toLowerCase(),startTime=start.value||'',endTime=end.value||'',count=0;rows.forEach(function(row){var orderNumber=row.cells[3].textContent.toLowerCase(),rowTime=row.dataset.time||'',visible=(!keyword||orderNumber.indexOf(keyword)>-1)&&(!window.spcLogSelectedDevices?.length||window.spcLogSelectedDevices.includes(row.dataset.device))&&(!area.value||row.dataset.area===area.value)&&(!startTime||rowTime>=startTime)&&(!endTime||rowTime<=endTime);row.style.display=visible?'':'none';if(visible){count++}});empty.style.display=count?'none':'table-row';pager.firstChild.nodeValue='共 '+count+' 条'}
       document.getElementById('query-log').addEventListener('click',filterRows);document.getElementById('reset-log').addEventListener('click',function(){order.value='';device.value='';area.value='';start.value='2026-08-01T00:00';end.value='2026-08-20T23:59';filterRows()});
     })();
   </script>
-<script src="sidebar-collapse.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script></body>
+<script src="sidebar-collapse.js"></script><link rel="stylesheet" href="metric-appearance.css"><script src="metric-appearance.js"></script><script src="runtime-nav-order.js"></script><link rel="stylesheet" href="unified-select.css"><script src="unified-select.js"></script><link rel="stylesheet" href="alert-log-enhance.css"><script src="alert-log-enhance.js"></script></body>
 </html>

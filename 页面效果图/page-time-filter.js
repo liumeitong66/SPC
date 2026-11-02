@@ -46,8 +46,9 @@
   const latest=window.spcAlertDailyRecords?.reduce((v,r)=>r['时间']>v?r['时间']:v,'')||'2026-08-04';
   const reference=new Date(latest+'T00:00:00'),key='spc-page-view-time:'+location.pathname;
   function preset(type){const end=new Date(reference),start=new Date(end);if(type==='month'||type==='halfYear'){const months=type==='halfYear'?6:1;start.setDate(1);start.setMonth(start.getMonth()-months);const last=new Date(start.getFullYear(),start.getMonth()+1,0).getDate();start.setDate(Math.min(end.getDate(),last));start.setDate(start.getDate()+1)}else start.setDate(start.getDate()-6);return {start:iso(start)+'T00:00',end:iso(end)+'T23:59',preset:type,presetVersion:2}}
-  const defaultRange=()=>({...preset('7d'),preset:''});
+  const defaultRange=()=>({...preset('7d'),preset:document.body.dataset.page==='device-runtime-monitor'?'7d':''});
   let active=defaultRange();try{const s=JSON.parse(sessionStorage.getItem(key));if(s?.start&&s?.end&&s.start<=s.end)active={...s,preset:s.presetVersion===2&&['7d','month','halfYear'].includes(s.preset)?s.preset:'',presetVersion:2}}catch{}
+  if(document.body.dataset.page==='device-runtime-monitor'&&!active.preset&&active.start===preset('7d').start&&active.end===preset('7d').end)active.preset='7d';
   window.spcPageTimeRange=active;
   window.spcPageTimeIsDefault=()=>active.start===preset('7d').start&&active.end===preset('7d').end;
   function stamp(raw){if(raw==null)return NaN;let text=String(raw).trim();if(/^\d{2}-\d{2}$/.test(text))text=reference.getFullYear()+'-'+text;if(/^\d{4}-\d{2}$/.test(text))return {month:text};if(/^\d{4}-\d{2}-\d{2}$/.test(text))text+='T00:00:00';return Date.parse(text.replace(' ','T'))}

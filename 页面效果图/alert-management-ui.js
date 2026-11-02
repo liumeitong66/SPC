@@ -16,14 +16,14 @@
   const updated=['2026-08-04 14:20:34','2026-08-04 14:18:09','2026-08-03 22:16:10','2026-08-04 14:10:52','2026-08-04 13:45:12','2026-08-04 12:06:18','2026-08-04 14:25:01'];
   const head=tbody.closest('table').querySelector('thead tr');
   const actionHead=head.lastElementChild;
-  ['创建时间','更新时间','操作人'].forEach(label=>{const th=document.createElement('th');th.textContent=label;head.insertBefore(th,actionHead)});
-  [230,210,120,190,100,100,170,170,100,140].forEach((width,index)=>{head.cells[index].style.width=width+'px'});
+  ['更新时间','操作人'].forEach(label=>{const th=document.createElement('th');th.textContent=label;head.insertBefore(th,actionHead)});
+  [230,210,120,190,100,100,170,100,140].forEach((width,index)=>{if(head.cells[index])head.cells[index].style.width=width+'px'});
   const rows=[...tbody.querySelectorAll('.alert-rule-row')];
   rows.forEach((row,index)=>{
     row.dataset.createdAt=created[index];
     row.dataset.updatedAt=updated[index];
     const operation=row.lastElementChild;
-    for(const value of [created[index],updated[index],'admin']){const td=document.createElement('td');td.textContent=value;operation.before(td)}
+    for(const value of [updated[index],'admin']){const td=document.createElement('td');td.textContent=value;operation.before(td)}
     const detail=operation.querySelector('a[href*="13A-"]'),logs=operation.querySelector('a[href*="15-"]'),edit=operation.querySelector('[data-alert-action="edit"]'),remove=operation.querySelector('[data-alert-action="delete"]');
     operation.replaceChildren(edit);
     const wrap=document.createElement('span');wrap.className='rule-more-wrap';

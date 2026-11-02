@@ -6,13 +6,14 @@
     sync();new MutationObserver(sync).observe(document.querySelector('.table tbody'),{attributes:true,childList:true,subtree:true,attributeFilter:[attr]});
   }
   if(page!=='user-management'&&page!=='role-management')return;
+  if(page==='user-management'){const updatePlaceholder=()=>{const input=document.querySelector('.filters .proto-search');if(input)input.placeholder='请输入用户名称'};updatePlaceholder();document.addEventListener('DOMContentLoaded',updatePlaceholder)};
   const table=document.querySelector('.records .table'),head=table.tHead.rows[0],rows=[...table.tBodies[0].rows],actionHead=head.lastElementChild;
-  ['创建时间','更新时间','操作人'].forEach(label=>{const cell=document.createElement('th');cell.textContent=label;head.insertBefore(cell,actionHead)});
+  ['更新时间','操作人'].forEach(label=>{const cell=document.createElement('th');cell.textContent=label;head.insertBefore(cell,actionHead)});
   const created=['2026-07-28 09:20:14','2026-07-29 10:08:35','2026-07-30 14:45:21'];
   const updated=['2026-08-04 14:20:34','2026-08-04 14:18:09','2026-08-03 22:16:10'];
   rows.forEach((row,index)=>{
     const operation=row.lastElementChild;
-    [created[index],updated[index],'admin'].forEach(value=>{const cell=document.createElement('td');cell.textContent=value;operation.before(cell)});
+    [updated[index],'admin'].forEach(value=>{const cell=document.createElement('td');cell.textContent=value;operation.before(cell)});
     if(page!=='role-management')return;
     operation.classList.add('role-action-cell');
     const edit=operation.querySelector('[data-proto-action="edit-role"]'),permissions=operation.querySelector('[data-proto-action="menu-permissions"]'),remove=operation.querySelector('[data-proto-action="delete-role"]');
