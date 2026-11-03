@@ -1,0 +1,5 @@
+window.spcBindOrganizationChecks=(menu,{branches,root,leaves,all,onChange})=>{
+const list=()=>[...menu.querySelectorAll(branches)];
+function sync(){let total=0,selected=0;list().forEach(branch=>{const children=[...branch.querySelectorAll(leaves)],parent=branch.querySelector(root),count=children.filter(c=>c.checked).length;total+=children.length;selected+=count;if(parent){parent.checked=children.length>0&&count===children.length;parent.indeterminate=count>0&&count<children.length}});const master=all&&menu.querySelector(all);if(master){master.checked=total>0&&selected===total;master.indeterminate=selected>0&&selected<total}onChange?.(selected)}
+menu.addEventListener('change',event=>{if(!event.target.matches('input[type=checkbox]'))return;event.stopImmediatePropagation();const master=all&&menu.querySelector(all);if(event.target===master)list().forEach(branch=>branch.querySelectorAll(leaves).forEach(c=>c.checked=master.checked));else{const branch=event.target.closest(branches);if(branch&&event.target===branch.querySelector(root))branch.querySelectorAll(leaves).forEach(c=>c.checked=event.target.checked)}sync()},true);sync();return sync;
+};

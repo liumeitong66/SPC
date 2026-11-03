@@ -36,6 +36,13 @@
   });
   document.addEventListener('click',event=>{if(event.target.closest('.rule-more-wrap'))return;document.querySelectorAll('.rule-more-menu').forEach(dropdown=>dropdown.hidden=true)});
   const pager=document.querySelector('.table-panel .pager');
+  [...head.cells].map((cell,index)=>({label:cell.textContent.trim(),index}))
+    .filter(({label})=>['适用范围','接收群名称','接受群名称'].includes(label))
+    .reverse().forEach(({index})=>{
+      head.cells[index].remove();
+      rows.forEach(row=>row.cells[index]?.remove());
+    });
+  [...head.cells].forEach(cell=>cell.style.width='');
   const updateCount=count=>{const summary=pager.querySelector(':scope > span:first-child');if(summary){summary.textContent='共 '+count+' 条';return}const first=[...pager.childNodes].find(node=>node.nodeType===3&&node.nodeValue.includes('共'));if(first)first.nodeValue='共 '+count+' 条';else pager.prepend(document.createTextNode('共 '+count+' 条'))};
   const query=()=>{const keyword=name.value.trim().toLowerCase(),levels=selected(),control=panel.querySelector('.time-filter .control'),start=control.dataset.start||'',end=control.dataset.end||'';let count=0;for(const row of tbody.querySelectorAll('.alert-rule-row')){const matchesName=!keyword||row.querySelector('.rule-name').textContent.toLowerCase().includes(keyword);const matchesLevel=levels.includes(row.querySelector('.lvl').textContent.trim());const created=row.dataset.createdAt.replace(' ','T');const matchesDate=(!start||created>=start)&&(!end||created<=end);const visible=matchesName&&matchesLevel&&matchesDate;row.hidden=!visible;row.style.display=visible?'':'none';if(visible)count++}updateCount(count)};
   document.getElementById('query-rule-filter').addEventListener('click',event=>{event.stopPropagation();query()});

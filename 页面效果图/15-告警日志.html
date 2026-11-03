@@ -40,7 +40,7 @@
   <script src="spc-prototype.js"></script>
   <script>
     (function(){
-      var params=new URLSearchParams(location.search),ruleNames={'wrong-material':'严重不良报警（错料）','bridge':'严重不良报警（连锡）','board-yield':'板卡良率报警','pass-drop':'直通率突降报警','false-positive':'误报率偏高报警','area-defect':'区不良率波动报警','full-board':'整片不良告警'};
+      var params=new URLSearchParams(location.search),ruleNames={'wrong-material':'严重不良报警（错件）','bridge':'严重不良报警（连锡）','board-yield':'板卡良率报警','pass-drop':'直通率突降报警','false-positive':'误报率偏高报警','area-defect':'区不良率波动报警','full-board':'整片不良告警'};
       var ruleName=ruleNames[params.get('rule')];if(ruleName){document.getElementById('log-title').textContent=ruleName+' · 告警日志'}
       var order=document.getElementById('order-number'),device=document.getElementById('device-name'),area=document.getElementById('area-name'),start=document.getElementById('start-date'),end=document.getElementById('end-date'),rows=Array.prototype.slice.call(document.querySelectorAll('#log-body tr:not(.empty-row)')),empty=document.querySelector('.empty-row'),pager=document.getElementById('log-pager');
       function filterRows(){var keyword=order.value.trim().toLowerCase(),startTime=start.value||'',endTime=end.value||'',count=0;rows.forEach(function(row){var orderNumber=row.cells[3].textContent.toLowerCase(),rowTime=row.dataset.time||'',visible=(!keyword||orderNumber.indexOf(keyword)>-1)&&(!window.spcLogSelectedDevices?.length||window.spcLogSelectedDevices.includes(row.dataset.device))&&(!area.value||row.dataset.area===area.value)&&(!startTime||rowTime>=startTime)&&(!endTime||rowTime<=endTime);row.style.display=visible?'':'none';if(visible){count++}});empty.style.display=count?'none':'table-row';pager.firstChild.nodeValue='共 '+count+' 条'}

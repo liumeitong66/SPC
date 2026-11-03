@@ -4,7 +4,7 @@
   document.querySelector('.alert-content > .metrics')?.remove();
   panels[3].remove();
   const areas = window.spcAlertDeviceAreas = {'AOI-01':'区域A','AOI-02':'区域B','AOI-03':'区域C','AOI-04':'区域D','AOI-05':'区域B'};
-  const types = ['严重不良报警（错料）','严重不良报警（连锡）','板卡良率报警','直通率突降报警','误报率偏高报警','区不良率波动报警','整片不良告警'];
+  const types = ['严重不良报警（错件）','严重不良报警（连锡）','板卡良率报警','直通率突降报警','误报率偏高报警','区不良率波动报警','整片不良告警'];
   const weights = [18,14,15,11,13,16,13], colors = ['#3478f6','#20a464','#e4a347','#8b6de3','#d44d9a','#46a1d9','#78889e'];
   const devices = Object.keys(areas), projects = ['3267504J2G_A面','C509048_B面','329134S_P129','1-A'];
   const sns = ['SI1020E1112','SI1020E1148','SI1020E1176','SI1020E1204','SI1020E1232'];

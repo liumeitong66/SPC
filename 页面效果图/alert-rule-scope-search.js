@@ -1,0 +1,9 @@
+(()=>{
+const picker=document.querySelector('.scope-picker'),old=picker?.querySelector('.scope-trigger'),menu=picker?.querySelector('.scope-menu');if(!old||!menu)return;
+const input=document.createElement('input');input.type='text';input.className='scope-trigger';input.placeholder='搜索设备名称或区域';input.setAttribute('aria-label','适用范围');input.setAttribute('aria-expanded','false');old.replaceWith(input);
+const open=()=>{picker.classList.add('open');input.setAttribute('aria-expanded','true')};input.addEventListener('focus',open);input.addEventListener('click',open);input.addEventListener('input',()=>{open();const query=input.value.trim().toLowerCase();menu.querySelectorAll('.scope-area').forEach(area=>{const title=area.querySelector('label').textContent.trim().toLowerCase();let any=false;area.querySelectorAll('label:not(:first-child)').forEach(label=>{label.hidden=!!query&&!title.includes(query)&&!label.textContent.toLowerCase().includes(query);if(!label.hidden)any=true});area.hidden=!any});const all=menu.querySelector('.scope-all');if(all)all.hidden=!!query});
+menu.addEventListener('change',()=>{const selected=[...menu.querySelectorAll('.scope-area label:not(:first-child) input:checked')];input.placeholder=selected.length?'已选 '+selected.length+' 台设备':'搜索设备名称或区域'});
+window.spcBindOrganizationChecks(menu,{branches:'.scope-area',root:'label:first-child input',leaves:'label:not(:first-child) input',all:'.scope-all input',onChange:count=>{input.placeholder=count?'已选 '+count+' 台设备':'搜索设备名称或区域'}});
+document.addEventListener('click',event=>{if(!picker.contains(event.target)){picker.classList.remove('open');input.setAttribute('aria-expanded','false')}});
+input.addEventListener('keydown',event=>{if(event.key==='Escape'){picker.classList.remove('open');input.setAttribute('aria-expanded','false')}});
+})();

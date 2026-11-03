@@ -1,0 +1,28 @@
+.rule-builder .condition-group{min-width:0;border:1px solid #cfd8e4;border-radius:5px;padding:12px;background:#fff;container-type:inline-size}
+.rule-builder .condition-root{border:0;padding:0;background:transparent}
+.condition-items{display:flex;flex-direction:column;gap:12px;margin-top:12px;min-width:0}
+.condition-actions{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px}
+.condition-actions .rule-add{margin:0}
+.condition-add,.condition-delete{border:0;background:transparent;font:inherit;font-size:13px;cursor:pointer;padding:0;color:#2468e8}
+.condition-delete{margin-left:auto;color:#df4a4a;white-space:nowrap}
+.rule-builder .rule-line{grid-template-columns:minmax(92px,1fr) minmax(92px,1fr) minmax(120px,2fr) minmax(76px,.8fr) minmax(70px,.8fr) 60px 28px;min-width:0}
+.rule-builder .rule-line>*{min-width:0;max-width:100%}
+.rule-builder .rule-builder-head{flex-wrap:wrap}
+@container(max-width:790px){.rule-builder .rule-line{grid-template-columns:repeat(3,minmax(0,1fr))}.rule-builder .rule-remove{justify-self:end}}
+@container(max-width:390px){.rule-builder .rule-line{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.form-section .section-fields.basic-fields .rule-notes{grid-column:1 / span 2}
+@media(max-width:760px){.form-section .section-fields.basic-fields .rule-notes{grid-column:1}}
+.rule-defects{position:relative;min-width:0;font-size:13px}
+.rule-defects[hidden],.rule-builder select[hidden]{display:none!important}
+.rule-defects summary{height:34px;box-sizing:border-box;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border:1px solid #cfd8e4;border-radius:6px;padding:7px 34px 7px 12px;background:#fff var(--spc-select-arrow) no-repeat right 10px center;color:#334155;font-family:inherit;font-size:13px;font-weight:400}
+.rule-defects summary:focus-visible,.rule-defects[open] summary{outline:none;border-color:#1682ff}
+.rule-defect-options.spc-select-menu{position:absolute;left:0;top:46px;z-index:100000;min-width:100%;font-family:inherit;font-size:14px;max-height:280px}
+.form-field .rule-defect-options label.spc-select-option{gap:8px;margin:0;white-space:nowrap;font-family:inherit;font-size:14px;font-weight:400}
+.form-field .rule-defect-options input{width:15px;height:15px!important;padding:0;margin:0;accent-color:#3478f6}
+.rule-defect-options label:has(input:checked){background:#e5f3ff!important;color:#1682ff!important}
+.rule-defect-hint{font-size:12px;color:#59687b;padding:6px 8px;white-space:nowrap}
+.rule-period-error{grid-column:1/-1;color:#df4a4a;font-size:12px}
+.form-section .section-fields.monitor-fields .rule-dimension-field{grid-column:1 / span 2}
+.rule-dimension-field .period-choice{flex-wrap:wrap;min-height:36px;height:auto;box-sizing:border-box;padding-top:7px;padding-bottom:7px}
+@media(min-width:761px) and (max-width:1200px){.form-section .section-fields.monitor-fields .rule-dimension-field{grid-column:1}}
+@media(max-width:760px){.form-section .section-fields.monitor-fields .rule-dimension-field{grid-column:1}}

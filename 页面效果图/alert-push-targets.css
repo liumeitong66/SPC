@@ -1,0 +1,12 @@
+.push-targets{grid-column:1/-1;display:flex;flex-direction:column;gap:14px;min-width:0}
+.push-target{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) max-content;gap:14px 24px;border:1px solid #e2e8f0;border-radius:7px;padding:14px;min-width:0}
+.push-target .push-webhook{grid-column:span 2}
+.push-target-actions{grid-column:5;grid-row:1;align-self:end;display:flex;align-items:center;justify-content:flex-end;gap:8px;height:36px;white-space:nowrap}
+.push-target .push-signature{grid-column:1}
+.push-target-actions .btn{height:32px}
+.push-target-actions .push-remove{width:28px}
+.push-target-feedback{grid-column:1/-1;font-size:12px;color:#59687b;overflow-wrap:anywhere}
+.push-target-feedback.is-error{color:#df4a4a}
+.push-target [hidden]{display:none!important}
+@media(max-width:1200px){.push-target{grid-template-columns:repeat(2,minmax(0,1fr)) max-content}.push-target .push-webhook{grid-column:auto}.push-target-actions{grid-column:3}}
+@media(max-width:760px){.push-target{grid-template-columns:minmax(0,1fr) max-content;gap:14px 12px}.push-target>.form-field{grid-column:1}.push-target-actions{grid-column:2}}
