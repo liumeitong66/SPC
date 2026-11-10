@@ -9,7 +9,7 @@
     {id:'normal',name:'连接及传输正常',color:'#20a464'},
     {id:'delayed',name:'已连接／传输异常',color:'#e6a23c'},
     {id:'disconnected',name:'未连接',color:'#df4a4a'},
-    {id:'disabled',name:'停用',color:'#b7c0cb'}
+
   ];
   const devices = [...document.querySelectorAll('[data-runtime-device]')].map(row => ({
     id:row.dataset.runtimeDevice,name:row.dataset.deviceName,sn:row.querySelector('.device-sn').textContent,
@@ -21,7 +21,7 @@
   // Immutable prototype history. Live row operations never rewrite past snapshots.
   const history = devices.map(device => ({...device,events:[{at:start,state:'normal'}]}));
   function event(id,time,state){history.find(d=>d.id===id).events.push({at:stamp(time),state});}
-  event('aoi-03','2026-08-03 22:16:08','disabled');
+  event('aoi-03','2026-08-03 22:16:08','disconnected');
   event('aoi-01','2026-08-04 11:55:08','disconnected');
   event('aoi-01','2026-08-04 12:10:08','delayed');
   event('aoi-01','2026-08-04 14:32:56','normal');
