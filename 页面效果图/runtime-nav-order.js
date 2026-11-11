@@ -35,7 +35,7 @@
     ['detection', '检测分析', [...['项目统计', '设备分析', '缺陷分析'].map(find), component]],
     ['monitor', '监控告警', [runtime, alert]],
     ['data', '数据管理', ['单板查询', '设备管理', '告警管理'].map(find)],
-    ['system', '系统管理', [find('角色管理')]]
+    ['system', '系统管理', ['用户管理', '角色管理'].map(find)]
   ].forEach(([id, label, children]) => {
     children = children.filter(Boolean);
     if (!children.length) return;
