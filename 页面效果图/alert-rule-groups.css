@@ -17,6 +17,8 @@
 .rule-defects summary{height:34px;box-sizing:border-box;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border:1px solid #cfd8e4;border-radius:6px;padding:7px 34px 7px 12px;background:#fff var(--spc-select-arrow) no-repeat right 10px center;color:#334155;font-family:inherit;font-size:13px;font-weight:400}
 .rule-defects summary:focus-visible,.rule-defects[open] summary{outline:none;border-color:#1682ff}
 .rule-defect-options.spc-select-menu{position:absolute;left:0;top:46px;z-index:100000;min-width:100%;font-family:inherit;font-size:14px;max-height:280px}
+.rule-defect-options.spc-select-menu.opens-above{top:auto;bottom:calc(100% + 12px)}
+.rule-defect-options.spc-select-menu.opens-above::before{top:auto;bottom:-9px;transform:rotate(225deg)}
 .form-field .rule-defect-options label.spc-select-option{gap:8px;margin:0;white-space:nowrap;font-family:inherit;font-size:14px;font-weight:400}
 .form-field .rule-defect-options input{width:15px;height:15px!important;padding:0;margin:0;accent-color:#3478f6}
 .rule-defect-options label:has(input:checked){background:#e5f3ff!important;color:#1682ff!important}

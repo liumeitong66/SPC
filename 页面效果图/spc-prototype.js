@@ -139,6 +139,8 @@
     { key: 'boardNgRate', label: '板卡不良率（%）', group: '板卡指标' },
     { key: 'boardFalse', label: '板卡误报总数', group: '板卡指标' },
     { key: 'boardFalseRate', label: '板卡误报率（%）', group: '板卡指标' },
+    { key: 'boardMiss', label: '板卡漏报总数', group: '板卡指标' },
+    { key: 'boardMissRate', label: '板卡漏报率（%）', group: '板卡指标' },
     { key: 'boardPass', label: '板卡直通总数', group: '板卡指标' },
     { key: 'boardPassRate', label: '板卡直通率（%）', group: '板卡指标' },
     { key: 'componentTotal', label: '器件总数', group: '器件指标' },
@@ -148,13 +150,13 @@
     { key: 'componentOkRate', label: '器件OK率（%）', group: '器件指标' },
     { key: 'componentNg', label: '器件NG总数', group: '器件指标' },
     { key: 'componentNgRate', label: '器件NG率（%）', group: '器件指标' },
-    { key: 'componentSpecialNg', label: '器件NG数（特殊缺陷）', group: '器件指标' },
+    { key: 'componentSpecialNg', label: '特殊缺陷总数', group: '器件指标' },
     { key: 'componentPass', label: '器件直通总数', group: '器件指标' },
     { key: 'componentPassRate', label: '器件直通率（%）', group: '器件指标' },
     { key: 'componentFalse', label: '器件误报数', group: '器件指标' },
-    { key: 'componentSpecialFalse', label: '器件误报数（特殊缺陷）', group: '器件指标' },
+    { key: 'componentSpecialFalse', label: '特殊缺陷误报数', group: '器件指标' },
     { key: 'componentMiss', label: '器件漏报数', group: '器件指标' },
-    { key: 'componentSpecialMiss', label: '器件漏报数（特殊缺陷）', group: '器件指标' }
+    { key: 'componentSpecialMiss', label: '特殊缺陷漏报数', group: '器件指标' }
   ];
   const defaultProjectColumnKeys = ['index', 'projectName', 'deviceCount', 'deviceNames', 'boardTotal', 'boardGood', 'boardYield', 'componentTotal', 'componentOkRate'];
   let activeProjectColumns = new Set(defaultProjectColumnKeys);
@@ -166,7 +168,7 @@
     ...projectColumns.filter(column => column.group !== '基础信息'),
     { key: 'lastDataTime', label: '最后数据时间', group: '基础信息' }
   ];
-  const defaultDeviceColumnKeys = ['index', 'deviceName', 'deviceSn', 'projectCount', 'boardTotal', 'boardYield', 'boardDppm', 'boardFalseRate', 'boardPassRate', 'componentDppm', 'componentNgRate', 'lastDataTime'];
+  const defaultDeviceColumnKeys = ['index', 'deviceName', 'deviceSn', 'projectCount', 'boardTotal', 'boardYield', 'boardDppm', 'boardFalseRate', 'boardMiss', 'boardMissRate', 'boardPassRate', 'componentDppm', 'componentNgRate', 'lastDataTime'];
   let activeDeviceColumns = new Set(defaultDeviceColumnKeys);
   let currentMouth = 'review';
   let currentComparisonType = 'device';
@@ -322,13 +324,15 @@
     const componentTotal = sample.componentTotal || sample.boardTotal * 82;
     const boardGood = Math.round(sample.boardTotal * source.yield / 100);
     const boardNg = sample.boardTotal - boardGood;
+    // Demo counts represent distinct boards with at least one missed defect.
+    const boardMiss = Math.round(sample.boardTotal * 0.002);
     const boardFalse = Math.round(sample.boardTotal * source.falseRate / 100);
     const boardPass = Math.round(sample.boardTotal * source.passRate / 100);
     const componentNg = Math.round(componentTotal * source.componentNgRate / 100);
     const componentFalse = Math.round(componentTotal * source.componentFalseDppm / 1000000);
     const componentPass = Math.round(componentTotal * source.componentPassRate / 100);
     return {
-      boardTotal: number(sample.boardTotal), boardGood: number(boardGood), boardDppm: number(boardNg / sample.boardTotal * 1000000), boardYield: pct(source.yield), boardNg: number(boardNg), boardNgRate: pct(100 - source.yield), boardFalse: number(boardFalse), boardFalseRate: pct(source.falseRate), boardPass: number(boardPass), boardPassRate: pct(source.passRate),
+      boardTotal: number(sample.boardTotal), boardGood: number(boardGood), boardDppm: number(boardNg / sample.boardTotal * 1000000), boardYield: pct(source.yield), boardNg: number(boardNg), boardNgRate: pct(100 - source.yield), boardFalse: number(boardFalse), boardFalseRate: pct(source.falseRate), boardMiss: number(boardMiss), boardMissRate: pct(sample.boardTotal ? boardMiss / sample.boardTotal * 100 : 0), boardPass: number(boardPass), boardPassRate: pct(source.passRate),
       componentTotal: number(componentTotal), componentOk: number(componentTotal - componentNg), componentDppm: number(componentNg / componentTotal * 1000000), componentFalseDppm: number(source.componentFalseDppm), componentOkRate: pct(100 - source.componentNgRate), componentNg: number(componentNg), componentNgRate: pct(source.componentNgRate), componentSpecialNg: number(componentNg * .034), componentPass: number(componentPass), componentPassRate: pct(source.componentPassRate), componentFalse: number(componentFalse), componentSpecialFalse: number(componentFalse * .031), componentMiss: number(Math.max(3, componentNg * .008)), componentSpecialMiss: number(Math.max(1, componentNg * .001))
     };
   }

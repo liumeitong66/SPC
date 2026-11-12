@@ -55,10 +55,10 @@
   const defectTable = defectPanel?.querySelector('table');
   if (defectPanel && defectTable) {
     defectPanel.querySelector('.table-title b').textContent = '缺陷统计';
-    const defaults = ['模板名称','板卡总数','NG板卡数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','器件OK总数','器件NG总数','器件NG数（特殊缺陷）','器件直通总数','器件误报数','器件误报数（特殊缺陷）','器件漏报数','器件漏报数（特殊缺陷）'];
+    const defaults = ['模板名称','板卡总数','NG板卡数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','板卡漏报总数','板卡漏报率（%）','器件OK总数','器件NG总数','器件直通总数','器件误报数','器件误报率（%）','器件漏报数','器件漏报率（%）','特殊缺陷总数','特殊缺陷误报数','特殊缺陷漏报数'];
     const extras = ['缺件','错位/偏移','错件','少锡','多锡','虚焊','连锡','立碑','极反','多件','翻件','本体浮高','翘脚','爬锡不良','损件','飞件','跨件连锡','脏污异物','锡球','金手指缺陷','红胶','侧立','偏移','其他','冷焊','少胶','多胶','桥丝断裂','测距NG','SN NG'];
     const headers = [...defaults, ...extras];
-    const sortableLabels = new Set(['板卡总数','板卡不良总数','板卡误报总数','器件OK总数','器件NG总数','器件NG数（特殊缺陷）','器件直通总数','器件误报数','器件误报数（特殊缺陷）','器件漏报数','器件漏报数（特殊缺陷）']);
+    const sortableLabels = new Set(['板卡总数','板卡不良总数','板卡误报总数','板卡漏报总数','板卡漏报率（%）','器件OK总数','器件NG总数','器件直通总数','器件误报数','器件误报率（%）','器件漏报数','器件漏报率（%）','特殊缺陷总数','特殊缺陷误报数','特殊缺陷漏报数']);
     let sortState = { index:null, direction:'desc' };
     const numericValue = value => Number(String(value).replace(/[,％%]/g,'')) || 0;
     const value = (row, index) => index < defaults.length ? row[index] : String(Math.max(0, Math.round((index + 2) * (row._sourceIndex + 1) * 1.7 * mouthDatasets[activeMouth].chartFactor)));
@@ -68,6 +68,16 @@
       const examples = mouthDatasets[activeMouth].rows;
       const sourceRows = Array.from({length: 60}, (_, index) => {
         const row = [...examples[index % examples.length]];
+        const total = numericValue(row[1]);
+        const missedBoards = Math.round(total * 0.002);
+        const [ng, falseCount, missCount] = [8, 11, 13].map(index => numericValue(row[index]));
+        const rate = (count, base) => (base > 0 ? count / base * 100 : 0).toFixed(2) + '%';
+        row.splice(14, 0, rate(missCount, ng));
+        row.splice(12, 0, rate(falseCount, ng + falseCount - missCount));
+        const [specialTotal] = row.splice(9, 1);
+        const [specialFalse] = row.splice(12, 1);
+        row.splice(14, 0, specialTotal, specialFalse);
+        row.splice(7, 0, String(missedBoards), (total ? missedBoards / total * 100 : 0).toFixed(2) + "%");
         if (index >= examples.length) row[0] = 'PCB-' + String(10001 + index) + (index % 2 ? '_A面' : '_B面');
         return Object.assign(row, { _sourceIndex: index % examples.length });
       });

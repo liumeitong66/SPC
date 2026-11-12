@@ -2,6 +2,8 @@
   const table = document.querySelector('.pcb-table');
   const labels = [...window.SPCBoardExportFields.labels];
   labels.splice(6, 0, '整板SN', '拼板SN', '器件SN');
+  labels.splice(labels.indexOf('特殊缺陷总数'), 1);
+  labels.splice(labels.indexOf('器件误报率（%）') + 1, 0, '特殊缺陷总数', '特殊缺陷误报数', '特殊缺陷漏报数');
   const defaults = ['PCB ID','条码号','设备SN','设备名称','设备位置','机器判定','一次复判','一次复判操作员','最终复判','最终复判操作员','检测开始时间'];
   let selected = new Set(defaults), rows = [], name = '', detailUrl;
   const esc = value => String(value ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,7 +12,7 @@
     const fields = labels.filter(label => selected.has(label));
     table.style.width = (192 + fields.reduce((sum, label) => sum + width(label), 0)) + 'px';
     table.innerHTML = '<colgroup><col style="width:52px"><col style="width:60px">'+fields.map(label=>`<col style="width:${width(label)}px">`).join('')+'<col style="width:80px"></colgroup><thead><tr><th><input type="checkbox" aria-label="全选"></th><th>序号</th>'+fields.map(label=>`<th>${label}</th>`).join('')+'<th>操作</th></tr></thead><tbody data-project-pcb-rows>'+rows.map((row,index)=>{
-      const values = {'PCB ID':row.id,'条码号':row.barcode,'模板名称':name,'设备SN':row.sn,'设备名称':row.device,'设备位置':row.area,'机器判定':row.algorithm,'一次复判':row.review,'一次复判操作员':row.reviewer,'最终复判':row.second,'最终复判操作员':row.secondReviewer,'检测开始时间':row.time,'检测时长（s）':row.duration,'器件总数':row.total,'器件OK总数':row.ok};
+      const values = {...window.SPCBoardExportFields.records[row.id], 'PCB ID':row.id,'条码号':row.barcode,'模板名称':name,'设备SN':row.sn,'设备名称':row.device,'设备位置':row.area,'机器判定':row.algorithm,'一次复判':row.review,'一次复判操作员':row.reviewer,'最终复判':row.second,'最终复判操作员':row.secondReviewer,'检测开始时间':row.time,'检测时长（s）':row.duration,'器件总数':row.total,'器件OK总数':row.ok};
       return `<tr><td><input type="checkbox" aria-label="选择 ${esc(row.id)}"></td><td>${index+1}</td>`+fields.map(label=>{
         const value=esc(values[label]);
         const status=['机器判定','一次复判','最终复判'].includes(label);
@@ -24,7 +26,8 @@
   table.addEventListener('click',event=>{const link=event.target.closest('[data-pcb-view]');if(link){event.preventDefault();window.SPCPrototype.toast('将打开 PCB“'+link.textContent+'”的整板视图（当前为演示，不执行实际跳转）','info');}});
   document.querySelector('[data-pcb-columns]').addEventListener('click',event=>{
     event.stopPropagation();
-    const groups={'基础信息':labels.slice(0,9),'判定与复判':labels.slice(9,18),'器件统计':labels.slice(18,28),'缺陷类型统计':labels.slice(28)};
+    const defectStart = labels.indexOf('缺件');
+    const groups={'基础信息':labels.slice(0,9),'判定与复判':labels.slice(9,18),'器件统计':labels.slice(18,defectStart),'缺陷类型统计':labels.slice(defectStart)};
     const modal=window.SPCPrototype.openModal('显示列',`<div class="proto-column-toolbar"><span class="proto-column-note">已选择 <b data-column-count>${selected.size}</b> / ${labels.length} 列</span><div class="proto-column-actions"><button data-column-action="all">全选</button><button data-column-action="none">取消全选</button><button data-column-action="default">恢复默认</button></div></div><div class="proto-column-groups">${Object.entries(groups).map(([group,fields])=>`<section class="proto-column-group"><h4>${group}</h4><div class="proto-column-grid">${fields.map(label=>`<label class="proto-column-option"><input type="checkbox" value="${label}" ${selected.has(label)?'checked':''} ${label==='PCB ID'?'disabled':''}><span>${label}${label==='PCB ID'?'（必选）':''}</span></label>`).join('')}</div></section>`).join('')}</div>`,'应用列设置',root=>{selected=new Set(['PCB ID',...Array.from(root.querySelectorAll('.proto-column-option input:checked'),input=>input.value)]);render();});
     modal.querySelector('.proto-modal').classList.add('proto-column-modal');
     const inputs=[...modal.querySelectorAll('.proto-column-option input')];

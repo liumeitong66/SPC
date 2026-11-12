@@ -30,7 +30,7 @@
     timeFields.find(field => field.querySelector('input[type="number"]')));
   const object = document.createElement('div');
   object.className = 'form-field rule-dimension-field';
-  object.innerHTML = '<label>统计维度 <em>*</em></label><div class="period-choice" role="radiogroup" aria-label="统计维度"><label><input type="radio" name="rule-dimension" value="pcb"> 单片PCB</label><label><input type="radio" name="rule-dimension" value="device" checked> 设备</label><label><input type="radio" name="rule-dimension" value="project"> 项目</label></div>';
+  object.innerHTML = '<label>统计维度 <em>*</em></label><div class="period-choice" role="radiogroup" aria-label="统计维度"><label><input type="radio" name="rule-dimension" value="device" checked> 设备</label><label><input type="radio" name="rule-dimension" value="project"> 项目</label></div>';
   monitor.append(object);
   const deviceHandling = document.createElement('div');
   deviceHandling.className = 'form-field';
@@ -82,45 +82,139 @@
     return el;
   };
   builder.replaceChildren(group(true));
-  window.addEventListener('change', event => {
-    if (event.target.matches('.rule-kind') && builder.contains(event.target)) {
-      event.target.closest('.rule-line').querySelector('.rule-defects')?.remove();
-    }
-  }, true);
-  function updateDefects(el) {
-    const continuous = el.querySelector('.rule-kind').value === 'continuous';
-    const metric = el.querySelector('select[aria-label="监控指标"]');
-    let picker = el.querySelector('.rule-defects');
-    if (continuous && !picker) {
-      picker = document.createElement('details');
-      picker.className = 'rule-defects';
-      picker.innerHTML = '<summary>选择缺陷类型</summary><div class="rule-defect-options spc-select-menu"><div class="rule-defect-hint">任意一种缺陷命中即计 1 片</div>' + ['错件','缺件','极反','翻件','连锡'].map(name => '<label class="spc-select-option"><input type="checkbox" value="' + name + '">' + name + '</label>').join('') + '</div>';
-      metric.after(picker);
-    }
-    metric.hidden = continuous;
-    if (picker) picker.hidden = !continuous;
-    if (continuous) {
-      const value = el.querySelector('input[aria-label="阈值数值"]');
-      value.type = 'number'; value.min = '1'; value.step = '1';
-      el.querySelector('.rule-unit').innerHTML = '<option>片 PCB</option>';
-    } else {
-      const value = el.querySelector('input[aria-label="阈值数值"]');
-      value.type = 'text'; value.removeAttribute('min'); value.removeAttribute('step');
+
+  const kinds = [
+    ['threshold', '累计检出'], ['continuous', '连续检出'],
+    ['ratio', '单片检出'], ['compare', '较上一周期变化']
+  ];
+  const boardMetrics = ['板卡不良', '板卡直通', '板卡误报', '板卡漏报'];
+  const partMetrics = ['器件不良', '器件直通', '器件误报', '器件漏报', '特殊缺陷'];
+  const defects = '缺件/错位/错件/少锡/多锡/虚焊/连锡/立碑/极反/多件/翻件/本体浮高/翘脚/爬锡不良/损件/飞件/跨件连锡/脏污异物/锡球/金手指缺陷/红胶/侧立/偏移/其他/冷焊/少胶/多胶/桥丝断裂/测距 NG/SN NG'.split('/');
+  const comparisons = ['大于', '小于', '等于', '大于等于', '小于等于'];
+
+  function replaceOptions(select, options) {
+    const previous = select.value;
+    select.replaceChildren(...options.map(option => {
+      const [value, label] = Array.isArray(option) ? option : [option, option];
+      return new Option(label, value);
+    }));
+    if (options.some(option => (Array.isArray(option) ? option[0] : option) === previous)) {
+      select.value = previous;
     }
   }
-  document.addEventListener('change', event => {
-    const el = event.target.closest('.rule-line');
-    if (!el || !builder.contains(el)) return;
-    if (event.target.matches('.rule-kind')) updateDefects(el);
-    if (event.target.matches('.rule-defects input')) {
-      const picker = event.target.closest('.rule-defects');
-      const selected = [...picker.querySelectorAll('input:checked')].map(input => input.value);
-      picker.querySelector('summary').textContent = selected.length ? selected.join('、') : '选择缺陷类型';
-      picker.querySelector('summary').title = selected.length ? selected.join('、') + '（任意命中）' : '';
+
+  function updateMetricPicker(metric, options, continuous) {
+    let picker = metric.nextElementSibling;
+    const previous = metric.multiple
+      ? Array.from(metric.selectedOptions, option => option.value)
+      : [metric.value];
+    metric.multiple = continuous;
+    metric.hidden = continuous;
+    replaceOptions(metric, options);
+    if (!continuous) {
+      if (picker?.matches('.rule-defects')) picker.remove();
+      return;
     }
+
+    if (!picker?.matches('.rule-defects')) {
+      picker = document.createElement('details');
+      picker.className = 'rule-defects';
+      picker.innerHTML = '<summary></summary><div class="rule-defect-options spc-select-menu"><div class="spc-select-options" role="group" aria-label="监控指标"></div></div>';
+      metric.after(picker);
+      picker.addEventListener('toggle', () => {
+        if (!picker.open) return;
+        const trigger = picker.getBoundingClientRect();
+        const below = window.innerHeight - trigger.bottom;
+        const above = trigger.top;
+        const openAbove = below < 292 && above > below;
+        const menu = picker.querySelector('.spc-select-menu');
+        menu.classList.toggle('opens-above', openAbove);
+        menu.style.maxHeight = Math.max(0, Math.min(280, (openAbove ? above : below) - 20)) + 'px';
+      });
+      picker.addEventListener('change', event => {
+        const checkbox = event.target;
+        const option = Array.from(metric.options).find(item => item.value === checkbox.value);
+        option.selected = checkbox.checked;
+        metric.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+
+    const selected = new Set(previous.filter(value => options.includes(value)));
+    if (previous.length && !selected.size) selected.add(options[0]);
+    const summary = picker.querySelector('summary');
+    const names = [...selected].join('、');
+    summary.textContent = names || '请选择';
+    summary.title = names;
+    summary.setAttribute('aria-label', names ? '监控指标：' + names : '监控指标');
+    const list = picker.querySelector('.spc-select-options');
+    const existing = [...list.querySelectorAll('input')];
+    if (existing.length !== options.length || existing.some((input, index) => input.value !== options[index])) {
+      list.replaceChildren(...options.map(value => {
+        const label = document.createElement('label');
+        label.className = 'spc-select-option';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = value;
+        label.append(checkbox, value);
+        return label;
+      }));
+    }
+    for (const option of metric.options) {
+      option.selected = selected.has(option.value);
+    }
+    list.querySelectorAll('input').forEach(input => input.checked = selected.has(input.value));
+  }
+
+  function updateCondition(el) {
+    const [kind, stage, metric, operator, unit] = el.querySelectorAll('select');
+    const threshold = el.querySelector('input[aria-label="阈值数值"]');
+    const previousCondition = el.dataset.conditionKey;
+    const fixed = monitor.querySelector('input[name="period"][value="fixed"]').checked;
+    replaceOptions(kind, kinds.filter(([value]) => fixed || value !== 'compare'));
+
+    const machine = stage.value === '机器判定';
+    const single = kind.value === 'ratio';
+    const continuous = kind.value === 'continuous';
+    const compare = kind.value === 'compare';
+    const boards = single ? [] : machine ? boardMetrics.slice(0, 1) : boardMetrics;
+    const parts = machine ? partMetrics.slice(0, 1) : partMetrics;
+    updateMetricPicker(metric, [...boards, ...parts, ...defects], continuous);
+    replaceOptions(operator, compare ? ['增加', '减少'] : comparisons);
+
+    let units;
+    if (continuous) units = ['片'];
+    else if (defects.includes(metric.value)) units = ['个'];
+    else if (boards.includes(metric.value)) units = ['片', '%'];
+    else if (single || compare || stage.value === '最终判定') units = ['个', '%'];
+    else units = ['片', '%'];
+    replaceOptions(unit, units);
+
+    const condition = [kind.value, stage.value, ...Array.from(metric.selectedOptions, option => option.value), operator.value, unit.value].join('|');
+    if (previousCondition && previousCondition !== condition) threshold.value = '';
+    el.dataset.conditionKey = condition;
+    el.dataset.conditionKind = kind.value;
+    threshold.placeholder = compare ? '变化幅度' : '阈值';
+  }
+
+  builder.querySelectorAll('.rule-line').forEach(updateCondition);
+  document.addEventListener('change', event => {
+    if (event.target.matches('input[name="period"]')) {
+      builder.querySelectorAll('.rule-line').forEach(updateCondition);
+      return;
+    }
+    const el = event.target.closest('.rule-line');
+    if (el && builder.contains(el) && event.target.matches('select')) updateCondition(el);
   });
   document.addEventListener('click', event => {
-    document.querySelectorAll('.rule-defects[open]').forEach(picker => { if (!picker.contains(event.target)) picker.open = false; });
+    builder.querySelectorAll('.rule-defects[open]').forEach(picker => {
+      if (!picker.contains(event.target)) picker.open = false;
+    });
+  });
+  builder.addEventListener('keydown', event => {
+    const picker = event.target.closest('.rule-defects[open]');
+    if (event.key !== 'Escape' || !picker) return;
+    picker.open = false;
+    picker.querySelector('summary').focus();
   });
   builder.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -136,6 +230,7 @@
     if (button.matches('.rule-remove')) {
       if (items.children.length > 1) button.closest('.rule-line').remove();
     }
+    builder.querySelectorAll('.rule-line:not([data-condition-kind])').forEach(updateCondition);
     builder.querySelectorAll('.condition-group').forEach(g => {
       const children = g.querySelector(':scope > .condition-items').children;
       [...children].forEach(child => {
@@ -146,13 +241,19 @@
   const serialize = g => ({
     relation: g.querySelector(':scope > .rule-builder-head select').value,
     conditions: [...g.querySelector(':scope > .condition-items').children].map(el =>
-      el.matches('.condition-group') ? serialize(el) : {
-        kind: el.querySelector('.rule-kind').value,
-        values: [...el.querySelectorAll('select,input:not([type="checkbox"])')].map(control => control.value),
-        defects: [...el.querySelectorAll('.rule-defects input:checked')].map(input => input.value),
-        defectRelation: 'any'
-      })
+      el.matches('.condition-group') ? serialize(el) : serializeCondition(el))
   });
+  function serializeCondition(el) {
+    const metric = el.querySelector('select[aria-label="监控指标"]');
+    const metrics = Array.from(metric.selectedOptions, option => option.value);
+    return {
+      kind: el.querySelector('.rule-kind').value,
+      values: [...el.querySelectorAll('select,input:not([type="checkbox"])')].map(control => control.value),
+      ...(metric.multiple ? { metrics } : {}),
+      defects: metrics.filter(value => defects.includes(value)),
+      defectRelation: 'any'
+    };
+  }
   window.spcGetAlertConditions = () => ({
     object: dimensionValue(),
     ...(dimensionValue() === 'project' ? {deviceHandling: handling.value} : {}),

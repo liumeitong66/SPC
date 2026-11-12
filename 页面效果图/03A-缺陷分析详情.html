@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
   if (deviceField) { deviceField.querySelector('label').textContent='设备名称/SN'; deviceField.classList.add('history-field'); deviceField.querySelector('.control').innerHTML='<span aria-hidden="true">⌕</span><input class="proto-search" type="search" data-defect-device-search aria-label="设备名称/SN" placeholder="请输入设备名称或SN" autocomplete="off">'; deviceField.insertAdjacentHTML('beforeend','<div class="history-menu" data-defect-device-history role="listbox"></div>'); }
   const reviewerField = [...filters.querySelectorAll('.field')].find(field => field.querySelector('label')?.textContent.trim() === '复判操作员'); if (reviewerField) { reviewerField.querySelector('.control').innerHTML='<span aria-hidden="true">⌕</span><input class="proto-search" type="search" aria-label="操作员姓名" placeholder="请输入操作员姓名" autocomplete="off">'; }
    const barcodeField=document.createElement('div'); barcodeField.className='field barcode-number'; barcodeField.innerHTML='<label>条码号</label><div class="control"><span aria-hidden="true">⌕</span><input class="proto-search" type="text" aria-label="条码号" placeholder="请输入条码号" autocomplete="off"><button type="button" class="board-scan-trigger" data-barcode-scan aria-label="扫码输入条码号" title="扫码输入条码号"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM19 14h2v2h-2zM19 19h2v2h-2zM15 19h2v2h-2z" fill="currentColor"/></svg></button></div>'; timeField?.insertAdjacentElement('afterend',barcodeField);
-   const names = ['模板名称','板卡总数','机器判定NG板总数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','器件OK总数','器件NG总数','器件NG数（特殊缺陷）','器件直通总数','器件误报数','器件误报数（特殊缺陷）','器件漏报数','器件漏报数（特殊缺陷）','缺件','错位/偏移','错件','少锡','多锡','虚焊','连锡','立碑','极反','多件','翻件','本体浮高','翘脚','爬锡不良','损件','飞件','跨件连锡','脏污异物','锡球','金手指缺陷','红胶','侧立','偏移','其他','冷焊','少胶','多胶','桥丝断裂','测距NG','SN NG'];
-  const values = ['3267504J2G_A面','2,184','752','486','22.25%','266','12.18%','4,356','812','74','3,470','266','18','32','4',...Array.from({length:30},(_,index) => String(Math.round((index+18)*1.9)))];
-  const clickable = new Set(['板卡总数','器件OK总数','器件NG总数','器件NG数（特殊缺陷）','器件直通总数','器件误报数','器件误报数（特殊缺陷）','器件漏报数','器件漏报数（特殊缺陷）',...names.slice(15)]);
+   const names = ['模板名称','板卡总数','机器判定NG板总数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','板卡漏报总数','板卡漏报率（%）','器件OK总数','器件NG总数','器件直通总数','器件误报数','器件误报率（%）','器件漏报数','器件漏报率（%）','特殊缺陷总数','特殊缺陷误报数','特殊缺陷漏报数','缺件','错位/偏移','错件','少锡','多锡','虚焊','连锡','立碑','极反','多件','翻件','本体浮高','翘脚','爬锡不良','损件','飞件','跨件连锡','脏污异物','锡球','金手指缺陷','红胶','侧立','偏移','其他','冷焊','少胶','多胶','桥丝断裂','测距NG','SN NG'];
+  const values = ['3267504J2G_A面','2,184','752','486','22.25%','266','12.18%','4','0.18%','4,356','812','3,470','266','25.43%','32','3.94%','74','18','4',...Array.from({length:30},(_,index) => String(Math.round((index+18)*1.9)))];
+  const clickable = new Set(['板卡总数','器件OK总数','器件NG总数','器件直通总数','器件误报数','器件误报率（%）','器件漏报数','器件漏报率（%）','特殊缺陷总数','特殊缺陷误报数','特殊缺陷漏报数',...names.slice(19)]);
   const boards = [
     {cells:['3267504J2G-0182','AOI-04-0008','28','21','75.00%','7','25.00%','21','J20678 · 张三','J20832 · 王五'],tags:['器件OK总数','器件NG总数','缺件','错位/偏移','少锡','连锡']},
     {cells:['3267504J2G-0181','AOI-04-0008','24','19','79.17%','5','20.83%','19','J20678 · 张三','J20832 · 王五'],tags:['器件OK总数','器件误报数','错件','虚焊','立碑','极反']},
@@ -65,9 +65,9 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
 document.addEventListener('DOMContentLoaded', () => {
   const currentPanel = document.querySelector('.table-panel');
   if (!currentPanel) return;
-  const defaultFields = ['模板名称','板卡总数','机器判定NG板总数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','器件OK总数','器件NG总数','器件NG数（特殊缺陷）','器件直通总数','器件误报数','器件误报数（特殊缺陷）','器件漏报数','器件漏报数（特殊缺陷）'];
+  const defaultFields = ['模板名称','板卡总数','机器判定NG板总数','板卡不良总数','板卡不良率（%）','板卡误报总数','板卡误报率（%）','板卡漏报总数','板卡漏报率（%）','器件OK总数','器件NG总数','器件直通总数','器件误报数','器件误报率（%）','器件漏报数','器件漏报率（%）','特殊缺陷总数','特殊缺陷误报数','特殊缺陷漏报数'];
   const defectFields = ['缺件','错位/偏移','错件','少锡','多锡','虚焊','连锡','立碑','极反','多件','翻件','本体浮高','翘脚','爬锡不良','损件','飞件','跨件连锡','脏污异物','锡球','金手指缺陷','红胶','侧立','偏移','其他','冷焊','少胶','多胶','桥丝断裂','测距NG','SN NG'];
-  const summaryValues = ['3267504J2G_A面','2,184','752','486','22.25%','266','12.18%','4,356','812','74','3,470','266','18','32','4'];
+  const summaryValues = ['3267504J2G_A面','2,184','752','486','22.25%','266','12.18%','4','0.18%','4,356','812','3,470','266','25.43%','32','3.94%','74','18','4'];
   const allSummaryFields = [...defaultFields, ...defectFields];
   const summaryCell = index => index < summaryValues.length ? summaryValues[index] : String(Math.max(0, Math.round((index + 3) * 1.9)));
   const pcbDefaults = ['PCB ID','条码号','设备名称','设备SN','机器判定NG器件总数','实际NG器件数','器件NG率（%）','器件误报数','器件误报率（%）','器件NG总数','一次复判员','二次复判员'];

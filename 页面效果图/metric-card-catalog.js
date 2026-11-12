@@ -1,9 +1,9 @@
 (() => {
   const catalogs = {
     project: ['PCB检测数','板卡良品总数','板卡良率','板卡NG数','板卡NG率','板卡不良数','板卡不良率','板卡误报数','板卡误报率','板卡直通数','板卡直通率','器件检测数','器件OK数','器件OK率','器件NG数','器件NG率','器件不良率','器件DPPM','器件误报DPPM','器件误报数','器件漏报数','器件直通数','器件直通率'],
-    defect: ['缺陷总数','板卡NG总数','器件NG总数','器件直通率','板卡不良数','板卡不良率','板卡误报数','板卡误报率','器件OK数','特殊缺陷器件NG数','特殊缺陷器件误报数','特殊缺陷器件漏报数'],
+    defect: ['缺陷总数','板卡NG总数','器件NG总数','器件直通率','板卡不良数','板卡不良率','板卡误报数','板卡误报率','器件OK数','特殊缺陷','特殊缺陷器件误报数','特殊缺陷器件漏报数'],
     false: ['板卡误报数','板卡误报率','器件误报数','器件误报DPPM','特殊缺陷器件误报数'],
-    bad: ['板卡不良数','板卡不良率','器件不良数','器件不良率','器件DPPM','特殊缺陷器件NG数']
+    bad: ['板卡不良数','板卡不良率','器件不良数','器件不良率','器件DPPM','特殊缺陷']
   };
   window.spcMetricIndicatorCatalog = catalogs;
   const page = document.body.dataset.mouthPage === 'project' ? 'project' : ({'defect-analysis':'defect','false-analysis':'false','defect-analysis-machine':'bad'}[document.body.dataset.page]);
